@@ -1,6 +1,14 @@
 #!/bin/bash
 
-source install_dir.txt
+linux_install_dir="~/.local/share/hpcflow"
+macOS_install_dir="~/Library/Application Support/hpcflow"
+windows_install_dir="%USERPROFILE%\AppData\Local\hpcflow"
+app_name="hpcflow"
+base_link="https://github.com/hpcflow/hpcflow-new/releases/download"
+latest_version="v0.2.0a18"
+linux_ending="linux-dir.zip"
+macOS_ending="macOS-dir.zip"
+windows_ending="windows-dir.zip"
 
 if [[ "$OSTYPE" == "linux-gnu"* ]]; then
         download_link="${base_link}/${latest_version}/${app_name}-${latest_version}-${linux_ending}"
