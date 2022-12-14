@@ -11,7 +11,8 @@ macOS_ending="macOS-dir.zip"
 windows_ending="windows-dir.zip"
 
 if [[ "$OSTYPE" == "linux-gnu"* ]]; then
-        download_link="${base_link}/${latest_version}/${app_name}-${latest_version}-${linux_ending}"
+        artifact_name="${app_name}-${latest_version}-${linux_ending}"
+        download_link="${base_link}/${latest_version}/${artifact_name}"
         echo "linux"
         curl $download_link -O -L
 	unzip $artifact_name
