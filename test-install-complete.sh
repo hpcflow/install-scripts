@@ -1,35 +1,72 @@
 #!/bin/bash
 
-linux_install_dir=~/.local/share/hpcflow
-macOS_install_dir=~/Library/Application\ Support/hpcflow
-windows_install_dir="%USERPROFILE%\AppData\Local\hpcflow"
 app_name="hpcflow"
 base_link="https://github.com/hpcflow/hpcflow-new/releases/download"
-latest_version="v0.2.0a18"
+
 linux_ending="linux-dir"
 macOS_ending="macOS-dir"
-windows_ending="windows-dir"
+linux_install_dir=~/.local/share/hpcflow
+macOS_install_dir=~/Library/Application\ Support/hpcflow
+
+latest_version="v0.2.0a18"
+
+progress_string_1="Step 1 of 2: Downloading ${app_name} ..."
+progress_string_2="Step 2 of 2: Installing ${app_name} ..."
+completion_string_1="Installation of ${app_name} complete."
 
 if [[ "$OSTYPE" == "linux-gnu"* ]]; then
-        artifact_name="${app_name}-${latest_version}-${linux_ending}.zip"
-        folder_name="${app_name}-${latest_version}-${linux_ending}"
-        download_link="${base_link}/${latest_version}/${artifact_name}"
-        echo "Downloading hpcflow ..."
-        curl -s $download_link -O -L
-        echo "Installing hpcflow ..."
-	unzip -qq $artifact_name
-        mkdir -p "${linux_install_dir}"
-        mv dist/onedir/$folder_name "${linux_install_dir}"
+
+        folder=${folder:-${linux_install_dir}}
+        version=${version:-${latest_version}}
+
+        while [ $# -gt 0 ]; do
+
+                if [[ $1 == *"--"* ]]; then
+                        param="${1/--/}"
+                        declare $param="$2"
+                        echo $1 $2 // Optional to see the parameter:value result
+                fi
+
+                shift
+
+        done
+
+        artifact_name="${app_name}-${version}-${linux_ending}.zip"
+        folder_name="${app_name}-${version}-${linux_ending}"
+        download_link="${base_link}/${version}/${artifact_name}"
+
 elif [[ "$OSTYPE" == "darwin"* ]]; then
-        artifact_name="${app_name}-${latest_version}-${macOS_ending}.zip"
-        folder_name="${app_name}-${latest_version}-${macOS_ending}"
-        download_link="${base_link}/${latest_version}/${artifact_name}"
-        echo "Downloading hpcflow ..."
-        curl -s $download_link -O -L
-        echo "Installing hpcflow ..."
-        unzip -qq $artifact_name
-        mkdir -p "${macOS_install_dir}"
-        mv dist/onedir/$folder_name "${macOS_install_dir}"
+
+        folder=${folder:-${macOS_install_dir}}
+        version=${version:-${latest_version}}
+
+        while [ $# -gt 0 ]; do
+
+                if [[ $1 == *"--"* ]]; then
+                        param="${1/--/}"
+                        declare $param="$2"
+                        echo $1 $2 // Optional to see the parameter:value result
+                fi
+
+                shift
+
+        done
+
+        artifact_name="${app_name}-${version}-${macOS_ending}.zip"
+        folder_name="${app_name}-${version}-${macOS_ending}"
+        download_link="${base_link}/${version}/${artifact_name}"
+
 else
         echo "Operating system ${OSTYPE} not supported."
 fi
+
+echo $progress_string_1
+curl -s $download_link -O -L
+echo $progress_string_2
+unzip -qq $artifact_name
+chmod -R u+rw dist/onedir/$folder_name
+mkdir -p "${folder}"
+mv -n dist/onedir/$folder_name "${folder}"
+echo $completion_string_1
+sleep 0.2
+echo "Add "${folder}" to path."
