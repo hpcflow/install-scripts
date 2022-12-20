@@ -69,4 +69,6 @@ mkdir -p "${folder}"
 mv -n dist/onedir/$folder_name "${folder}"
 echo $completion_string_1
 sleep 0.2
-echo "Add "${folder}" to path."
+echo "Add "${folder}" to path by adding:"
+echo "export PATH=\"\$PATH:"${folder}/${folder_name}"\""
+echo "to ~/.bashrc or ~/.zshrc ."
