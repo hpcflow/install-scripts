@@ -70,6 +70,7 @@ else
 fi
 
 echo $progress_string_1
+echo $TEMPD
 curl -s --output-dir $TEMPD $download_link -O -L
 echo $progress_string_2
 unzip -qq $TEMPD/$artifact_name
@@ -83,5 +84,5 @@ echo "export PATH=\"\$PATH:"${folder}/${folder_name}"\""
 echo "to ~/.bashrc or ~/.zshrc ."
 
 # Make sure temp directory is deleted on exit
-trap "exit 1"		HUP INT PIPE QUIT TERM
-trap 'rm -rf $TEMPD'	EXIT
+#trap "exit 1"		HUP INT PIPE QUIT TERM
+#trap 'rm -rf $TEMPD'	EXIT
