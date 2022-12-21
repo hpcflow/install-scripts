@@ -11,3 +11,9 @@ enable them to run hpcflow.
 
 To install in macOS or linux, enter the following command in a terminal window:
 `/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/hpcflow/install-folder-version/main/install-hpcflow.sh)"`
+
+For windows, enter the following command in a powershell window:
+`iex (iwr 'https://raw.githubusercontent.com/hpcflow/install-folder-version/main/install-hpcflow.ps1').Content`
+
+To set options, use:
+`& $([scriptblock]::Create((New-Object Net.WebClient).DownloadString('https://raw.githubusercontent.com/hpcflow/install-folder-version/main/install-hpcflow.ps1'))) -version version-value -folder folder-value`
