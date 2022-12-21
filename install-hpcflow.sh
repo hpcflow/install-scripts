@@ -77,7 +77,7 @@ unzip -qq $TEMPD/$artifact_name -d $TEMPD
 chmod -R u+rw $TEMPD/dist/onedir/$folder_name
 mkdir -p "${folder}"
 mv -n $TEMPD/dist/onedir/$folder_name "${folder}"
-ln -s $folder/$folder_name/$folder_name $folder/hpcflow
+ln -s "${folder}/"${folder_name}/"${folder_name} "${folder}/hpcflow
 echo $completion_string_1
 sleep 0.2
 echo "Add "${folder}" to path by adding:"
