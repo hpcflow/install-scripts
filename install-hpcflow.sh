@@ -16,6 +16,7 @@ completion_string_1="Installation of ${app_name} complete."
 
 # Make temp diretory and store path in a variable
 TEMPD=$(mktemp -d)
+echo $TEMPD
 
 # Exit if temp directory wasn't created successfully
 if [ ! -r "$TEMPD" ]; then
@@ -24,6 +25,7 @@ if [ ! -r "$TEMPD" ]; then
 fi
 
 if [[ "$OSTYPE" == "linux-gnu"* ]]; then
+
 
         folder=${folder:-${linux_install_dir}}
         version=${version:-${latest_version}}
@@ -73,7 +75,7 @@ echo $progress_string_1
 echo $TEMPD
 curl -s --output-dir $TEMPD $download_link -O -L
 echo $progress_string_2
-unzip -qq $TEMPD/$artifact_name
+unzip -qq $TEMPD/$artifact_name -d $TEMPD
 chmod -R u+rw $TEMPD/dist/onedir/$folder_name
 mkdir -p "${folder}"
 mv -n $TEMPD/dist/onedir/$folder_name "${folder}"
