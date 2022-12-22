@@ -71,8 +71,10 @@ else
 fi
 
 echo $progress_string_1
+echo
 curl -s --output-dir $TEMPD $download_link -O -L
 echo $progress_string_2
+echo
 unzip -qq $TEMPD/$artifact_name -d $TEMPD
 chmod -R u+rw $TEMPD/dist/onedir/$folder_name
 mkdir -p "${folder}"
@@ -80,9 +82,13 @@ mv -n $TEMPD/dist/onedir/$folder_name "${folder}"
 ln -s "${folder}"/"${folder_name}"/"${folder_name}" "${folder}"/hpcflow
 echo $completion_string_1
 sleep 0.2
-echo "Add "${folder}" to path by adding:"
+echo
+echo
+echo "Add "${app_name}" to path by adding the following lines to ~/.bashrc or ~/.zshrc:"
+echo "export PATH=\"\$PATH:"${folder}"\""
 echo "export PATH=\"\$PATH:"${folder}/${folder_name}"\""
-echo "to ~/.bashrc or ~/.zshrc ."
+echo
+echo "Type hpcflow to get started."
 
 # Make sure temp directory is deleted on exit
 trap "exit 1"		HUP INT PIPE QUIT TERM
