@@ -1,5 +1,12 @@
 param($version="v0.2.0a18", $folder="${env:USERPROFILE}\AppData\Local\hpcflow")
 
+Function New-TemporaryFolder {
+	# Make a new folder based upon a TempFileName
+	#$T="$($env:TEMP)\tmp$([convert]::tostring((get-random 65535),16).padleft(4,'0')).tmp"
+	$T="$($env:TMPDIR)/tmp$([convert]::tostring((get-random 65535),16).padleft(4,'0')).tmp"
+	New-Item -ItemType Directory -Path $T
+}
+
 $app_name="hpcflow"
 $base_link="https://github.com/hpcflow/hpcflow-new/releases/download"
 
@@ -13,15 +20,31 @@ $artifact_name="${app_name}-${version}-${windows_ending}.zip"
 $folder_name="${app_name}-${version}-${windows_ending}"
 $download_link="${base_link}/${version}/${artifact_name}"
 
-Write-Output $latest_version
-Write-Output $version
+$tempd=New-TemporaryFolder
 
-Write-Output $progress_string_1
-Invoke-WebRequest $download_link -OutFile $artifact_name
+try{
 
-Write-Output $progress_string_2
-Expand-Archive $artifact_name -DestinationPath ./
-Move-Item $folder_name $folder
+	Write-Output $progress_string_1
+
+	Invoke-WebRequest $download_link -OutFile $tempd/$artifact_name
+
+	Write-Output $progress_string_2
+	if (-Not (Test-Path -Path $folder/$folder_name)) {
+		Expand-Archive $tempd/$artifact_name -DestinationPath $tempd
+		Move-Item $tempd/$folder_name $folderS
+	}
+
+	if(Test-Path -Path $folder/$app_name -PathType Leaf) {
+		Remove-Item $folder/$app_name
+	}
+	New-Item -ItemType SymbolicLink -Path $folder -Name $app_name -value $folder/$folder_name/$folder_name | Out-Null
+
+	Remove-Item $tempd -Recurse
+}
+catch{
+	Write-Host $_
+	Remove-Item $tempd -Recurse
+}
 
 Write-Output $completion_string_1
 
