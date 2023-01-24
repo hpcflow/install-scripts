@@ -25,6 +25,8 @@ path=false
 
 # Flag to note if user specified version
 versionspec=false
+# Flag recording if hpcflow symlink folder is on path
+onpath=false
 
 # Make temp diretory and store path in a variable
 TEMPD=$(mktemp -d)
@@ -46,8 +48,8 @@ while [ $# -gt 0 ]; do
             declare $param=true
         else
             declare $param="$2"
-			if [[ "$param" == "version "]]; then
-				versionspec == true
+			if [[ "$param" == "version" ]]; then
+				versionspec=true
 			fi
 
         fi
@@ -71,15 +73,21 @@ elif [[ "$OSTYPE" == "darwin"* ]]; then
 
 else
         echo "Operating system ${OSTYPE} not supported."
-fi
+fi			
 
 # If prelease flag is set, default is latest prerelease, otherwise latest stable
 # Both overridden if version specified by user
 if [ "$prerelease" = true ]; then
 
-	echo "Installing latest prelease version"
+	echo "Installing latest prelease version."
 	sleep 0.2
     version=${version:-${latest_prerelease_version}}
+
+elif  [ "$versionspec" = true ]; then
+
+	echo "Installing ${app_name} version ${version}."
+	sleep 0.2
+	version=${version}
 
 else
 
@@ -88,6 +96,21 @@ else
     version=${version:-${latest_stable_version}}
 
 fi
+
+if [ `grep -c "${version}" "${folder}"/user_versions.txt` -ge 1 ] || [ `grep -c "${version}" "${folder}"/stable_versions.txt` -ge 1 ]; then
+
+	echo "${app_name} ${version} already installed on this system... "
+	sleep 0.2
+	echo "Exiting..."
+	exit 1
+
+fi
+
+# Check if folders on path already
+case :$PATH: in
+	*:"${folder}"/links:)	onpath=true ;;
+	*) 
+esac
 
 # Set variables for download and install
 artifact_name="${app_name}-${version}-${macOS_ending}.zip"
@@ -104,6 +127,7 @@ if [ "$purge" != true ]; then
 	unzip -qq $TEMPD/$artifact_name -d $TEMPD
 	chmod -R u+rw $TEMPD/dist/onedir/$folder_name
 	mkdir -p "${folder}"
+	mkdir -p "${folder}/links"
 	mv -n $TEMPD/dist/onedir/$folder_name "${folder}"
 
 	# Create symlinks and clear up older versions
@@ -113,26 +137,27 @@ if [ "$purge" != true ]; then
 		#
 		# Create generic app_name sym link to latest release along with specific version numbered link
 
+		ln -sf "${folder}/${folder_name}/${folder_name}" "${folder}/links/${app_name}"
+		ln -sf "${folder}/${folder_name}/${folder_name}" "${folder}/links/${folder_name}"
 
-		ln -s "${folder}/${folder_name}/${folder_name}" "${folder}/links/${app_name}"
-		ln -s "${folder}/${folder_name}/${folder_name}" "${folder}/links/${folder_name}"
+		echo "-not -name ${folder_name}" >> "${folder}"/stable_versions.txt
 
-		echo "-no -name ${folder_name}" >> stable_versions.txt
+		tail -n3 "${folder}"/stable_versions.txt >> "${folder}"/to_keep.txt
+		mv "${folder}"/to_keep.txt "${folder}"/stable_versions.txt
 
-		tail -n3 stable_versions.txt >> to_keep.txt
-		mv to_keep.txt stable_versions.txt
-
-		# Delete symlinks and folders not stored in 
-		find "${folder}/links/${app_name}-v*" `cat stable_versions.txt` -delete
-		find "${folder}/${app_name}-v*" `cat stable_versions.txt` -delete
+		# Delete symlinks and folders not stored in stable_versions.txt and user_versions.txt
+		find "${folder}"/links/"${app_name}"-v* `cat "${folder}"/stable_versions.txt 2> /dev/null` `cat "${folder}"/user_versions.txt 2> /dev/null` -delete
+		find "${folder}"/"${app_name}"-v* `cat "${folder}"/stable_versions.txt 2> /dev/null` `cat "${folder}"/user_versions.txt 2> /dev/null` -delete
 
 		# Record sym link names to inform user
 
-		symstring="${app_name} or ${folder_name}$"
+		symstring="${app_name} or ${folder_name}"
 
 	else
 
-		ln -s "${folder}/${folder_name}/${folder_name}" "${folder}/links/${folder_name}"
+		ln -sf "${folder}/${folder_name}/${folder_name}" "${folder}/links/${folder_name}"
+
+		echo "-not -name ${folder_name}" >> "${folder}"/user_versions.txt
 
 		# Record sym link names to inform user
 
@@ -142,35 +167,29 @@ if [ "$purge" != true ]; then
 
 	if [ "$path" = true ]; then
 
-		# Check if folders on path already
-		case :$PATH: in
-			*:"${folder}":)	echo "${folder} on path already." ;;
-			*) "${folder} not on path ... adding."
-		esac
-
 		# Check which files exist
-		if test -f ~/.zshrc; then
+		if [ `test -f ~/.zshrc` ] && [[ "$onpath" = false ]]; then
 			echo "Updating ~/.zshrc..."
-			echo "export PATH=\"\$PATH:"${folder}"\"" >> ~/.zshrc
+			echo "export PATH=\"\$PATH:"${folder}"/links\"" >> ~/.zshrc
 		fi
 
-		if test -f ~/.bashrc; then
+		if [ `test -f ~/.bashrc` ] && [[ "$onpath" = false ]]; then
 			echo "Updating ~/.bashrc...";
-			echo "export PATH=\"\$PATH:"${folder}"\"" >> ~/.bashhrc
+			echo "export PATH=\"\$PATH:"${folder}"/links\"" >> ~/.bashhrc
 		fi
 	fi
 
 	echo $completion_string_1
 	sleep 0.2
-	if [ "$path" != true ]; then
+	if [ "$path" != true ] && [ "$onpath" != true ]; then
 		echo
 		echo
 		echo "Add "${app_name}" to path by adding the following line to ~/.bashrc or ~/.zshrc:"
-		echo "export PATH=\"\$PATH:"${folder}"\""
+		echo "export PATH=\"\$PATH:"${folder}"/links\""
 	fi
 	echo
 	echo
-	echo "Type ${symstring} to get started."
+	echo "Re-open terminal and then type ${symstring} to get started."
 
 elif [ "$purge" = true ]; then
 	
