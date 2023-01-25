@@ -8,10 +8,8 @@ macOS_ending="macOS-dir"
 linux_install_dir=~/.local/share/hpcflow
 macOS_install_dir=~/Library/Application\ Support/hpcflow
 
-latest_stable_version="v0.0.1"
-latest_prerelease_version="v0.2.0a19"
-
-latest_stable_releases="https://raw.githubusercontent.com/hpcflow/hpcflow-new/main/docs/source/released_binaries.yml"
+#latest_stable_releases="https://raw.githubusercontent.com/hpcflow/hpcflow-new/main/docs/source/released_binaries.yml"
+latest_stable_releases="https://raw.githubusercontent.com/hpcflow/hpcflow-new/dummy-stable/docs/source/released_binaries.yml"
 latest_prelease_releases="https://raw.githubusercontent.com/hpcflow/hpcflow-new/develop/docs/source/released_binaries.yml"
 
 progress_string_1="Step 1 of 2: Downloading ${app_name} ..."
@@ -66,10 +64,12 @@ done
 if [[ "$OSTYPE" == "linux-gnu"* ]]; then
 
         folder=${folder:-${linux_install_dir}}
+		app_name_ending=$linux_ending
         
 elif [[ "$OSTYPE" == "darwin"* ]]; then
 
         folder=${folder:-${macOS_install_dir}}
+		app_name_ending=$macOS_ending
 
 else
         echo "Operating system ${OSTYPE} not supported."
@@ -81,19 +81,24 @@ if [ "$prerelease" = true ]; then
 
 	echo "Installing latest prelease version."
 	sleep 0.2
-    version=${version:-${latest_prerelease_version}}
+
+	artifact_name=`curl -s $latest_prelease_releases | grep "${app_name_ending}" | cut -d ":" -f 1`
+	version=`echo $artifact_name | cut -d '-' -f 2`
 
 elif  [ "$versionspec" = true ]; then
 
 	echo "Installing ${app_name} version ${version}."
 	sleep 0.2
 	version=${version}
+	artifact_name="${app_name}-${version}-${app_name_ending}.zip"
 
 else
 
 	echo "Installing latest stable version"
 	sleep 0.2
-    version=${version:-${latest_stable_version}}
+
+	artifact_name=`curl -s $latest_stable_releases | grep "${app_name_ending}" | cut -d ":" -f 1`
+	version=`echo $artifact_name | cut -d '-' -f 2`
 
 fi
 
@@ -113,8 +118,7 @@ case :$PATH: in
 esac
 
 # Set variables for download and install
-artifact_name="${app_name}-${version}-${macOS_ending}.zip"
-folder_name="${app_name}-${version}-${macOS_ending}"
+folder_name="${app_name}-${version}-${app_name_ending}"
 download_link="${base_link}/${version}/${artifact_name}"
 
 if [ "$purge" != true ]; then
