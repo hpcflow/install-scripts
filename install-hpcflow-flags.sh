@@ -3,8 +3,11 @@
 app_name="hpcflow"
 base_link="https://github.com/hpcflow/hpcflow-new/releases/download"
 
-linux_ending="linux-dir"
-macOS_ending="macOS-dir"
+linux_ending_folder="linux-dir"
+macOS_ending_folder="macOS-dir"
+linux_ending_file="linux"
+macOS_ending_file="macOS"
+
 linux_install_dir=~/.local/share/hpcflow
 macOS_install_dir=~/Library/Application\ Support/hpcflow
 
@@ -42,7 +45,7 @@ while [ $# -gt 0 ]; do
 
         param="${1/--/}"
 
-        if [[ "$param" == "prerelease" ]] || [[ $param == "purge" ]] || [[ $param == "path" ]]; then
+        if [[ "$param" == "prerelease" ]] || [[ $param == "purge" ]] || [[ $param == "path" ]] || [[ $param == "onefile" ]] || [[ $param == "univlink" ]]; then
             declare $param=true
         else
             declare $param="$2"
@@ -64,15 +67,30 @@ done
 if [[ "$OSTYPE" == "linux-gnu"* ]]; then
 
         folder=${folder:-${linux_install_dir}}
-		app_name_ending=$linux_ending
+
+		if [[ "$onefile" = true ]]; then
+			app_name_ending=$linux_ending_file
+			file_name_ending=$linux_ending_file
+		else
+			app_name_ending=$linux_ending_folder
+			file_name_ending="${linux_ending_folder}.zip"
+		fi
         
 elif [[ "$OSTYPE" == "darwin"* ]]; then
 
         folder=${folder:-${macOS_install_dir}}
-		app_name_ending=$macOS_ending
+
+		if [[ "$onefile" = true ]]; then
+			app_name_ending=$macOS_ending_file
+			file_name_ending=$macOS_ending_file
+		else
+			app_name_ending=$macOS_ending_folder
+			file_name_ending="${macOS_ending_folder}.zip"
+		fi
 
 else
         echo "Operating system ${OSTYPE} not supported."
+		exit 1
 fi			
 
 # If prelease flag is set, default is latest prerelease, otherwise latest stable
@@ -82,7 +100,7 @@ if [ "$prerelease" = true ]; then
 	echo "Installing latest prelease version."
 	sleep 0.2
 
-	artifact_name=`curl -s $latest_prelease_releases | grep "${app_name_ending}" | cut -d ":" -f 1`
+	artifact_name=`curl -s $latest_prelease_releases | grep "${file_name_ending}:" | cut -d ":" -f 1`
 	version=`echo $artifact_name | cut -d '-' -f 2`
 
 elif  [ "$versionspec" = true ]; then
@@ -90,19 +108,22 @@ elif  [ "$versionspec" = true ]; then
 	echo "Installing ${app_name} version ${version}."
 	sleep 0.2
 	version=${version}
-	artifact_name="${app_name}-${version}-${app_name_ending}.zip"
+	artifact_name="${app_name}-${version}-${file_name_ending}"
 
 else
 
 	echo "Installing latest stable version"
 	sleep 0.2
 
-	artifact_name=`curl -s $latest_stable_releases | grep "${app_name_ending}" | cut -d ":" -f 1`
+	artifact_name=`curl -s $latest_stable_releases | grep "${file_name_ending}:" | cut -d ":" -f 1`
 	version=`echo $artifact_name | cut -d '-' -f 2`
 
 fi
 
-if [ `grep -c "${version}" "${folder}"/user_versions.txt` -ge 1 ] || [ `grep -c "${version}" "${folder}"/stable_versions.txt` -ge 1 ]; then
+touch "${folder}"/user_versions.txt
+touch "${folder}"/stable_versions.txt
+
+if [ `grep -c "${version}-{file_name_ending}" "${folder}"/user_versions.txt` -ge 1 ] || [ `grep -c "${version}-{file_name_ending}" "${folder}"/stable_versions.txt` -ge 1 ]; then
 
 	echo "${app_name} ${version} already installed on this system... "
 	sleep 0.2
@@ -128,11 +149,27 @@ if [ "$purge" != true ]; then
 	curl -s --output-dir $TEMPD $download_link -O -L
 	echo $progress_string_2
 	echo
-	unzip -qq $TEMPD/$artifact_name -d $TEMPD
-	chmod -R u+rw $TEMPD/dist/onedir/$folder_name
+
 	mkdir -p "${folder}"
 	mkdir -p "${folder}/links"
-	mv -n $TEMPD/dist/onedir/$folder_name "${folder}"
+
+	if [ "$onefile" != true ]; then
+
+		unzip -qq $TEMPD/$artifact_name -d $TEMPD
+		chmod -R u+rw $TEMPD/dist/onedir/$folder_name
+		mv -n $TEMPD/dist/onedir/$folder_name "${folder}"	
+
+	elif [ "$onefile" == true ]; then
+
+		chmod u+rwx $TEMPD/$artifact_name
+		mv -n $TEMPD/$artifact_name "${folder}"
+
+	else
+
+        echo "Unexpected error."
+		exit 1
+
+	fi
 
 	# Create symlinks and clear up older versions
 	if [[ "$prerelease" != true ]] && [[ "$versionspec" != true ]]; then
@@ -141,10 +178,38 @@ if [ "$purge" != true ]; then
 		#
 		# Create generic app_name sym link to latest release along with specific version numbered link
 
-		ln -sf "${folder}/${folder_name}/${folder_name}" "${folder}/links/${app_name}"
-		ln -sf "${folder}/${folder_name}/${folder_name}" "${folder}/links/${folder_name}"
+		if [ "$onefile" != true ]; then
 
-		echo "-not -name ${folder_name}" >> "${folder}"/stable_versions.txt
+			ln -sf "${folder}/${folder_name}/${folder_name}" "${folder}/links/${folder_name}"
+
+			echo "-not -name ${folder_name}" >> "${folder}"/stable_versions.txt
+
+			# Record sym link names to inform user
+			symstring="${folder_name}"
+
+			if [ "$univlink" == true ]; then
+
+				ln -sf "${folder}/${folder_name}/${folder_name}" "${folder}/links/${app_name}"
+				symstring="${app_name} or ${folder_name}"
+
+			fi
+
+		elif [ "$onefile" == true ]; then
+
+			ln -sf "${folder}/${artifact_name}" "${folder}/links/${app_name}"
+			ln -sf "${folder}/${artifact_name}" "${folder}/links/${artifact_name_name}"
+
+			echo "-not -name ${folder_name}" >> "${folder}"/stable_versions.txt
+
+			# Record sym link names to inform user
+			symstring="${app_name} or ${folder_name}"
+
+		else
+
+        	echo "Unexpected error."
+			exit 1
+
+		fi
 
 		tail -n3 "${folder}"/stable_versions.txt >> "${folder}"/to_keep.txt
 		mv "${folder}"/to_keep.txt "${folder}"/stable_versions.txt
@@ -153,19 +218,28 @@ if [ "$purge" != true ]; then
 		find "${folder}"/links/"${app_name}"-v* `cat "${folder}"/stable_versions.txt 2> /dev/null` `cat "${folder}"/user_versions.txt 2> /dev/null` -delete
 		find "${folder}"/"${app_name}"-v* `cat "${folder}"/stable_versions.txt 2> /dev/null` `cat "${folder}"/user_versions.txt 2> /dev/null` -delete
 
-		# Record sym link names to inform user
-
-		symstring="${app_name} or ${folder_name}"
-
 	else
 
-		ln -sf "${folder}/${folder_name}/${folder_name}" "${folder}/links/${folder_name}"
+		if [ "$onefile" != true ]; then
+			ln -sf "${folder}/${folder_name}/${folder_name}" "${folder}/links/${folder_name}"
 
-		echo "-not -name ${folder_name}" >> "${folder}"/user_versions.txt
+			echo "-not -name ${folder_name}" >> "${folder}"/user_versions.txt
 
-		# Record sym link names to inform user
+			# Record sym link names to inform user
 
-		symstring=${folder_name}
+			symstring=${folder_name}
+		elif [ "$onefile" == true ]; then
+			ln -sf "${folder}/${folder_name}/${folder_name}" "${folder}/links/${folder_name}"
+
+			echo "-not -name ${folder_name}" >> "${folder}"/user_versions.txt
+
+			# Record sym link names to inform user
+
+			symstring=${folder_name}
+		else
+        	echo "Unexpected error."
+			exit 1
+		fi
 
 	fi
 
