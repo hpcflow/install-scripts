@@ -7,87 +7,11 @@ run_main() {
 
 	make_tempdir
 
-	# Assign command line variables and flags
-	while [ $# -gt 0 ]; do
+	parse_params "$@"
 
-		if [[ $1 == *"--"* ]]; then
+	set_OS_specific_variables
 
-			param="${1/--/}"
-
-			if [[ "$param" == "prerelease" ]] || [[ $param == "purge" ]] || [[ $param == "path" ]] || [[ $param == "onefile" ]] || [[ $param == "univlink" ]]; then
-				declare $param=true
-			else
-				declare $param="$2"
-				if [[ "$param" == "version" ]]; then
-					versionspec=true
-				fi
-
-			fi
-
-			echo $1 $2 // Optional to see the parameter:value result
-
-		fi
-
-		shift
-
-	done
-
-	# Set OS specific variables
-	if [[ "$OSTYPE" == "linux-gnu"* ]]; then
-
-		folder=${folder:-${linux_install_dir}}
-
-		if [[ "$onefile" = true ]]; then
-			app_name_ending=$linux_ending_file
-			file_name_ending=$linux_ending_file
-		else
-			app_name_ending=$linux_ending_folder
-			file_name_ending="${linux_ending_folder}.zip"
-		fi
-
-	elif [[ "$OSTYPE" == "darwin"* ]]; then
-
-		folder=${folder:-${macOS_install_dir}}
-
-		if [[ "$onefile" = true ]]; then
-			app_name_ending=$macOS_ending_file
-			file_name_ending=$macOS_ending_file
-		else
-			app_name_ending=$macOS_ending_folder
-			file_name_ending="${macOS_ending_folder}.zip"
-		fi
-
-	else
-		echo "Operating system ${OSTYPE} not supported."
-		exit 1
-	fi
-
-	# If prelease flag is set, default is latest prerelease, otherwise latest stable
-	# Both overridden if version specified by user
-	if [ "$prerelease" = true ]; then
-
-		echo "Installing latest prelease version."
-		sleep 0.2
-
-		artifact_name=$(curl -s $latest_prelease_releases | grep "${file_name_ending}:" | cut -d ":" -f 1)
-		version=$(echo $artifact_name | cut -d '-' -f 2)
-
-	elif [ "$versionspec" = true ]; then
-
-		echo "Installing ${app_name} version ${version}."
-		sleep 0.2
-		version=${version}
-		artifact_name="${app_name}-${version}-${file_name_ending}"
-
-	else
-
-		echo "Installing latest stable version"
-		sleep 0.2
-
-		artifact_name=$(curl -s $latest_stable_releases | grep "${file_name_ending}:" | cut -d ":" -f 1)
-		version=$(echo $artifact_name | cut -d '-' -f 2)
-
-	fi
+	get_artifact_names
 
 	touch "${folder}"/user_versions.txt
 	touch "${folder}"/stable_versions.txt
@@ -273,7 +197,7 @@ set_variables() {
 
 	#latest_stable_releases="https://raw.githubusercontent.com/hpcflow/hpcflow-new/main/docs/source/released_binaries.yml"
 	latest_stable_releases="https://raw.githubusercontent.com/hpcflow/hpcflow-new/dummy-stable/docs/source/released_binaries.yml"
-	latest_prelease_releases="https://raw.githubusercontent.com/hpcflow/hpcflow-new/develop/docs/source/released_binaries.yml"
+	latest_prerelease_releases="https://raw.githubusercontent.com/hpcflow/hpcflow-new/develop/docs/source/released_binaries.yml"
 
 	progress_string_1="Step 1 of 2: Downloading ${app_name} ..."
 	progress_string_2="Step 2 of 2: Installing ${app_name} ..."
@@ -284,9 +208,9 @@ set_variables() {
 set_flags () {
 
 	# Flag variables false by default
-	prerelease=false
 	purge=false
 	path=false
+	prerelease=false
 
 	# Flag to note if user specified version
 	versionspec=false
@@ -317,15 +241,36 @@ parse_params () {
 
 			param="${1/--/}"
 
-			if [[ "$param" == "prerelease" ]] || [[ $param == "purge" ]] || [[ $param == "path" ]] || [[ $param == "onefile" ]] || [[ $param == "univlink" ]]; then
-				declare $param=true
-			else
-				declare $param="$2"
-				if [[ "$param" == "version" ]]; then
-					versionspec=true
-				fi
+			case $param in
 
-			fi
+				prerelease)
+					prerelease=true
+					;;
+				purge)
+					purge=true
+					;;
+				path)
+					path=true
+					;;
+				onefile)
+					onefile=true
+					;;
+				univlink)
+					univlink=true
+					;;
+				version)
+					version=$2
+					versionspec=true
+					;;
+				folder)
+					folder=$2
+					;;
+				*)
+					echo "Unknown option ${param}"
+					echo "Exiting..."
+					exit 1
+
+			esac
 
 			# echo $1 $2 // Optional to see the parameter:value result
 
@@ -337,6 +282,75 @@ parse_params () {
 
 }
 
-if [[ "${BASH_SOURCE[0]}" ]]; then
+set_OS_specific_variables () {
+
+	# Set OS specific variables
+	if [[ "$OSTYPE" == "linux-gnu"* ]]; then
+
+		folder=${folder:-${linux_install_dir}}
+
+		if [[ "$onefile" = true ]]; then
+			app_name_ending=$linux_ending_file
+			file_name_ending=$linux_ending_file
+		else
+			app_name_ending=$linux_ending_folder
+			file_name_ending="${linux_ending_folder}.zip"
+		fi
+
+	elif [[ "$OSTYPE" == "darwin"* ]]; then
+
+		folder=${folder:-${macOS_install_dir}}
+
+		if [[ "$onefile" = true ]]; then
+			app_name_ending=$macOS_ending_file
+			file_name_ending=$macOS_ending_file
+		else
+			app_name_ending=$macOS_ending_folder
+			file_name_ending="${macOS_ending_folder}.zip"
+		fi
+
+	else
+		echo "Operating system ${OSTYPE} not supported."
+		exit 1
+	fi
+
+}
+
+get_artifact_names () {
+
+	# If prelease flag is set, default is latest prerelease, otherwise latest stable
+	# Both overridden if version specified by user
+	if [ "$prerelease" = true ]; then
+
+		echo "Installing latest prerelease version."
+		sleep 0.2
+
+		artifact_name=$(curl -s $latest_prerelease_releases | grep "${file_name_ending}:" | cut -d ":" -f 1)
+		version=$(echo $artifact_name | cut -d '-' -f 2)
+
+	elif [ "$versionspec" = true ]; then
+
+		echo "Installing ${app_name} version ${version}."
+		sleep 0.2
+		version=${version}
+		artifact_name="${app_name}-${version}-${file_name_ending}"
+
+	else
+
+		echo "Installing latest stable version"
+		sleep 0.2
+
+		artifact_name=$(curl -s $latest_stable_releases | grep "${file_name_ending}:" | cut -d ":" -f 1)
+		version=$(echo $artifact_name | cut -d '-' -f 2)
+
+	fi
+
+}
+
+dummy_func () {
+	prerelease=true
+}
+
+if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
 	run_main "$@"
 fi
