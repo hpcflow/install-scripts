@@ -13,23 +13,11 @@ run_main() {
 
 	get_artifact_names
 
-	touch "${folder}"/user_versions.txt
-	touch "${folder}"/stable_versions.txt
+	create_install_tracker_files
 
-	if [ $(grep -c "${version}-{app_name_ending}" "${folder}"/user_versions.txt) -ge 1 ] || [ $(grep -c "${version}-{app_name_ending}" "${folder}"/stable_versions.txt) -ge 1 ]; then
+	check_if_desired_version_installed
 
-		echo "${app_name} ${version} already installed on this system... "
-		sleep 0.2
-		echo "Exiting..."
-		exit 1
-
-	fi
-
-	# Check if folders on path already
-	case :$PATH: in
-	*:"${folder}"/links:) onpath=true ;;
-	*) ;;
-	esac
+	check_if_symlink_folder_on_path
 
 	# Set variables for download and install
 	folder_name="${app_name}-${version}-${app_name_ending}"
@@ -37,25 +25,17 @@ run_main() {
 
 	if [ "$purge" != true ]; then
 
-		echo $progress_string_1
-		echo
-		curl -s --output-dir $TEMPD $download_link -O -L
-		echo $progress_string_2
-		echo
+		download_artifact_to_temp
 
-		mkdir -p "${folder}"
-		mkdir -p "${folder}/links"
+		make_destination_folders
 
 		if [ "$onefile" != true ]; then
 
-			unzip -qq $TEMPD/$artifact_name -d $TEMPD
-			chmod -R u+rw $TEMPD/dist/onedir/$folder_name
-			mv -n $TEMPD/dist/onedir/$folder_name "${folder}"
+			unzip_and_move_one_folder_version
 
 		elif [ "$onefile" == true ]; then
 
-			chmod u+rwx $TEMPD/$artifact_name
-			mv -n $TEMPD/$artifact_name "${folder}"
+			unzip_and_move_onefile_version
 
 		else
 
@@ -73,29 +53,17 @@ run_main() {
 
 			if [ "$onefile" != true ]; then
 
-				ln -sf "${folder}/${folder_name}/${folder_name}" "${folder}/links/${folder_name}"
-
-				echo "-not -name ${folder_name}" >>"${folder}"/stable_versions.txt
-
-				# Record sym link names to inform user
-				symstring="${folder_name}"
+				create_versioned_symlink_stable_one_folder
 
 				if [ "$univlink" == true ]; then
 
-					ln -sf "${folder}/${folder_name}/${folder_name}" "${folder}/links/${app_name}"
-					symstring="${app_name} or ${folder_name}"
+					create_universal_symlink
 
 				fi
 
 			elif [ "$onefile" == true ]; then
 
-				ln -sf "${folder}/${artifact_name}" "${folder}/links/${app_name}"
-				ln -sf "${folder}/${artifact_name}" "${folder}/links/${artifact_name_name}"
-
-				echo "-not -name ${folder_name}" >>"${folder}"/stable_versions.txt
-
-				# Record sym link names to inform user
-				symstring="${app_name} or ${folder_name}"
+				create_versioned_symlink_stable_onefile
 
 			else
 
@@ -104,75 +72,38 @@ run_main() {
 
 			fi
 
-			tail -n3 "${folder}"/stable_versions.txt >>"${folder}"/to_keep.txt
-			mv "${folder}"/to_keep.txt "${folder}"/stable_versions.txt
-
-			# Delete symlinks and folders not stored in stable_versions.txt and user_versions.txt
-			find "${folder}"/links/"${app_name}"-v* $(cat "${folder}"/stable_versions.txt 2>/dev/null) $(cat "${folder}"/user_versions.txt 2>/dev/null) -delete
-			find "${folder}"/"${app_name}"-v* $(cat "${folder}"/stable_versions.txt 2>/dev/null) $(cat "${folder}"/user_versions.txt 2>/dev/null) -delete
+			keep_most_recent_stable
 
 		else
 
 			if [ "$onefile" != true ]; then
-				ln -sf "${folder}/${folder_name}/${folder_name}" "${folder}/links/${folder_name}"
 
-				echo "-not -name ${folder_name}" >>"${folder}"/user_versions.txt
+				create_versioned_symlink_user_one_folder
 
-				# Record sym link names to inform user
-
-				symstring=${folder_name}
 			elif [ "$onefile" == true ]; then
-				ln -sf "${folder}/${folder_name}/${folder_name}" "${folder}/links/${folder_name}"
 
-				echo "-not -name ${folder_name}" >>"${folder}"/user_versions.txt
+				create_versioned_symlink_user_onefile
 
-				# Record sym link names to inform user
-
-				symstring=${folder_name}
 			else
+
 				echo "Unexpected error."
 				exit 1
+
 			fi
 
 		fi
 
 		if [ "$path" = true ]; then
 
-			# Check which files exist
-			if [ $(test -f ~/.zshrc) ] && [[ "$onpath" = false ]]; then
-				echo "Updating ~/.zshrc..."
-				echo "export PATH=\"\$PATH:"${folder}"/links\"" >>~/.zshrc
-			fi
+			add_to_path
 
-			if [ $(test -f ~/.bashrc) ] && [[ "$onpath" = false ]]; then
-				echo "Updating ~/.bashrc..."
-				echo "export PATH=\"\$PATH:"${folder}"/links\"" >>~/.bashhrc
-			fi
 		fi
 
-		echo $completion_string_1
-		sleep 0.2
-		if [ "$path" != true ] && [ "$onpath" != true ]; then
-			echo
-			echo
-			echo "Add "${app_name}" to path by adding the following line to ~/.bashrc or ~/.zshrc:"
-			echo "export PATH=\"\$PATH:"${folder}"/links\""
-		fi
-		echo
-		echo
-		echo "Re-open terminal and then type ${symstring} to get started."
+		print_post_install_info
 
 	elif [ "$purge" = true ]; then
 
-		echo "Purging local install of "${app_name}"..."
-		sleep 0.2
-		echo "I say we take off and nuke the entire site from orbit. It's the only way to be sure."
-		# echo "Deleting "${app_name}" folder "${folder}"..."
-		# sleep 0.2
-		#rm -r  "${folder}"
-		# echo "Removing "${app_name}" folder "$folder}" from path..."
-		# sleep 0.2
-		# COMMAND GOES HERE
+		purge_application
 
 	fi
 
@@ -205,7 +136,7 @@ set_variables() {
 
 }
 
-set_flags () {
+set_flags() {
 
 	# Flag variables false by default
 	purge=false
@@ -219,7 +150,7 @@ set_flags () {
 
 }
 
-make_tempdir () {
+make_tempdir() {
 
 	# Make temp diretory and store path in a variable
 	TEMPD=$(mktemp -d)
@@ -232,7 +163,7 @@ make_tempdir () {
 
 }
 
-parse_params () {
+parse_params() {
 
 	# Assign command line variables and flags
 	while [ $# -gt 0 ]; do
@@ -243,32 +174,33 @@ parse_params () {
 
 			case $param in
 
-				prerelease)
-					prerelease=true
-					;;
-				purge)
-					purge=true
-					;;
-				path)
-					path=true
-					;;
-				onefile)
-					onefile=true
-					;;
-				univlink)
-					univlink=true
-					;;
-				version)
-					version=$2
-					versionspec=true
-					;;
-				folder)
-					folder=$2
-					;;
-				*)
-					echo "Unknown option ${param}"
-					echo "Exiting..."
-					exit 1
+			prerelease)
+				prerelease=true
+				;;
+			purge)
+				purge=true
+				;;
+			path)
+				path=true
+				;;
+			onefile)
+				onefile=true
+				;;
+			univlink)
+				univlink=true
+				;;
+			version)
+				version=$2
+				versionspec=true
+				;;
+			folder)
+				folder=$2
+				;;
+			*)
+				echo "Unknown option ${param}"
+				echo "Exiting..."
+				exit 1
+				;;
 
 			esac
 
@@ -282,7 +214,7 @@ parse_params () {
 
 }
 
-set_OS_specific_variables () {
+set_OS_specific_variables() {
 
 	# Set OS specific variables
 	if [[ "$OSTYPE" == "linux-gnu"* ]]; then
@@ -316,7 +248,7 @@ set_OS_specific_variables () {
 
 }
 
-get_artifact_names () {
+get_artifact_names() {
 
 	# If prelease flag is set, default is latest prerelease, otherwise latest stable
 	# Both overridden if version specified by user
@@ -347,7 +279,152 @@ get_artifact_names () {
 
 }
 
-dummy_func () {
+create_install_tracker_files() {
+	touch "${folder}"/user_versions.txt
+	touch "${folder}"/stable_versions.txt
+}
+
+check_if_desired_version_installed() {
+
+	if [ $(grep -c "${version}-{app_name_ending}" "${folder}"/user_versions.txt) -ge 1 ] || [ $(grep -c "${version}-{app_name_ending}" "${folder}"/stable_versions.txt) -ge 1 ]; then
+
+		echo "${app_name} ${version} already installed on this system... "
+		sleep 0.2
+		echo "Exiting..."
+		exit 1
+
+	fi
+
+}
+
+check_if_symlink_folder_on_path() {
+
+	# Check if folders on path already
+	case :$PATH: in
+	*:"${folder}"/links:) onpath=true ;;
+	*) ;;
+	esac
+
+}
+
+download_artifact_to_temp() {
+
+	echo $progress_string_1
+	echo
+	curl -s --output-dir $TEMPD $download_link -O -L
+	echo $progress_string_2
+	echo
+
+}
+
+make_destination_folders() {
+
+	mkdir -p "${folder}"
+	mkdir -p "${folder}/links"
+
+}
+
+unzip_and_move_one_folder_version() {
+
+	unzip -qq $TEMPD/$artifact_name -d $TEMPD
+	chmod -R u+rw $TEMPD/dist/onedir/$folder_name
+	mv -n $TEMPD/dist/onedir/$folder_name "${folder}"
+
+}
+
+unzip_and_move_onefile_version() {
+
+	chmod u+rwx $TEMPD/$artifact_name
+	mv -n $TEMPD/$artifact_name "${folder}"
+
+}
+
+create_versioned_symlink_stable_one_folder() {
+
+	ln -sf "${folder}/${folder_name}/${folder_name}" "${folder}/links/${folder_name}"
+
+	echo "-not -name ${folder_name}" >>"${folder}"/stable_versions.txt
+
+	# Record sym link names to inform user
+	symstring="${folder_name}"
+
+}
+
+create_universal_symlink () {
+
+	ln -sf "${folder}/${folder_name}/${folder_name}" "${folder}/links/${app_name}"
+	symstring="${app_name} or ${folder_name}"
+
+}
+
+create_versioned_symlink_stable_onefile () {
+
+				ln -sf "${folder}/${artifact_name}" "${folder}/links/${artifact_name}"
+
+				echo "-not -name ${folder_name}" >>"${folder}"/stable_versions.txt
+
+				# Record sym link names to inform user
+				symstring="${artifact_name}"
+
+}
+
+keep_most_recent_stable () {
+
+			tail -n3 "${folder}"/stable_versions.txt >>"${folder}"/to_keep.txt
+			mv "${folder}"/to_keep.txt "${folder}"/stable_versions.txt
+
+			# Delete symlinks and folders not stored in stable_versions.txt and user_versions.txt
+			find "${folder}"/links/"${app_name}"-v* $(cat "${folder}"/stable_versions.txt 2>/dev/null) $(cat "${folder}"/user_versions.txt 2>/dev/null) -delete
+			find "${folder}"/"${app_name}"-v* $(cat "${folder}"/stable_versions.txt 2>/dev/null) $(cat "${folder}"/user_versions.txt 2>/dev/null) -delete
+
+}
+
+add_to_path () {
+
+			# Check which files exist
+			if [ $(test -f ~/.zshrc) ] && [[ "$onpath" = false ]]; then
+				echo "Updating ~/.zshrc..."
+				echo "export PATH=\"\$PATH:"${folder}"/links\"" >>~/.zshrc
+			fi
+
+			if [ $(test -f ~/.bashrc) ] && [[ "$onpath" = false ]]; then
+				echo "Updating ~/.bashrc..."
+				echo "export PATH=\"\$PATH:"${folder}"/links\"" >>~/.bashhrc
+			fi
+
+}
+
+print_post_install_info () {
+
+		echo $completion_string_1
+		sleep 0.2
+		if [ "$path" != true ] && [ "$onpath" != true ]; then
+			echo
+			echo
+			echo "Add "${app_name}" to path by adding the following line to ~/.bashrc or ~/.zshrc:"
+			echo "export PATH=\"\$PATH:"${folder}"/links\""
+		fi
+		echo
+		echo
+		echo "Re-open terminal and then type ${symstring} to get started."
+
+}
+
+purge_application () {
+
+		echo "Purging local install of "${app_name}"..."
+		sleep 0.2
+		echo "I say we take off and nuke the entire site from orbit. It's the only way to be sure."
+		# echo "Deleting "${app_name}" folder "${folder}"..."
+		# sleep 0.2
+		#rm -r  "${folder}"
+		# echo "Removing "${app_name}" folder "$folder}" from path..."
+		# sleep 0.2
+		# COMMAND GOES HERE
+
+}
+
+dummy_func() {
 	prerelease=true
 }
 
