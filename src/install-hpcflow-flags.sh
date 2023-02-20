@@ -295,6 +295,8 @@ check_if_desired_version_installed() {
 
 	fi
 
+	echo "test print"
+
 }
 
 check_if_symlink_folder_on_path() {
