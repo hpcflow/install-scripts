@@ -286,7 +286,7 @@ create_install_tracker_files() {
 
 check_if_desired_version_installed() {
 
-	if [ $(grep -c "${version}-{app_name_ending}" "${folder}"/user_versions.txt) -ge 1 ] || [ $(grep -c "${version}-{app_name_ending}" "${folder}"/stable_versions.txt) -ge 1 ]; then
+	if [ $(grep -c "${version}-${app_name_ending}" "${folder}"/user_versions.txt) -ge 1 ] || [ $(grep -c "${version}-${app_name_ending}" "${folder}"/stable_versions.txt) -ge 1 ]; then
 
 		echo "${app_name} ${version} already installed on this system... "
 		sleep 0.2
@@ -294,8 +294,6 @@ check_if_desired_version_installed() {
 		exit 1
 
 	fi
-
-	echo "test print"
 
 }
 
@@ -412,7 +410,7 @@ print_post_install_info () {
 
 }
 
-purge_application () {
+purge_application (){
 
 		echo "Purging local install of "${app_name}"..."
 		sleep 0.2

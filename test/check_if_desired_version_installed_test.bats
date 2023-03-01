@@ -24,26 +24,37 @@ setup() {
 }
 
 @test "Exit if version found in user_versions.txt" {
-
-    folder=$BATS_TEST_TMPDIR
-
-	touch "${folder}"/user_versions.txt
-	touch "${folder}"/stable_versions.txt
-
-    echo "not -name hpcflow-v0.0.1-macOS-dir" >> "${folder}"/user_versions.txt
     
     run bash -c '
 		source src/install-hpcflow-flags.sh;
-        folder=$BATS_TEST_TMPDIR
-	    touch "${folder}"/user_versions.txt
-	    touch "${folder}"/stable_versions.txt
-        echo "not -name hpcflow-v0.0.1-macOS-dir" >> "${folder}"/user_versions.txt
-        version=v0.0.1
-        app_name=:"hpcflow"
-        app_name_ending=macOS-dir
-        check_if_desired_version_installed
+        folder=$BATS_TEST_TMPDIR;
+	    touch $folder/user_versions.txt;
+	    touch $folder/stable_versions.txt;
+        echo "-not -name hpcflow-v0.0.1-macOS-dir" >> $folder/user_versions.txt;
+        version=v0.0.1;
+        app_name=:"hpcflow";
+        app_name_ending=macOS-dir;
+        check_if_desired_version_installed;
         '
 
-        assert_output "test"
+        assert_failure
+
+}
+
+@test "Exit if version found in stable_versions.txt" {
+    
+    run bash -c '
+		source src/install-hpcflow-flags.sh;
+        folder=$BATS_TEST_TMPDIR;
+	    touch $folder/user_versions.txt;
+	    touch $folder/stable_versions.txt;
+        echo "-not -name hpcflow-v0.0.1-macOS-dir" >> $folder/stable_versions.txt;
+        version=v0.0.1;
+        app_name=:"hpcflow";
+        app_name_ending=macOS-dir;
+        check_if_desired_version_installed;
+        '
+
+        assert_failure
 
 }
