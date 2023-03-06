@@ -1,4 +1,48 @@
-function  Get-Script-Parameters {
+param(
+	[Parameter()]
+	[string]$Folder,
+
+	[Parameter()]
+	[switch]$OneFile,
+
+	[Parameter()]
+	[switch]$PreRelease
+
+)
+
+function Install-HPCFlowApplication {
+
+	param(
+		[Parameter()]
+		[string]$Folder,
+
+		[Parameter()]
+		[switch]$OneFile,
+
+		[Parameter()]
+		[switch]$PreRelease
+	)
+
+	if ($OneFile.IsPresent) {
+		$ArtifactEnding = '-win.exe'
+		$OneFileFlag = $true
+	}
+	else {
+		$ArtifactEnding = '-win-dir.zip'
+		$OneFileFlag = $false
+	}
+
+	if ($PreRelease.IsPresent) {
+		$PreReleaseFlag = $true
+	}
+	else {
+		$PreReleaseFlag = $false
+	}
+
+	Get-ScriptParameters | Get-LatestReleaseInfo -PreRelease $PreReleaseFlag | Extract-WindowsInfo -FileEnding $ArtifactEnding | Parse-WindowsInfo | Download-Artifact -DownloadFolder '~/Desktop' | Place-Artifact -FinalDestination $Folder -OneFile $OneFileFlag
+}
+
+function  Get-ScriptParameters {
     $params = @{
         AppName = "hpcflow"
         BaseLink = "https://github.com/hpcflow/hpcflow-new/releases/download"
@@ -17,16 +61,15 @@ function  Get-Script-Parameters {
     return $params
 }
 
-function Get-Latest-Stable-Release-Info {
+function Get-LatestReleaseInfo {
 	param(
 		[Parameter(Mandatory, ValueFromPipeline, ValueFromPipelineByPropertyName)]
 		[hashtable]$param,
-
 		[Parameter()]
-		[bool]$PrereleaseFlag
+		[bool]$PreRelease
 	)
 
-	if ($PrereleaseFlag) {
+	if ($Prerelease) {
 		$PageHTML = Invoke-WebRequest -Uri $param.LatestPrereleaseReleases -Method Get
 	}
 	else {
@@ -39,11 +82,10 @@ function Get-Latest-Stable-Release-Info {
 
 }
 
-function Extract-Windows-Info {
+function Extract-WindowsInfo {
 	param(
 		[parameter(Mandatory, ValueFromPipeline, ValueFromPipelineByPropertyName)]
 		[string]$StablePageContents,
-
 		[parameter(Mandatory)]
 		[string]$FileEnding
 	)
@@ -57,7 +99,7 @@ function Extract-Windows-Info {
 	}
 }
 
-function Parse-Windows-Info {
+function Parse-WindowsInfo {
 	param(
 		[parameter(Mandatory, ValueFromPipeline, ValueFromPipelineByPropertyName)]
 		[string]$VersionInfo
@@ -73,9 +115,48 @@ function Parse-Windows-Info {
 
 }
 
+function Download-Artifact {
+	param(
+		[parameter(Mandatory, ValueFromPipeline, ValueFromPipelineByPropertyName)]
+		[hashtable]$ArtifactData,
+		[parameter(Mandatory)]
+		[string]$DownloadFolder
+	)
+
+	$DownloadLocation = $DownloadFolder +"/" + $ArtifactData.ArtifactName
+
+	Write-Host $DownloadLocation
+
+	Invoke-WebRequest $ArtifactData.ArtifactWebAddress -OutFile $DownloadLocation
+
+	return $DownloadLocation
+
+}
+
+function Place-Artifact {
+	param(
+		[parameter(Mandatory, ValueFromPipeline, ValueFromPipelineByPropertyName)]
+		[string]$DownloadLocation,
+		[parameter(Mandatory)]
+		[string]$FinalDestination,
+		[parameter()]
+		[bool]$OneFile
+	)
+
+	if ($OneFile) {
+		Move-Item $DownloadLocation $FinalDestination
+	}
+	else {
+		Expand-Archive $DownloadLocation -DestinationPath $FinalDestination
+	}
+
+}
+
 function New-TemporaryFolder {
 	# Make a new folder based upon a TempFileName
 	#$T="$($env:TEMP)\tmp$([convert]::tostring((get-random 65535),16).padleft(4,'0')).tmp"
 	$T="$($env:TMPDIR)/tmp$([convert]::tostring((get-random 65535),16).padleft(4,'0')).tmp"
 	New-Item -ItemType Directory -Path $T
 }
+
+Install-HPCFlowApplication @PSBoundParameters
