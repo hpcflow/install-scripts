@@ -359,68 +359,67 @@ create_universal_symlink () {
 
 create_versioned_symlink_stable_onefile () {
 
-				ln -sf "${folder}/${artifact_name}" "${folder}/links/${artifact_name}"
+	ln -sf "${folder}/${artifact_name}" "${folder}/links/${artifact_name}"
 
-				echo "-not -name ${folder_name}" >>"${folder}"/stable_versions.txt
+	echo "-not -name ${folder_name}" >>"${folder}"/stable_versions.txt
 
-				# Record sym link names to inform user
-				symstring="${artifact_name}"
+	# Record sym link names to inform user
+	symstring="${artifact_name}"
 
 }
 
 keep_most_recent_stable () {
 
-			tail -n3 "${folder}"/stable_versions.txt >>"${folder}"/to_keep.txt
-			mv "${folder}"/to_keep.txt "${folder}"/stable_versions.txt
+	tail -n3 "${folder}"/stable_versions.txt >>"${folder}"/to_keep.txt
 
-			# Delete symlinks and folders not stored in stable_versions.txt and user_versions.txt
-			find "${folder}"/links/"${app_name}"-v* $(cat "${folder}"/stable_versions.txt 2>/dev/null) $(cat "${folder}"/user_versions.txt 2>/dev/null) -delete
-			find "${folder}"/"${app_name}"-v* $(cat "${folder}"/stable_versions.txt 2>/dev/null) $(cat "${folder}"/user_versions.txt 2>/dev/null) -delete
+	# Delete symlinks and folders not stored in stable_versions.txt and user_versions.txt
+	find "${folder}"/links/"${app_name}"-v* $(cat "${folder}"/stable_versions.txt 2>/dev/null) $(cat "${folder}"/user_versions.txt 2>/dev/null) -delete
+	find "${folder}"/"${app_name}"-v* $(cat "${folder}"/stable_versions.txt 2>/dev/null) $(cat "${folder}"/user_versions.txt 2>/dev/null) -delete
 
 }
 
 add_to_path () {
 
-			# Check which files exist
-			if [ $(test -f ~/.zshrc) ] && [[ "$onpath" = false ]]; then
-				echo "Updating ~/.zshrc..."
-				echo "export PATH=\"\$PATH:"${folder}"/links\"" >>~/.zshrc
-			fi
+	# Check which files exist
+	if [ $(test -f ~/.zshrc) ] && [[ "$onpath" = false ]]; then
+		echo "Updating ~/.zshrc..."
+		echo "export PATH=\"\$PATH:"${folder}"/links\"" >>~/.zshrc
+	fi
 
-			if [ $(test -f ~/.bashrc) ] && [[ "$onpath" = false ]]; then
-				echo "Updating ~/.bashrc..."
-				echo "export PATH=\"\$PATH:"${folder}"/links\"" >>~/.bashhrc
-			fi
+	if [ $(test -f ~/.bashrc) ] && [[ "$onpath" = false ]]; then
+		echo "Updating ~/.bashrc..."
+		echo "export PATH=\"\$PATH:"${folder}"/links\"" >>~/.bashhrc
+	fi
 
 }
 
 print_post_install_info () {
 
-		echo $completion_string_1
-		sleep 0.2
-		if [ "$path" != true ] && [ "$onpath" != true ]; then
-			echo
-			echo
-			echo "Add "${app_name}" to path by adding the following line to ~/.bashrc or ~/.zshrc:"
-			echo "export PATH=\"\$PATH:"${folder}"/links\""
-		fi
+	echo $completion_string_1
+	sleep 0.2
+	if [ "$path" != true ] && [ "$onpath" != true ]; then
 		echo
 		echo
-		echo "Re-open terminal and then type ${symstring} to get started."
+		echo "Add "${app_name}" to path by adding the following line to ~/.bashrc or ~/.zshrc:"
+		echo "export PATH=\"\$PATH:"${folder}"/links\""
+	fi
+	echo
+	echo
+	echo "Re-open terminal and then type ${symstring} to get started."
 
 }
 
 purge_application (){
 
-		echo "Purging local install of "${app_name}"..."
-		sleep 0.2
-		echo "I say we take off and nuke the entire site from orbit. It's the only way to be sure."
-		# echo "Deleting "${app_name}" folder "${folder}"..."
-		# sleep 0.2
-		#rm -r  "${folder}"
-		# echo "Removing "${app_name}" folder "$folder}" from path..."
-		# sleep 0.2
-		# COMMAND GOES HERE
+	echo "Purging local install of "${app_name}"..."
+	sleep 0.2
+	echo "I say we take off and nuke the entire site from orbit. It's the only way to be sure."
+	# echo "Deleting "${app_name}" folder "${folder}"..."
+	# sleep 0.2
+	#rm -r  "${folder}"
+	# echo "Removing "${app_name}" folder "$folder}" from path..."
+	# sleep 0.2
+	# COMMAND GOES HERE
 
 }
 

@@ -23,6 +23,8 @@ function Install-HPCFlowApplication {
 		[switch]$PreRelease
 	)
 
+	Write-Host 'Test Message'
+
 	if ($OneFile.IsPresent) {
 		$ArtifactEnding = '-win.exe'
 		$OneFileFlag = $true
@@ -39,7 +41,14 @@ function Install-HPCFlowApplication {
 		$PreReleaseFlag = $false
 	}
 
-	Get-ScriptParameters | Get-LatestReleaseInfo -PreRelease $PreReleaseFlag | Extract-WindowsInfo -FileEnding $ArtifactEnding | Parse-WindowsInfo | Download-Artifact -DownloadFolder '~/Desktop' | Place-Artifact -FinalDestination $Folder -OneFile $OneFileFlag
+	Get-ScriptParameters | `
+	Get-LatestReleaseInfo -PreRelease $PreReleaseFlag | `
+	Extract-WindowsInfo -FileEnding $ArtifactEnding | `
+	Parse-WindowsInfo | `
+	Download-Artifact -DownloadFolder '~/Desktop' | `
+	Place-Artifact -FinalDestination $Folder -OneFile $OneFileFlag | `
+	Create-SymLinkToApp -Folder $Folder -OneFile $OneFileFlag
+
 }
 
 function  Get-ScriptParameters {
@@ -129,14 +138,16 @@ function Download-Artifact {
 
 	Invoke-WebRequest $ArtifactData.ArtifactWebAddress -OutFile $DownloadLocation
 
-	return $DownloadLocation
+	$ArtifactData = $ArtifactData + @{DownloadLocation=$DownloadLocation}
+
+	return $ArtifactData
 
 }
 
 function Place-Artifact {
 	param(
 		[parameter(Mandatory, ValueFromPipeline, ValueFromPipelineByPropertyName)]
-		[string]$DownloadLocation,
+		[hashtable]$ArtifactData,
 		[parameter(Mandatory)]
 		[string]$FinalDestination,
 		[parameter()]
@@ -144,11 +155,16 @@ function Place-Artifact {
 	)
 
 	if ($OneFile) {
-		Move-Item $DownloadLocation $FinalDestination
+		Move-Item $ArtifactData.DownloadLocation $FinalDestination
 	}
 	else {
-		Expand-Archive $DownloadLocation -DestinationPath $FinalDestination
+		Expand-Archive $ArtifactData.DownloadLocation -DestinationPath $FinalDestination
+		Remove-Item $ArtifactData.DownloadLocation
 	}
+
+	$ArtifactData = $ArtifactData + @{FinalDesination=$FinalDesination}
+
+	Return $ArtifactData
 
 }
 
@@ -157,6 +173,55 @@ function New-TemporaryFolder {
 	#$T="$($env:TEMP)\tmp$([convert]::tostring((get-random 65535),16).padleft(4,'0')).tmp"
 	$T="$($env:TMPDIR)/tmp$([convert]::tostring((get-random 65535),16).padleft(4,'0')).tmp"
 	New-Item -ItemType Directory -Path $T
+}
+
+function Create-SymLinkToApp {
+	param(
+		[parameter(Mandatory, ValueFromPipeline, ValueFromPipelineByPropertyName)]
+		[hashtable]$ArtifactData,
+
+		[parameter(Mandatory)]
+		[string]$Folder,
+
+		[parameter()]
+		[bool]$OneFile
+	)
+
+	$artifact_name = $ArtifactData.ArtifactName
+
+	if(-Not (Test-Path -PathType container $Folder/links))
+	{
+		New-Item -ItemType Directory -Path $Folder/links
+	}
+
+	# First create links folder if it doesn't exist
+
+	$SymLinkFolder=$Folder+"/links"
+
+	if($OneFile) {
+		New-Item -ItemType SymbolicLink -Path $SymLinkFolder -Name $artifact_name -Target $Folder/$artifact_name
+	}
+	else {
+		$link_name = $artifact_name.Replace(".zip","")
+		New-Item -ItemType SymbolicLink -Path $SymLinkFolder -Name $link_name -Target $Folder/$artifact_name/$artifact_name
+	}
+
+	return  $SymLinkFolder
+
+}
+
+function Add-SymLinkFolderToPath {
+	param(
+		[parameter(Mandatory, ValueFromPipeline, ValueFromPipelineByPropertyName)]
+		[string]$SymLinkFolder
+	)
+
+	if(-Not (Test-Path $profile)) {
+		New-Item -Path $profile -Type File -Force
+	}
+
+	 Add-Content $profile "`$env:PATH +=`";$SymLinkFolder`""
+
 }
 
 Install-HPCFlowApplication @PSBoundParameters
