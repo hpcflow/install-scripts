@@ -45,6 +45,7 @@ function Install-HPCFlowApplication {
 	Get-LatestReleaseInfo -PreRelease $PreReleaseFlag | `
 	Extract-WindowsInfo -FileEnding $ArtifactEnding | `
 	Parse-WindowsInfo | `
+	Check-AppInstall -Folder $Folder -OneFile $OneFileFlag | `
 	Download-Artifact -DownloadFolder '~/Desktop' | `
 	Place-Artifact -FinalDestination $Folder -OneFile $OneFileFlag | `
 	Create-SymLinkToApp -Folder $Folder -OneFile $OneFileFlag
@@ -78,7 +79,7 @@ function Get-LatestReleaseInfo {
 		[bool]$PreRelease
 	)
 
-	if ($Prerelease) {
+	if ($PreRelease) {
 		$PageHTML = Invoke-WebRequest -Uri $param.LatestPrereleaseReleases -Method Get
 	}
 	else {
@@ -86,6 +87,8 @@ function Get-LatestReleaseInfo {
 	}
 	
 	$PageContents = $PageHTML.Content
+
+	Write-Host $PageContents
 
 	return $PageContents
 
@@ -121,6 +124,35 @@ function Parse-WindowsInfo {
 	}
 
 	return $ArtifactData
+
+}
+
+function Check-AppInstall {
+	param(
+		[parameter(Mandatory, ValueFromPipeline, ValueFromPipelineByPropertyName)]
+		[hashtable]$ArtifactData,
+		[parameter(Mandatory)]
+		[string]$Folder,
+		[parameter(Mandatory)]
+		[bool]$OneFile
+	)
+
+	if($OneFile) {
+		$FileToCheck = $Folder + $ArtifactData.ArtifactName
+		Write-Host $FileToCheck
+		if(Test-Path $FileToCheck) {
+			Exit
+		}
+	}
+	Else {
+		$FileToCheck = $Folder + $ArtifactData.ArtifactName.Replace(".zip",'')
+		Write-Host $FileToCheck
+		if(Test-Path -PathType container $FileToCheck) {
+			Exit
+		}
+	}
+
+	Return $ArtifactData
 
 }
 
