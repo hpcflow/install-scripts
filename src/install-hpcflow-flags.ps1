@@ -48,7 +48,8 @@ function Install-HPCFlowApplication {
 	Check-AppInstall -Folder $Folder -OneFile $OneFileFlag | `
 	Download-Artifact -DownloadFolder '~/Desktop' | `
 	Place-Artifact -FinalDestination $Folder -OneFile $OneFileFlag | `
-	Create-SymLinkToApp -Folder $Folder -OneFile $OneFileFlag
+	Create-SymLinkToApp -Folder $Folder -OneFile $OneFileFlag | `
+	Add-SymLinkFolderToPath
 
 }
 
@@ -248,11 +249,16 @@ function Add-SymLinkFolderToPath {
 		[string]$SymLinkFolder
 	)
 
-	if(-Not (Test-Path $profile)) {
-		New-Item -Path $profile -Type File -Force
-	}
+	if(-Not ($Env:Path -split ":" -contains $SymLinkFolder)) {
 
-	 Add-Content $profile "`$env:PATH +=`";$SymLinkFolder`""
+		if(-Not (Test-Path $profile)) {
+			New-Item -Path $profile -Type File
+		}
+
+	 	Add-Content $profile "`$env:PATH +=`":$SymLinkFolder`""
+		& $profile
+
+	}
 
 }
 
