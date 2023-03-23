@@ -23,22 +23,39 @@ function Install-HPCFlowApplication {
 		[switch]$PreRelease
 	)
 
-	Write-Host 'Test Message'
+	$AppName = "hpcflow"
 
 	if ($OneFile.IsPresent) {
 		$ArtifactEnding = '-win.exe'
 		$OneFileFlag = $true
+		$AppType = "single file"
 	}
 	else {
 		$ArtifactEnding = '-win-dir.zip'
 		$OneFileFlag = $false
+		$AppType = "single folder"
 	}
 
 	if ($PreRelease.IsPresent) {
 		$PreReleaseFlag = $true
+		$VersionType = "latest prerelease"
 	}
 	else {
 		$PreReleaseFlag = $false
+		$VersionType = "latest stable"
+	}
+
+	Write-Host "Installing $AppName $VersionType $AppType version..."
+	Start-Sleep -Milliseconds 100
+
+	if ($PSBoundParameters.ContainsKey('Folder')) {
+		Write-Host "Installing to user specified folder $Folder..."
+		Start-Sleep -Milliseconds 100
+	}
+	else {
+		$Folder = Get-InstallDir
+		Write-Host "Installing to default location $Folder..."
+		Start-Sleep -Milliseconds 100
 	}
 
 	Get-ScriptParameters | `
@@ -51,6 +68,13 @@ function Install-HPCFlowApplication {
 	Create-SymLinkToApp -Folder $Folder -OneFile $OneFileFlag | `
 	Add-SymLinkFolderToPath
 
+}
+
+function Get-InstallDir {
+	# WindowsInstallDir = "${env:USERPROFILE}\AppData\Local\hpcflow"
+	$WindowsInstallDir = "/Users/user/Documents/hpcflow_test"
+
+	return $WindowsInstallDir
 }
 
 function  Get-ScriptParameters {
@@ -88,8 +112,6 @@ function Get-LatestReleaseInfo {
 	}
 	
 	$PageContents = $PageHTML.Content
-
-	Write-Host $PageContents
 
 	return $PageContents
 
@@ -139,16 +161,22 @@ function Check-AppInstall {
 	)
 
 	if($OneFile) {
-		$FileToCheck = $Folder + $ArtifactData.ArtifactName
-		Write-Host $FileToCheck
+		$FileToCheck = $Folder + '/' +$ArtifactData.ArtifactName
 		if(Test-Path $FileToCheck) {
+			Write-Host "This version already installed..."
+			Start-Sleep -Milliseconds 50
+			Write-Host "Exiting..."
+			Start-Sleep -Milliseconds 100
 			Exit
 		}
 	}
 	Else {
-		$FileToCheck = $Folder + $ArtifactData.ArtifactName.Replace(".zip",'')
-		Write-Host $FileToCheck
+		$FileToCheck = $Folder + '/'+$ArtifactData.ArtifactName.Replace(".zip",'')
 		if(Test-Path -PathType container $FileToCheck) {
+			Write-Host "This version already installed..."
+			Start-Sleep -Milliseconds 50
+			Write-Host "Exiting..."
+			Start-Sleep -Milliseconds 100
 			Exit
 		}
 	}
@@ -165,9 +193,10 @@ function Download-Artifact {
 		[string]$DownloadFolder
 	)
 
-	$DownloadLocation = $DownloadFolder +"/" + $ArtifactData.ArtifactName
+	Write-Host "Downloading "$ArtifactData.ArtifactName
+	Start-Sleep -Milliseconds 100
 
-	Write-Host $DownloadLocation
+	$DownloadLocation = $DownloadFolder +"/" + $ArtifactData.ArtifactName
 
 	Invoke-WebRequest $ArtifactData.ArtifactWebAddress -OutFile $DownloadLocation
 
@@ -233,11 +262,16 @@ function Create-SymLinkToApp {
 
 	if($OneFile) {
 		New-Item -ItemType SymbolicLink -Path $SymLinkFolder -Name $artifact_name -Target $Folder/$artifact_name
+		Write-Host "Type $artifact_name to get started!"
+		Start-Sleep -Milliseconds 100
 	}
 	else {
 		$link_name = $artifact_name.Replace(".zip","")
 		New-Item -ItemType SymbolicLink -Path $SymLinkFolder -Name $link_name -Target $Folder/$artifact_name/$artifact_name
+		Write-Host "Type $link_name to get started!"
+		Start-Sleep -Milliseconds 100
 	}
+
 
 	return  $SymLinkFolder
 
