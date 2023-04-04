@@ -74,8 +74,6 @@ function Install-HPCFlowApplication {
 
 	$DownloadFolder = New-TemporaryFolder
 
-	NONSENSE
-
 	Get-ScriptParameters | `
 	Get-LatestReleaseInfo -PreRelease $PreReleaseFlag | `
 	Extract-WindowsInfo -FileEnding $ArtifactEnding | `
