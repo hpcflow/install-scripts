@@ -22,6 +22,19 @@ function Install-HPCFlowApplication {
 		[Parameter()]
 		[switch]$PreRelease
 	)
+	trap{
+		# Check if DownloadFolder variable has been created. If it has, delete folder it points to.
+
+		# First check variable exists (i.e. is not null)
+		if($DownloadFolder){
+			# Next check if folder exists
+			if(Test-Path -Path $DownloadFolder){
+				Remove-Item $DownloadFolder
+				}
+		}
+		Write-Host "Installation of" $AppName "unsuccessful"
+		Exit
+	}
 
 	$AppName = "hpcflow"
 
@@ -45,6 +58,7 @@ function Install-HPCFlowApplication {
 		$VersionType = "latest stable"
 	}
 
+
 	Write-Host "Installing $AppName $VersionType $AppType version..."
 	Start-Sleep -Milliseconds 100
 
@@ -58,15 +72,21 @@ function Install-HPCFlowApplication {
 		Start-Sleep -Milliseconds 100
 	}
 
+	$DownloadFolder = New-TemporaryFolder
+
+	NONSENSE
+
 	Get-ScriptParameters | `
 	Get-LatestReleaseInfo -PreRelease $PreReleaseFlag | `
 	Extract-WindowsInfo -FileEnding $ArtifactEnding | `
 	Parse-WindowsInfo | `
 	Check-AppInstall -Folder $Folder -OneFile $OneFileFlag | `
-	Download-Artifact -DownloadFolder '~/Desktop' | `
+	Download-Artifact -DownloadFolder $DownloadFolder | `
 	Place-Artifact -FinalDestination $Folder -OneFile $OneFileFlag | `
 	Create-SymLinkToApp -Folder $Folder -OneFile $OneFileFlag | `
 	Add-SymLinkFolderToPath
+
+	
 
 }
 
