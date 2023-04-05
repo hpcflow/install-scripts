@@ -180,22 +180,24 @@ function Check-AppInstall {
 
 	if($OneFile) {
 		$FileToCheck = $Folder + '/' +$ArtifactData.ArtifactName
+		Write-Host "Path checked:" $FileToCheck
 		if(Test-Path $FileToCheck) {
 			Write-Host "This version already installed..."
 			Start-Sleep -Milliseconds 50
 			Write-Host "Exiting..."
 			Start-Sleep -Milliseconds 100
-			Exit
+			#Exit
 		}
 	}
 	Else {
 		$FileToCheck = $Folder + '/'+$ArtifactData.ArtifactName.Replace(".zip",'')
+		Write-Host "Path checked:" $FileToCheck
 		if(Test-Path -PathType container $FileToCheck) {
 			Write-Host "This version already installed..."
 			Start-Sleep -Milliseconds 50
 			Write-Host "Exiting..."
 			Start-Sleep -Milliseconds 100
-			Exit
+			#Exit
 		}
 	}
 
