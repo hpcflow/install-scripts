@@ -33,7 +33,7 @@ function Install-HPCFlowApplication {
 				}
 		}
 		Write-Host "Installation of" $AppName "unsuccessful"
-		Exit
+		#Exit
 	}
 
 	$AppName = "hpcflow"
