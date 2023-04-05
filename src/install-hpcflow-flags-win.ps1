@@ -89,8 +89,8 @@ function Install-HPCFlowApplication {
 }
 
 function Get-InstallDir {
-	# WindowsInstallDir = "${env:USERPROFILE}\AppData\Local\hpcflow"
-	$WindowsInstallDir = "/Users/user/Documents/hpcflow_test"
+	$WindowsInstallDir = "${env:USERPROFILE}\AppData\Local\hpcflow"
+	#$WindowsInstallDir = "/Users/user/Documents/hpcflow_test"
 
 	return $WindowsInstallDir
 }
@@ -250,8 +250,8 @@ function Place-Artifact {
 
 function New-TemporaryFolder {
 	# Make a new folder based upon a TempFileName
-	#$T="$($env:TEMP)\tmp$([convert]::tostring((get-random 65535),16).padleft(4,'0')).tmp"
-	$T="$($env:TMPDIR)/tmp$([convert]::tostring((get-random 65535),16).padleft(4,'0')).tmp"
+	$T="$($env:TEMP)\tmp$([convert]::tostring((get-random 65535),16).padleft(4,'0')).tmp"
+	#$T="$($env:TMPDIR)/tmp$([convert]::tostring((get-random 65535),16).padleft(4,'0')).tmp"
 	New-Item -ItemType Directory -Path $T
 }
 
@@ -301,13 +301,13 @@ function Add-SymLinkFolderToPath {
 		[string]$SymLinkFolder
 	)
 
-	if(-Not ($Env:Path -split ":" -contains $SymLinkFolder)) {
+	if(-Not ($Env:Path -split ";" -contains $SymLinkFolder)) {
 
 		if(-Not (Test-Path $profile)) {
 			New-Item -Path $profile -Type File
 		}
 
-	 	Add-Content $profile "`$env:PATH +=`":$SymLinkFolder`""
+	 	Add-Content $profile "`$env:PATH +=`";$SymLinkFolder`""
 		& $profile
 
 	}
