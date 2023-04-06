@@ -72,7 +72,8 @@ function Install-HPCFlowApplication {
 		Start-Sleep -Milliseconds 100
 	}
 
-	$DownloadFolder = New-TemporaryFolder
+	#$DownloadFolder = New-TemporaryFolder
+	$DownloadFolder = '~/Desktop/test'
 
 	Get-ScriptParameters | `
 	Get-LatestReleaseInfo -PreRelease $PreReleaseFlag | `
@@ -131,6 +132,8 @@ function Get-LatestReleaseInfo {
 	
 	$PageContents = $PageHTML.Content
 
+	Write-Host $PageContents
+
 	return $PageContents
 
 }
@@ -163,6 +166,8 @@ function Parse-WindowsInfo {
 		ArtifactName = $Parts[0]
 		ArtifactWebAddress = $Parts[1]
 	}
+
+	Write-Host $ArtifactName
 
 	return $ArtifactData
 
