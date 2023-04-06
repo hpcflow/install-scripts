@@ -72,8 +72,7 @@ function Install-HPCFlowApplication {
 		Start-Sleep -Milliseconds 100
 	}
 
-	#$DownloadFolder = New-TemporaryFolder
-	$DownloadFolder = '~/Desktop/test'
+	$DownloadFolder = New-TemporaryFolder
 
 	Get-ScriptParameters | `
 	Get-LatestReleaseInfo -PreRelease $PreReleaseFlag | `
@@ -90,7 +89,7 @@ function Install-HPCFlowApplication {
 }
 
 function Get-InstallDir {
-	$WindowsInstallDir = "${env:USERPROFILE}\AppData\Local\hpcflow"
+	¢$WindowsInstallDir = "${env:USERPROFILE}\AppData\Local\hpcflow"
 	#$WindowsInstallDir = "/Users/user/Documents/hpcflow_test"
 
 	return $WindowsInstallDir
