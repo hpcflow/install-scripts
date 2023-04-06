@@ -140,12 +140,14 @@ function Get-LatestReleaseInfo {
 function Extract-WindowsInfo {
 	param(
 		[parameter(Mandatory, ValueFromPipeline, ValueFromPipelineByPropertyName)]
-		[string]$StablePageContents,
+		[string]$PageContents,
 		[parameter(Mandatory)]
 		[string]$FileEnding
 	)
 
-	$StablePageContentsSplit = $StablePageContents -Split [System.Environment]::NewLine
+	$StablePageContentsSplit = $PageContents -Split [System.Environment]::NewLine
+
+	Write-Host $StablePageContentsSplit
 
 	foreach ($VersionInfo in $StablePageContentsSplit) {
 		if ($VersionInfo -Like "*"+$FileEnding) {
