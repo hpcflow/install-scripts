@@ -89,7 +89,7 @@ function Install-HPCFlowApplication {
 }
 
 function Get-InstallDir {
-	¢$WindowsInstallDir = "${env:USERPROFILE}\AppData\Local\hpcflow"
+	$WindowsInstallDir = "${env:USERPROFILE}\AppData\Local\hpcflow"
 	#$WindowsInstallDir = "/Users/user/Documents/hpcflow_test"
 
 	return $WindowsInstallDir
