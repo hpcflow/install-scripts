@@ -150,7 +150,9 @@ function Extract-WindowsInfo {
 	Write-Host $StablePageContentsSplit
 
 	foreach ($VersionInfo in $StablePageContentsSplit) {
+		Write-Host $VersionInfo
 		if ($VersionInfo -Like "*"+$FileEnding) {
+			Write-Host $VersionInfo $FileEnding
 			return $VersionInfo
 		}
 	}
