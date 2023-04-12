@@ -303,7 +303,7 @@ function Add-SymLinkFolderToPath {
 		[string]$SymLinkFolder
 	)
 
-	if(-Not ($Env:Path -split ";" -contains $SymLinkFolder)) {
+	if(-Not ($Env:PATH -split ";" -contains $SymLinkFolder)) {
 
 		if(-Not (Test-Path $profile)) {
 			New-Item -Path $profile -Type File
