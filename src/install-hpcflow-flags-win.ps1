@@ -287,7 +287,7 @@ function Create-SymLinkToApp {
 		$link_name = $artifact_name.Replace(".zip","")
 		$folder_name = $link_name
 		$exe_name = $artifact_name.Replace(".zip",".exe")
-		New-Item -ItemType SymbolicLink -Path $SymLinkFolder -Name $link_name -Target $Folder/$artifact_name/$artifact_name
+		New-Item -ItemType SymbolicLink -Path $SymLinkFolder -Name $link_name -Target $Folder/$folder_name/$exe_name
 		Write-Host "Type $link_name to get started!"
 		Start-Sleep -Milliseconds 100
 	}
