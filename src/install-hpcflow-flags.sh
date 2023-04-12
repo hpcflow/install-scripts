@@ -1,4 +1,4 @@
-#!/bin/bash
+echo/bin/bash
 run_main() {
 
 	set_variables
@@ -299,11 +299,19 @@ check_if_desired_version_installed() {
 
 check_if_symlink_folder_on_path() {
 
+	echo "Checking if links folder on path..."
+
 	# Check if folders on path already
 	case :$PATH: in
 	*:"${folder}"/links:) onpath=true ;;
 	*) ;;
 	esac
+
+	if [[ "$onpath" = false ]]; then
+		echo "Need to add links folder to path..."
+	else
+		echo "Links folder on path..."
+	fi
 
 }
 
@@ -403,15 +411,15 @@ keep_most_recent_stable () {
 add_to_path () {
 
 	# Check which files exist
-	if [ $(test -f ~/.zshrc) ] && [[ "$onpath" = false ]]; then
+	if [[ $(test -f ~/.zshrc) ]] && [[ "$onpath" = false ]]; then
 		echo "Updating ~/.zshrc..."
 		echo "export PATH=\"\$PATH:"${folder}"/links\"" >>~/.zshrc
 		source ~/.zshrc
 	fi
 
-	if [ $(test -f ~/.bashrc) ] && [[ "$onpath" = false ]]; then
+	if [[ $(test -f ~/.bashrc) ]] && [[ "$onpath" = false ]]; then
 		echo "Updating ~/.bashrc..."
-		echo "export PATH=\"\$PATH:"${folder}"/links\"" >>~/.bashhrc
+		echo "export PATH=\"\$PATH:"${folder}"/links\"" >>~/.bashrc
 		source ~/.bashrc
 	fi
 
