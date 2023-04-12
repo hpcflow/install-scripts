@@ -350,6 +350,17 @@ create_versioned_symlink_stable_one_folder() {
 
 }
 
+create_versioned_symlink_user_one_folder () {
+
+	ln -sf "${folder}/${folder_name}/${folder_name}" "${folder}/links/${folder_name}"
+
+	echo "-not -name ${folder_name}" >>"${folder}"/user_versions.txt
+
+	# Record sym link names to inform user
+	symstring="${folder_name}"
+
+}
+
 create_universal_symlink () {
 
 	ln -sf "${folder}/${folder_name}/${folder_name}" "${folder}/links/${app_name}"
@@ -362,6 +373,17 @@ create_versioned_symlink_stable_onefile () {
 	ln -sf "${folder}/${artifact_name}" "${folder}/links/${artifact_name}"
 
 	echo "-not -name ${folder_name}" >>"${folder}"/stable_versions.txt
+
+	# Record sym link names to inform user
+	symstring="${artifact_name}"
+
+}
+
+create_versioned_symlink_user_onefile () {
+
+	ln -sf "${folder}/${artifact_name}" "${folder}/links/${artifact_name}"
+
+	echo "-not -name ${folder_name}" >>"${folder}"/user_versions.txt
 
 	# Record sym link names to inform user
 	symstring="${artifact_name}"
