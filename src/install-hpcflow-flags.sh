@@ -413,7 +413,6 @@ add_to_path () {
 		if test -f ~/.bashrc; then
 			echo "Updating ~/.bashrc..."
 			echo "export PATH=\"\$PATH:"${folder}"/links\"" >>~/.bashrc
-			source ~/.bashrc
 		fi
 
 	fi
@@ -455,8 +454,15 @@ dummy_func() {
 }
 
 if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
+
 	run_main "$@"
+
 	if test -f ~/.zshrc; then
 		exec /bin/zsh
 	fi
+
+	if test -f ~/.bashrc; then
+		source ~/.bashrc
+	fi
+
 fi
