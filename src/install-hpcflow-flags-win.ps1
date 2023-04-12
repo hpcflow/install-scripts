@@ -148,11 +148,12 @@ function Extract-WindowsInfo {
 	$StablePageContentsSplit = $PageContents -Split [System.Environment]::NewLine
 
 	Write-Host $StablePageContentsSplit
+	Write-Host $FileEnding
 
 	foreach ($VersionInfo in $StablePageContentsSplit) {
-		Write-Host $VersionInfo
+		Write-Host 'In Loop:' $VersionInfo
 		if ($VersionInfo -Like "*"+$FileEnding) {
-			Write-Host $VersionInfo $FileEnding
+			Write-Host 'In conditional' $VersionInfo $FileEnding
 			return $VersionInfo
 		}
 	}
