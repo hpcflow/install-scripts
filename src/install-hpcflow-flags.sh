@@ -1,4 +1,4 @@
-echo/bin/bash
+#!/bin/bash
 run_main() {
 
 	set_variables
@@ -299,19 +299,11 @@ check_if_desired_version_installed() {
 
 check_if_symlink_folder_on_path() {
 
-	echo "Checking if links folder on path..."
-
 	# Check if folders on path already
 	case :$PATH: in
 	*:"${folder}"/links:) onpath=true ;;
 	*) ;;
 	esac
-
-	if [[ "$onpath" = false ]]; then
-		echo "Need to add links folder to path..."
-	else
-		echo "Links folder on path..."
-	fi
 
 }
 
@@ -319,7 +311,7 @@ download_artifact_to_temp() {
 
 	echo $progress_string_1
 	echo
-	curl -s --o "${TEMPD}/${artifact_name}" $download_link -O -L
+	curl -s --output "${TEMPD}/${artifact_name}" $download_link -O -L
 	echo $progress_string_2
 	echo
 
@@ -410,17 +402,20 @@ keep_most_recent_stable () {
 
 add_to_path () {
 
-	# Check which files exist
-	if [[ $(test -f ~/.zshrc) ]] && [[ "$onpath" = false ]]; then
-		echo "Updating ~/.zshrc..."
-		echo "export PATH=\"\$PATH:"${folder}"/links\"" >>~/.zshrc
-		source ~/.zshrc
-	fi
+	if [ "$onpath" = false ]; then
 
-	if [[ $(test -f ~/.bashrc) ]] && [[ "$onpath" = false ]]; then
-		echo "Updating ~/.bashrc..."
-		echo "export PATH=\"\$PATH:"${folder}"/links\"" >>~/.bashrc
-		source ~/.bashrc
+		# Check which files exist
+		if test -f ~/.zshrc; then
+			echo "Updating ~/.zshrc..."
+			echo "export PATH=\"\$PATH:"${folder}"/links\"" >>~/.zshrc
+		fi
+
+		if test -f ~/.bashrc; then
+			echo "Updating ~/.bashrc..."
+			echo "export PATH=\"\$PATH:"${folder}"/links\"" >>~/.bashrc
+			source ~/.bashrc
+		fi
+
 	fi
 
 }
@@ -461,4 +456,7 @@ dummy_func() {
 
 if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
 	run_main "$@"
+	if test -f ~/.zshrc; then
+		exec /bin/zsh
+	fi
 fi
