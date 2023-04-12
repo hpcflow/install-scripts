@@ -145,7 +145,7 @@ function Extract-WindowsInfo {
 		[string]$FileEnding
 	)
 
-	$StablePageContentsSplit = $PageContents -Split [System.Environment]::NewLine
+	$StablePageContentsSplit = $PageContents -Split "\n"
 
 	Write-Host $StablePageContentsSplit
 	Write-Host $FileEnding
