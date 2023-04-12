@@ -406,11 +406,13 @@ add_to_path () {
 	if [ $(test -f ~/.zshrc) ] && [[ "$onpath" = false ]]; then
 		echo "Updating ~/.zshrc..."
 		echo "export PATH=\"\$PATH:"${folder}"/links\"" >>~/.zshrc
+		source ~/.zshrc
 	fi
 
 	if [ $(test -f ~/.bashrc) ] && [[ "$onpath" = false ]]; then
 		echo "Updating ~/.bashrc..."
 		echo "export PATH=\"\$PATH:"${folder}"/links\"" >>~/.bashhrc
+		source ~/.bashrc
 	fi
 
 }
