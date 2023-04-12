@@ -459,4 +459,7 @@ if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
 	if test -f ~/.zshrc; then
 		exec /bin/zsh
 	fi
+	if test -f ~/.bashrc; then
+		exec /bin/bash
+	fi
 fi
