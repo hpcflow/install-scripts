@@ -462,7 +462,7 @@ if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
 	fi
 
 	if test -f ~/.bashrc; then
-		source ~/.bashrc
+		exec /bin/bash
 	fi
 
 fi
