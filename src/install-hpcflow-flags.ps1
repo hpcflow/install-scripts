@@ -143,7 +143,7 @@ function Extract-WindowsInfo {
 		[string]$FileEnding
 	)
 
-	$StablePageContentsSplit = $StablePageContents -Split [System.Environment]::NewLine
+	$StablePageContentsSplit = $StablePageContents -Split "\n"
 
 	foreach ($VersionInfo in $StablePageContentsSplit) {
 		if ($VersionInfo -Like "*"+$FileEnding) {

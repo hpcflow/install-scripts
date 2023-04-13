@@ -269,38 +269,49 @@ function Create-SymLinkToApp {
 
 	$artifact_name = $ArtifactData.ArtifactName
 
-	if(-Not (Test-Path -PathType container $Folder\links))
+	if(-Not (Test-Path -PathType container $Folder\aliases))
 	{
-		New-Item -ItemType Directory -Path $Folder\links
+		New-Item -ItemType Directory -Path $Folder\aiases
 	}
 
-	# First create links folder if it doesn't exist
+	# First create folder to store alias files if it doesn't exist
 
-	$SymLinkFolder=$Folder+"\links"
+	$SymLinkFile=$Folder+"\aliases\hpcflow_aliases.csv"
 
 	if($OneFile) {
-		New-Item -ItemType SymbolicLink -Path $SymLinkFolder -Name $artifact_name -Target $Folder/$artifact_name
+		
+		if (-Not (Get-Content $SymLinkFile | %{$_ -match $artifact_name})
+		{
+			Add-Content $SymLinkFile "`"$artifact_name`",`"$Folder\$artifact_name`",`"`",`"None`""
+		}
+		
 		Write-Host "Type $artifact_name to get started!"
 		Start-Sleep -Milliseconds 100
+
 	}
 	else {
+
 		$link_name = $artifact_name.Replace(".zip","")
 		$folder_name = $link_name
 		$exe_name = $artifact_name.Replace(".zip",".exe")
-		New-Item -ItemType SymbolicLink -Path $SymLinkFolder -Name $link_name -Target $Folder/$folder_name/$exe_name
+		
+		if (-Not (Get-Content $SymLinkFile | %{$_ -match $link_name})
+		{
+			Add-Content $SymLinkFile "`"$link_name`",`"$Folder\$folder_name\$exe_name`",`"`",`"None`""
+		}
 		Write-Host "Type $link_name to get started!"
 		Start-Sleep -Milliseconds 100
 	}
 
 
-	return  $SymLinkFolder
+	return  $SymLinkFile
 
 }
 
 function Add-SymLinkFolderToPath {
 	param(
 		[parameter(Mandatory, ValueFromPipeline, ValueFromPipelineByPropertyName)]
-		[string]$SymLinkFolder
+		[string]$SymLinkFile
 	)
 
 	if(-Not ($Env:PATH -split ";" -contains $SymLinkFolder)) {
@@ -309,7 +320,10 @@ function Add-SymLinkFolderToPath {
 			New-Item -Path $profile -Type File
 		}
 
-	 	Add-Content $profile "`$Env:PATH +=`";$SymLinkFolder`""
+		if (-Not (Get-Content $profile | %{$_ -match "Import-Alias $SymlinkFile"})) {
+			Add-Content $profile "Import-Alias $SymLinkFile"
+		}
+
 		& $profile
 
 	}
