@@ -33,7 +33,7 @@ function Install-HPCFlowApplication {
 				}
 		}
 		Write-Host "Installation of" $AppName "unsuccessful"
-		Exit
+		#Exit
 	}
 
 	$AppName = "hpcflow"
@@ -89,8 +89,8 @@ function Install-HPCFlowApplication {
 }
 
 function Get-InstallDir {
-	# WindowsInstallDir = "${env:USERPROFILE}\AppData\Local\hpcflow"
-	$WindowsInstallDir = "/Users/user/Documents/hpcflow_test"
+	$WindowsInstallDir = "${env:USERPROFILE}\AppData\Local\hpcflow"
+	#$WindowsInstallDir = "/Users/user/Documents/hpcflow_test"
 
 	return $WindowsInstallDir
 }
@@ -138,12 +138,12 @@ function Get-LatestReleaseInfo {
 function Extract-WindowsInfo {
 	param(
 		[parameter(Mandatory, ValueFromPipeline, ValueFromPipelineByPropertyName)]
-		[string]$StablePageContents,
+		[string]$PageContents,
 		[parameter(Mandatory)]
 		[string]$FileEnding
 	)
 
-	$StablePageContentsSplit = $StablePageContents -Split "\n"
+	$StablePageContentsSplit = $PageContents -Split "\n"
 
 	foreach ($VersionInfo in $StablePageContentsSplit) {
 		if ($VersionInfo -Like "*"+$FileEnding) {
@@ -185,7 +185,7 @@ function Check-AppInstall {
 			Start-Sleep -Milliseconds 50
 			Write-Host "Exiting..."
 			Start-Sleep -Milliseconds 100
-			Exit
+			#Exit
 		}
 	}
 	Else {
@@ -195,7 +195,7 @@ function Check-AppInstall {
 			Start-Sleep -Milliseconds 50
 			Write-Host "Exiting..."
 			Start-Sleep -Milliseconds 100
-			Exit
+			#Exit
 		}
 	}
 
@@ -250,8 +250,8 @@ function Place-Artifact {
 
 function New-TemporaryFolder {
 	# Make a new folder based upon a TempFileName
-	#$T="$($env:TEMP)\tmp$([convert]::tostring((get-random 65535),16).padleft(4,'0')).tmp"
-	$T="$($env:TMPDIR)/tmp$([convert]::tostring((get-random 65535),16).padleft(4,'0')).tmp"
+	$T="$($env:TEMP)\tmp$([convert]::tostring((get-random 65535),16).padleft(4,'0')).tmp"
+	#$T="$($env:TMPDIR)/tmp$([convert]::tostring((get-random 65535),16).padleft(4,'0')).tmp"
 	New-Item -ItemType Directory -Path $T
 }
 
@@ -269,47 +269,62 @@ function Create-SymLinkToApp {
 
 	$artifact_name = $ArtifactData.ArtifactName
 
-	if(-Not (Test-Path -PathType container $Folder/links))
+	if(-Not (Test-Path -PathType container $Folder\aliases))
 	{
-		New-Item -ItemType Directory -Path $Folder/links
+		New-Item -ItemType Directory -Path $Folder\aliases
 	}
 
-	# First create links folder if it doesn't exist
+	# First create folder to store alias files if it doesn't exist
 
-	$SymLinkFolder=$Folder+"/links"
+	$AliasFile=$Folder+"\aliases\hpcflow_aliases.csv"
+
+	if (-Not (Test-Path $AliasFile -PathType leaf)) {
+		New-Item -Path $AliasFile -Type File
+	}
 
 	if($OneFile) {
-		New-Item -ItemType SymbolicLink -Path $SymLinkFolder -Name $artifact_name -Target $Folder/$artifact_name
+		
+		if (-Not (Get-Content $AliasFile | %{$_ -match $artifact_name})) {
+			Add-Content $AliasFile "`"$artifact_name`",`"$Folder\$artifact_name`",`"`",`"None`""
+		}
+		
 		Write-Host "Type $artifact_name to get started!"
 		Start-Sleep -Milliseconds 100
+
 	}
 	else {
+
 		$link_name = $artifact_name.Replace(".zip","")
-		New-Item -ItemType SymbolicLink -Path $SymLinkFolder -Name $link_name -Target $Folder/$artifact_name/$artifact_name
+		$folder_name = $link_name
+		$exe_name = $artifact_name.Replace(".zip",".exe")
+		
+		if (-Not (Get-Content $AliasFile | %{$_ -match $link_name})) {
+			Add-Content $AliasFile "`"$link_name`",`"$Folder\$folder_name\$exe_name`",`"`",`"None`""
+		}
 		Write-Host "Type $link_name to get started!"
 		Start-Sleep -Milliseconds 100
 	}
 
 
-	return  $SymLinkFolder
+	return  $AliasFile
 
 }
 
 function Add-SymLinkFolderToPath {
 	param(
 		[parameter(Mandatory, ValueFromPipeline, ValueFromPipelineByPropertyName)]
-		[string]$SymLinkFolder
+		[string]$AliasFile
 	)
 
-	if(-Not ($Env:Path -split ":" -contains $SymLinkFolder)) {
+	if(-Not (Test-Path $profile)) {
+		New-Item -Path $profile -Type File
+	}
 
-		if(-Not (Test-Path $profile)) {
-			New-Item -Path $profile -Type File
-		}
+	$ImportString = "Import-Alias $AliasFile" 
 
-	 	Add-Content $profile "`$env:PATH +=`":$SymLinkFolder`""
+	if (-Not (Get-Content $profile | %{$_ -match $ImportString.replace('\','\\')})) {
+		Add-Content $profile $ImportString
 		& $profile
-
 	}
 
 }
