@@ -276,16 +276,16 @@ function Create-SymLinkToApp {
 
 	# First create folder to store alias files if it doesn't exist
 
-	$SymLinkFile=$Folder+"\aliases\hpcflow_aliases.csv"
+	$AliasFile=$Folder+"\aliases\hpcflow_aliases.csv"
 
-	if (-Not (Test-Path $profile)) {
-		New-Item -Path $SymLinkFile -Type File
+	if (-Not (Test-Path $AliasFile -PathType leaf)) {
+		New-Item -Path $AliasFile -Type File
 	}
 
 	if($OneFile) {
 		
-		if (-Not (Get-Content $SymLinkFile | %{$_ -match $artifact_name})) {
-			Add-Content $SymLinkFile "`"$artifact_name`",`"$Folder\$artifact_name`",`"`",`"None`""
+		if (-Not (Get-Content $AliasFile | %{$_ -match $artifact_name})) {
+			Add-Content $AliasFile "`"$artifact_name`",`"$Folder\$artifact_name`",`"`",`"None`""
 		}
 		
 		Write-Host "Type $artifact_name to get started!"
@@ -298,36 +298,31 @@ function Create-SymLinkToApp {
 		$folder_name = $link_name
 		$exe_name = $artifact_name.Replace(".zip",".exe")
 		
-		if (-Not (Get-Content $SymLinkFile | %{$_ -match $link_name})) {
-			Add-Content $SymLinkFile "`"$link_name`",`"$Folder\$folder_name\$exe_name`",`"`",`"None`""
+		if (-Not (Get-Content $AliasFile | %{$_ -match $link_name})) {
+			Add-Content $AliasFile "`"$link_name`",`"$Folder\$folder_name\$exe_name`",`"`",`"None`""
 		}
 		Write-Host "Type $link_name to get started!"
 		Start-Sleep -Milliseconds 100
 	}
 
 
-	return  $SymLinkFile
+	return  $AliasFile
 
 }
 
 function Add-SymLinkFolderToPath {
 	param(
 		[parameter(Mandatory, ValueFromPipeline, ValueFromPipelineByPropertyName)]
-		[string]$SymLinkFile
+		[string]$AliasFile
 	)
 
-	if(-Not ($Env:PATH -split ";" -contains $SymLinkFolder)) {
+	if(-Not (Test-Path $profile)) {
+		New-Item -Path $profile -Type File
+	}
 
-		if(-Not (Test-Path $profile)) {
-			New-Item -Path $profile -Type File
-		}
-
-		if (-Not (Get-Content $profile | %{$_ -match "Import-Alias $SymlinkFile"})) {
-			Add-Content $profile "Import-Alias $SymLinkFile"
-		}
-
+	if (-Not (Get-Content $profile | %{$_ -match "Import-Alias $AliasFile"})) {
+		Add-Content $profile "Import-Alias $AliasFile"
 		& $profile
-
 	}
 
 }
