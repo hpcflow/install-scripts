@@ -280,7 +280,7 @@ function Create-SymLinkToApp {
 
 	if($OneFile) {
 		
-		if (-Not (Get-Content $SymLinkFile | %{$_ -match $artifact_name})
+		if (-Not (Get-Content $SymLinkFile | %{$_ -match $artifact_name}))
 		{
 			Add-Content $SymLinkFile "`"$artifact_name`",`"$Folder\$artifact_name`",`"`",`"None`""
 		}
