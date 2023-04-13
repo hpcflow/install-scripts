@@ -320,8 +320,10 @@ function Add-SymLinkFolderToPath {
 		New-Item -Path $profile -Type File
 	}
 
-	if (-Not (Get-Content $profile | %{$_ -match "Import-Alias $AliasFile.replace('\','\\')"})) {
-		Add-Content $profile "Import-Alias $AliasFile"
+	$ImportString = "Import-Alias $AliasFile" 
+
+	if (-Not (Get-Content $profile | %{$_ -match $ImportString.replace('\','\\')})) {
+		Add-Content $profile $ImportString
 		& $profile
 	}
 
