@@ -295,7 +295,7 @@ function Create-SymLinkToApp {
 		$folder_name = $link_name
 		$exe_name = $artifact_name.Replace(".zip",".exe")
 		
-		if (-Not (Get-Content $SymLinkFile | %{$_ -match $link_name})
+		if (-Not (Get-Content $SymLinkFile | %{$_ -match $link_name}))
 		{
 			Add-Content $SymLinkFile "`"$link_name`",`"$Folder\$folder_name\$exe_name`",`"`",`"None`""
 		}
