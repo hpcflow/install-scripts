@@ -271,17 +271,20 @@ function Create-SymLinkToApp {
 
 	if(-Not (Test-Path -PathType container $Folder\aliases))
 	{
-		New-Item -ItemType Directory -Path $Folder\aiases
+		New-Item -ItemType Directory -Path $Folder\aliases
 	}
 
 	# First create folder to store alias files if it doesn't exist
 
 	$SymLinkFile=$Folder+"\aliases\hpcflow_aliases.csv"
 
+	if (-Not (Test-Path $profile)) {
+		New-Item -Path $SymLinkFile -Type File
+	}
+
 	if($OneFile) {
 		
-		if (-Not (Get-Content $SymLinkFile | %{$_ -match $artifact_name}))
-		{
+		if (-Not (Get-Content $SymLinkFile | %{$_ -match $artifact_name})) {
 			Add-Content $SymLinkFile "`"$artifact_name`",`"$Folder\$artifact_name`",`"`",`"None`""
 		}
 		
@@ -295,8 +298,7 @@ function Create-SymLinkToApp {
 		$folder_name = $link_name
 		$exe_name = $artifact_name.Replace(".zip",".exe")
 		
-		if (-Not (Get-Content $SymLinkFile | %{$_ -match $link_name}))
-		{
+		if (-Not (Get-Content $SymLinkFile | %{$_ -match $link_name})) {
 			Add-Content $SymLinkFile "`"$link_name`",`"$Folder\$folder_name\$exe_name`",`"`",`"None`""
 		}
 		Write-Host "Type $link_name to get started!"
