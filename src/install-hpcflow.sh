@@ -311,7 +311,7 @@ download_artifact_to_temp() {
 
 	echo $progress_string_1
 	echo
-	curl -s --o "${TEMPD}/${artifact_name}" $download_link -O -L
+	curl -s --output "${TEMPD}/${artifact_name}" $download_link -O -L
 	echo $progress_string_2
 	echo
 
