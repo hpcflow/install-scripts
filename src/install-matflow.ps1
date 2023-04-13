@@ -10,7 +10,7 @@ param(
 
 )
 
-function Install-HPCFlowApplication {
+function Install-MatFlowApplication {
 
 	param(
 		[Parameter()]
@@ -36,7 +36,7 @@ function Install-HPCFlowApplication {
 		#Exit
 	}
 
-	$AppName = "hpcflow"
+	$AppName = "matflow"
 
 	if ($OneFile.IsPresent) {
 		$ArtifactEnding = '-win.exe'
@@ -89,22 +89,21 @@ function Install-HPCFlowApplication {
 }
 
 function Get-InstallDir {
-	$WindowsInstallDir = "${env:USERPROFILE}\AppData\Local\hpcflow"
-	#$WindowsInstallDir = "/Users/user/Documents/hpcflow_test"
+	$WindowsInstallDir = "${env:USERPROFILE}\AppData\Local\matflow"
 
 	return $WindowsInstallDir
 }
 
 function  Get-ScriptParameters {
     $params = @{
-        AppName = "hpcflow"
-        BaseLink = "https://github.com/hpcflow/hpcflow-new/releases/download"
+        AppName = "matflow"
+        BaseLink = "https://github.com/matflow/matflow-new/releases/download"
         WindowsEndingFolder ="win-dir"
 	    WindowsEndingFile = "win.exe"
-        WindowsInstallDir = "${env:USERPROFILE}\AppData\Local\hpcflow"
+        WindowsInstallDir = "${env:USERPROFILE}\AppData\Local\matflow"
 
-	    LatestStableReleases = "https://raw.githubusercontent.com/hpcflow/hpcflow-new/dummy-stable/docs/source/released_binaries.yml"
-	    LatestPrereleaseReleases="https://raw.githubusercontent.com/hpcflow/hpcflow-new/develop/docs/source/released_binaries.yml"
+	    LatestStableReleases = "https://raw.githubusercontent.com/matflow/matflow-new/dummy-stable/docs/source/released_binaries.yml"
+	    LatestPrereleaseReleases="https://raw.githubusercontent.com/matflow/matflow-new/develop/docs/source/released_binaries.yml"
 
 	    ProgressString1="Step 1 of 2: Downloading $AppName ..."
 	    ProgressString2="Step 2 of 2: Installing $AppName ..."
@@ -276,7 +275,7 @@ function Create-SymLinkToApp {
 
 	# First create folder to store alias files if it doesn't exist
 
-	$AliasFile=$Folder+"\aliases\hpcflow_aliases.csv"
+	$AliasFile=$Folder+"\aliases\matflow_aliases.csv"
 
 	if (-Not (Test-Path $AliasFile -PathType leaf)) {
 		New-Item -Path $AliasFile -Type File
@@ -329,4 +328,4 @@ function Add-SymLinkFolderToPath {
 
 }
 
-Install-HPCFlowApplication @PSBoundParameters
+Install-MatFlowApplication @PSBoundParameters
