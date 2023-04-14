@@ -11,6 +11,8 @@ run_main() {
 
 	set_OS_specific_variables
 
+	make_main_folder
+
 	get_artifact_names
 
 	create_install_tracker_files
@@ -277,6 +279,10 @@ get_artifact_names() {
 
 	fi
 
+}
+
+make_main_folder() {
+	mkdir -p "${folder}"
 }
 
 create_install_tracker_files() {
