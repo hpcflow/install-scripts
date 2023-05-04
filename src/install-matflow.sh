@@ -11,6 +11,8 @@ run_main() {
 
 	set_OS_specific_variables
 
+	make_main_folder
+
 	get_artifact_names
 
 	create_install_tracker_files
@@ -116,7 +118,7 @@ run_main() {
 set_variables() {
 
 	app_name="matflow"
-	base_link="https://github.com/matflow/matflow-new/releases/download"
+	base_link="https://github.com/hpcflow/matflow-new/releases/download"
 
 	linux_ending_folder="linux-dir"
 	macOS_ending_folder="macOS-dir"
@@ -126,8 +128,8 @@ set_variables() {
 	linux_install_dir=~/.local/share/matflow
 	macOS_install_dir=~/Library/Application\ Support/matflow
 
-	latest_stable_releases="https://raw.githubusercontent.com/matflow/matflow-new/dummy-stable/docs/source/released_binaries.yml"
-	latest_prerelease_releases="https://raw.githubusercontent.com/matflow/matflow-new/develop/docs/source/released_binaries.yml"
+	latest_stable_releases="https://raw.githubusercontent.com/hpcflow/matflow-new/dummy-stable/docs/source/released_binaries.yml"
+	latest_prerelease_releases="https://raw.githubusercontent.com/hpcflow/matflow-new/develop/docs/source/released_binaries.yml"
 
 	progress_string_1="Step 1 of 2: Downloading ${app_name} ..."
 	progress_string_2="Step 2 of 2: Installing ${app_name} ..."
@@ -278,6 +280,10 @@ get_artifact_names() {
 
 }
 
+make_main_folder() {
+	mkdir -p "${folder}"
+}
+
 create_install_tracker_files() {
 	touch "${folder}"/user_versions.txt
 	touch "${folder}"/stable_versions.txt
@@ -402,14 +408,14 @@ keep_most_recent_stable () {
 add_to_path () {
 
 	# Check which files exist
-	if [ $(test -f ~/.zshrc) ] && [[ "$onpath" = false ]]; then
+	if [ -f ~/.zshrc ] && [[ "$onpath" = false ]]; then
 		echo "Updating ~/.zshrc..."
 		echo "export PATH=\"\$PATH:"${folder}"/links\"" >>~/.zshrc
 	fi
 
-	if [ $(test -f ~/.bashrc) ] && [[ "$onpath" = false ]]; then
+	if [ -f ~/.bashrc ] && [[ "$onpath" = false ]]; then
 		echo "Updating ~/.bashrc..."
-		echo "export PATH=\"\$PATH:"${folder}"/links\"" >>~/.bashhrc
+		echo "export PATH=\"\$PATH:"${folder}"/links\"" >>~/.bashrc
 	fi
 
 }

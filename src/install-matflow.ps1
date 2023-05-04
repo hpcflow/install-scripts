@@ -97,13 +97,13 @@ function Get-InstallDir {
 function  Get-ScriptParameters {
     $params = @{
         AppName = "matflow"
-        BaseLink = "https://github.com/matflow/matflow-new/releases/download"
+        BaseLink = "https://github.com/hpcflow/matflow-new/releases/download"
         WindowsEndingFolder ="win-dir"
 	    WindowsEndingFile = "win.exe"
         WindowsInstallDir = "${env:USERPROFILE}\AppData\Local\matflow"
 
-	    LatestStableReleases = "https://raw.githubusercontent.com/matflow/matflow-new/dummy-stable/docs/source/released_binaries.yml"
-	    LatestPrereleaseReleases="https://raw.githubusercontent.com/matflow/matflow-new/develop/docs/source/released_binaries.yml"
+	    LatestStableReleases = "https://raw.githubusercontent.com/hpcflow/matflow-new/dummy-stable/docs/source/released_binaries.yml"
+	    LatestPrereleaseReleases="https://raw.githubusercontent.com/hpcflow/matflow-new/develop/docs/source/released_binaries.yml"
 
 	    ProgressString1="Step 1 of 2: Downloading $AppName ..."
 	    ProgressString2="Step 2 of 2: Installing $AppName ..."
