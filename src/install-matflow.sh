@@ -118,7 +118,7 @@ run_main() {
 set_variables() {
 
 	app_name="matflow"
-	base_link="https://github.com/matflow/matflow-new/releases/download"
+	base_link="https://github.com/hpcflow/matflow-new/releases/download"
 
 	linux_ending_folder="linux-dir"
 	macOS_ending_folder="macOS-dir"
@@ -128,8 +128,8 @@ set_variables() {
 	linux_install_dir=~/.local/share/matflow
 	macOS_install_dir=~/Library/Application\ Support/matflow
 
-	latest_stable_releases="https://raw.githubusercontent.com/matflow/matflow-new/dummy-stable/docs/source/released_binaries.yml"
-	latest_prerelease_releases="https://raw.githubusercontent.com/matflow/matflow-new/develop/docs/source/released_binaries.yml"
+	latest_stable_releases="https://raw.githubusercontent.com/hpcflow/matflow-new/dummy-stable/docs/source/released_binaries.yml"
+	latest_prerelease_releases="https://raw.githubusercontent.com/hpcflow/matflow-new/develop/docs/source/released_binaries.yml"
 
 	progress_string_1="Step 1 of 2: Downloading ${app_name} ..."
 	progress_string_2="Step 2 of 2: Installing ${app_name} ..."

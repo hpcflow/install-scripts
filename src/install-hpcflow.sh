@@ -128,7 +128,6 @@ set_variables() {
 	linux_install_dir=~/.local/share/hpcflow
 	macOS_install_dir=~/Library/Application\ Support/hpcflow
 
-	#latest_stable_releases="https://raw.githubusercontent.com/hpcflow/hpcflow-new/main/docs/source/released_binaries.yml"
 	latest_stable_releases="https://raw.githubusercontent.com/hpcflow/hpcflow-new/dummy-stable/docs/source/released_binaries.yml"
 	latest_prerelease_releases="https://raw.githubusercontent.com/hpcflow/hpcflow-new/develop/docs/source/released_binaries.yml"
 
