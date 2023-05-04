@@ -408,12 +408,12 @@ keep_most_recent_stable () {
 add_to_path () {
 
 	# Check which files exist
-	if [ $(test -f ~/.zshrc) ] && [[ "$onpath" = false ]]; then
+	if [ -f ~/.zshrc ] && [[ "$onpath" = false ]]; then
 		echo "Updating ~/.zshrc..."
 		echo "export PATH=\"\$PATH:"${folder}"/links\"" >>~/.zshrc
 	fi
 
-	if [ $(test -f ~/.bashrc) ] && [[ "$onpath" = false ]]; then
+	if [ -f ~/.bashrc ] && [[ "$onpath" = false ]]; then
 		echo "Updating ~/.bashrc..."
 		echo "export PATH=\"\$PATH:"${folder}"/links\"" >>~/.bashrc
 	fi
