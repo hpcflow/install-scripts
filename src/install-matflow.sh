@@ -11,6 +11,8 @@ run_main() {
 
 	set_OS_specific_variables
 
+	make_main_folder
+
 	get_artifact_names
 
 	create_install_tracker_files
@@ -278,6 +280,39 @@ get_artifact_names() {
 
 }
 
+make_main_folder() {
+	mkdir -p "${folder}"
+}
+
+create_install_tracker_files() {
+	touch "${folder}"/user_versions.txt
+	touch "${folder}"/stable_versions.txt
+}
+
+check_if_desired_version_installed() {
+
+	if [ $(grep -c "${version}-${app_name_ending}" "${folder}"/user_versions.txt) -ge 1 ] || [ $(grep -c "${version}-${app_name_ending}" "${folder}"/stable_versions.txt) -ge 1 ]; then
+
+		echo "${app_name} ${version} already installed on this system... "
+		sleep 0.2
+		echo "Exiting..."
+		exit 1
+
+	fi
+
+}
+
+check_if_symlink_folder_on_path() {
+
+	# Check if folders on path already
+	case :$PATH: in
+	*:"${folder}"/links:) onpath=true ;;
+	*) ;;
+	esac
+
+}
+
+download_artifact_to_temp() {
 create_install_tracker_files() {
 	touch "${folder}"/user_versions.txt
 	touch "${folder}"/stable_versions.txt
