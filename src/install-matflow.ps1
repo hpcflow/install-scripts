@@ -34,6 +34,7 @@ function Install-MatFlowApplication {
 		}
 		Write-Host "Installation of" $AppName "unsuccessful"
 		#Exit
+		Return
 	}
 
 	$AppName = "matflow"
@@ -185,6 +186,7 @@ function Check-AppInstall {
 			Write-Host "Exiting..."
 			Start-Sleep -Milliseconds 100
 			#Exit
+			Return
 		}
 	}
 	Else {
@@ -195,6 +197,7 @@ function Check-AppInstall {
 			Write-Host "Exiting..."
 			Start-Sleep -Milliseconds 100
 			#Exit
+			Return
 		}
 	}
 
