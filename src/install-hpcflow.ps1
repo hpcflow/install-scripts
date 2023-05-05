@@ -34,6 +34,7 @@ function Install-HPCFlowApplication {
 		}
 		Write-Host "Installation of" $AppName "unsuccessful"
 		#Exit
+		Return
 	}
 
 	$AppName = "hpcflow"
@@ -186,6 +187,7 @@ function Check-AppInstall {
 			Write-Host "Exiting..."
 			Start-Sleep -Milliseconds 100
 			#Exit
+			Return
 		}
 	}
 	Else {
@@ -196,6 +198,7 @@ function Check-AppInstall {
 			Write-Host "Exiting..."
 			Start-Sleep -Milliseconds 100
 			#Exit
+			Return
 		}
 	}
 
