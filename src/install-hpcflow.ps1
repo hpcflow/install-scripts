@@ -73,6 +73,8 @@ function Install-HPCFlowApplication {
 		Start-Sleep -Milliseconds 100
 	}
 
+	Check-InstallDir $Folder
+
 	$DownloadFolder = New-TemporaryFolder
 
 	Get-ScriptParameters | `
@@ -99,7 +101,7 @@ function Get-InstallDir {
 function Check-InstallDir {
 
 	if(-Not (Test-Path $Folder)) {
-		New-Item -ItemType Directory $Folder
+		tNew-Item -ItemType Directory $Folder
 	}
 
 }
