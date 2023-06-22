@@ -96,6 +96,14 @@ function Get-InstallDir {
 	return $WindowsInstallDir
 }
 
+function Check-InstallDir {
+
+	if(-Not (Test-Path $Folder)) {
+		New-Item -ItemType Directory $Folder
+	}
+
+}
+
 function  Get-ScriptParameters {
     $params = @{
         AppName = "hpcflow"
