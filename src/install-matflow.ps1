@@ -73,6 +73,8 @@ function Install-MatFlowApplication {
 		Start-Sleep -Milliseconds 100
 	}
 
+	Check-InstallDir $Folder
+
 	$DownloadFolder = New-TemporaryFolder
 
 	Get-ScriptParameters | `
@@ -93,6 +95,14 @@ function Get-InstallDir {
 	$WindowsInstallDir = "${env:USERPROFILE}\AppData\Local\matflow"
 
 	return $WindowsInstallDir
+}
+
+function Check-InstallDir {
+
+	if(-Not (Test-Path $Folder)) {
+		tNew-Item -ItemType Directory $Folder
+	}
+
 }
 
 function  Get-ScriptParameters {
