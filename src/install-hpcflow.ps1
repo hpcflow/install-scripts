@@ -134,10 +134,10 @@ function Get-LatestReleaseInfo {
 	)
 
 	if ($PreRelease) {
-		$PageHTML = Invoke-WebRequest -Uri $param.LatestPrereleaseReleases -Method Get
+		$PageHTML = Invoke-WebRequest -UseBasicParsing -Uri $param.LatestPrereleaseReleases -Method Get
 	}
 	else {
-		$PageHTML = Invoke-WebRequest -Uri $param.LatestStableReleases -Method Get
+		$PageHTML = Invoke-WebRequest -UseBasicParsing -Uri $param.LatestStableReleases -Method Get
 	}
 	
 	$PageContents = $PageHTML.Content
@@ -229,7 +229,7 @@ function Download-Artifact {
 
 	$DownloadLocation = $DownloadFolder +"/" + $ArtifactData.ArtifactName
 
-	Invoke-WebRequest $ArtifactData.ArtifactWebAddress -OutFile $DownloadLocation
+	Invoke-WebRequest -UseBasicParsing $ArtifactData.ArtifactWebAddress -OutFile $DownloadLocation
 
 	$ArtifactData = $ArtifactData + @{DownloadLocation=$DownloadLocation}
 
