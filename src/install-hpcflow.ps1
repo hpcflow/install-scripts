@@ -101,7 +101,7 @@ function Get-InstallDir {
 function Check-InstallDir {
 
 	if(-Not (Test-Path $Folder)) {
-		New-Item -ItemType Directory $Folder
+		New-Item -Force -ItemType Directory $Folder
 	}
 
 }
@@ -265,7 +265,7 @@ function New-TemporaryFolder {
 	# Make a new folder based upon a TempFileName
 	$T="$($env:TEMP)\tmp$([convert]::tostring((get-random 65535),16).padleft(4,'0')).tmp"
 	#$T="$($env:TMPDIR)/tmp$([convert]::tostring((get-random 65535),16).padleft(4,'0')).tmp"
-	New-Item -ItemType Directory -Path $T
+	New-Item -Force -ItemType Directory -Path $T
 }
 
 function Create-SymLinkToApp {
@@ -284,7 +284,7 @@ function Create-SymLinkToApp {
 
 	if(-Not (Test-Path -PathType container $Folder\aliases))
 	{
-		New-Item -ItemType Directory -Path $Folder\aliases
+		New-Item -Force -ItemType Directory -Path $Folder\aliases
 	}
 
 	# First create folder to store alias files if it doesn't exist
@@ -292,7 +292,7 @@ function Create-SymLinkToApp {
 	$AliasFile=$Folder+"\aliases\hpcflow_aliases.csv"
 
 	if (-Not (Test-Path $AliasFile -PathType leaf)) {
-		New-Item -Path $AliasFile -Type File
+		New-Item Force -Path $AliasFile -Type File
 	}
 
 	if($OneFile) {
@@ -330,7 +330,7 @@ function Add-SymLinkFolderToPath {
 	)
 
 	if(-Not (Test-Path $profile)) {
-		New-Item -Path $profile -Type File
+		New-Item -Force -Path $profile -Type File
 	}
 
 	$ImportString = "Import-Alias $AliasFile" 
