@@ -101,7 +101,7 @@ function Get-InstallDir {
 function Check-InstallDir {
 
 	if(-Not (Test-Path $Folder)) {
-		tNew-Item -ItemType Directory $Folder
+		New-Item -ItemType Directory $Folder
 	}
 
 }
