@@ -1,0 +1,16 @@
+name: Integration test - Matflow, BASH, Linux
+on:
+  workflow_dispatch:
+
+jobs:
+  int-test-script-bash-linux:
+    runs-on: ubuntu-latest
+
+    steps:
+
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Run script
+        run: (touch tmp.sh && curl -fsSL https://raw.githubusercontent.com/hpcflow/install-scripts/main/src/install-matflow.sh > tmp.sh && bash tmp.sh --prerelease --path --onefile) ; rm tmp.sh
+
