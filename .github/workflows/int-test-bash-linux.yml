@@ -19,7 +19,7 @@ jobs:
           echo "ARTIFACT_NAME=${artifact_name}" >> "$GITHUB_OUTPUT"
 
       - name: Run Matflow test suite
-        run: ~/.local/share/matflow/{{ steps.run-script.outputs.ARTIFACT_NAME }} test
+        run: ~/.local/share/matflow/${{ steps.run-script.outputs.ARTIFACT_NAME }} test
 
 
 
