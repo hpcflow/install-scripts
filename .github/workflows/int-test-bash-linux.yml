@@ -14,11 +14,8 @@ jobs:
       - name: Run script
         run: (touch tmp.sh && curl -fsSL https://raw.githubusercontent.com/hpcflow/install-scripts/main/src/install-matflow.sh > tmp.sh && bash tmp.sh --prerelease --path --onefile) ; rm tmp.sh
 
-      - name: Source bashrc
-        run: source ~/.bashrc
-
       - name: Run Matflow test suite
-        run: matflow-v0.3.0a33-linux test
+        run: ~/.local/share/matflow/matflow-v0.3.0a33-linux test
 
 
 
