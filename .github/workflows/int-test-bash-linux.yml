@@ -16,11 +16,11 @@ jobs:
         run: |
           script_output=`(touch tmp.sh && curl -fsSL https://raw.githubusercontent.com/hpcflow/install-scripts/main/src/install-matflow.sh > tmp.sh && bash tmp.sh --prerelease --path --onefile) ; rm tmp.sh`
           artifact_name=`echo $script_output | grep matflow- | cut -d " " -f 6`
-          echo "ARTIFACT_NAME=${artifact_name}" >> "$GITHUB_OUTPUT"
+          echo "art_name=${artifact_name}" >> "$GITHUB_ENV"
 
       - name: Run Matflow test suite
         run: |
-          artifact_name=${{ steps.run-script.outputs.ARTIFACT_NAME }}
+          artifact_name=${{ env.art_name }}
           ~/.local/share/matflow/$artifact_name test
 
 
