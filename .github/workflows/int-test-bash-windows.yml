@@ -1,4 +1,4 @@
-name: Integration test - Matflow, BASH, Windows
+name: Integration test - Matflow, powershell, Windows
 on:
   workflow_dispatch:
 
@@ -13,4 +13,4 @@ jobs:
 
       - name: Run script
         id: run-script
-        run: $([scriptblock]::Create((New-Object Net.WebClient).DownloadString('https://raw.githubusercontent.com/hpcflow/install-scripts/main/src/install-matflow.ps1'))) -PreRelease -OneFile
+        run: & $([scriptblock]::Create((New-Object Net.WebClient).DownloadString('https://raw.githubusercontent.com/hpcflow/install-scripts/main/src/install-matflow.ps1'))) -PreRelease -OneFile
