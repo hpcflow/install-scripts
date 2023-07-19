@@ -12,10 +12,12 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Run script
-        run: (touch tmp.sh && curl -fsSL https://raw.githubusercontent.com/hpcflow/install-scripts/main/src/install-matflow.sh > tmp.sh && bash tmp.sh --prerelease --path --onefile) ; rm tmp.sh
+        id: run-script
+        run: artifact_name = ((touch tmp.sh && curl -fsSL https://raw.githubusercontent.com/hpcflow/install-scripts/main/src/install-matflow.sh > tmp.sh && bash tmp.sh --prerelease --path --onefile) ; rm tmp.sh) | grep -matflow | cut -d " " -f 6
+          echo "ARTIFACT_NAME=${artifact_name}" >> "$GITHUB_OUTPUT"
 
       - name: Run Matflow test suite
-        run: ~/.local/share/matflow/matflow-v0.3.0a33-linux test
+        run: ~/.local/share/matflow/{{ steps.run-script.outputs.ARTIFACT_NAME }} test
 
 
 
