@@ -1,0 +1,9 @@
+name: Integration test - Matflow, BASH, Linux
+on:
+  workflow_dispatch:
+
+jobs:
+  int-test-script-bash-linux:
+    runs-on: ubuntu-latest
+
+   
