@@ -22,6 +22,3 @@ jobs:
         run: |
           artifact_name=${{ env.art_name }}
           ~/.local/share/matflow/$artifact_name test
-
-
-
