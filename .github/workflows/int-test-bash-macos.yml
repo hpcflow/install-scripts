@@ -3,7 +3,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  int-test-script-bash-linux:
+  int-test-script-bash-macos:
     runs-on: macos-latest
 
     steps:
