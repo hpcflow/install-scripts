@@ -2,7 +2,7 @@ name: Integration test - Matflow, BASH, macos
 
 env:
   APP_NAME: "matflow"
-  INSTALL_ROOT: "~/Library/Application\ Support"
+  INSTALL_ROOT: "~/Library/Application\\ Support"
 on:
   workflow_dispatch:
 
