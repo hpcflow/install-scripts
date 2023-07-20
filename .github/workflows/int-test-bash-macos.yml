@@ -24,4 +24,4 @@ jobs:
 
       - name: Run Matflow test suite
         run: |
-          ${{ env.INSALL_ROOT }}/${{ env.APP_NAME }}/${{ env.ART_NAME }} test
+          ${{ env.INSTALL_ROOT }}/${{ env.APP_NAME }}/${{ env.ART_NAME }} test
