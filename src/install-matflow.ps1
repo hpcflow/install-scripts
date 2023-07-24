@@ -37,6 +37,8 @@ function Install-MatFlowApplication {
 		#Return
 	#}
 
+	Write-Host "This is Install-MatFlowApplication"
+
 	$AppName = "matflow"
 
 	if ($OneFile.IsPresent) {
@@ -92,12 +94,18 @@ function Install-MatFlowApplication {
 }
 
 function Get-InstallDir {
+
+	Write-Host "This is Get-InstallDir"
+
 	$WindowsInstallDir = "${env:USERPROFILE}\AppData\Local\matflow"
 
 	return $WindowsInstallDir
 }
 
 function  Get-ScriptParameters {
+
+	Write-Host "This is Get-ScriptParameters"
+
     $params = @{
         AppName = "matflow"
         BaseLink = "https://github.com/hpcflow/matflow-new/releases/download"
@@ -124,6 +132,8 @@ function Get-LatestReleaseInfo {
 		[bool]$PreRelease
 	)
 
+	Write-Host "This is Get-LatestReleaseInfo"
+
 	if ($PreRelease) {
 		$PageHTML = Invoke-WebRequest -Uri $param.LatestPrereleaseReleases -Method Get
 	}
@@ -145,6 +155,8 @@ function Extract-WindowsInfo {
 		[string]$FileEnding
 	)
 
+	Write-Host "This is Extract-WindowsInfo"
+
 	$StablePageContentsSplit = $PageContents -Split "\n"
 
 	foreach ($VersionInfo in $StablePageContentsSplit) {
@@ -159,6 +171,8 @@ function Parse-WindowsInfo {
 		[parameter(Mandatory, ValueFromPipeline, ValueFromPipelineByPropertyName)]
 		[string]$VersionInfo
 	)
+
+	Write-Host "This is Parse-WindowsInfo"
 
 	$Parts = $VersionInfo -Split ': '
 	$ArtifactData = @{
@@ -179,6 +193,8 @@ function Check-AppInstall {
 		[parameter(Mandatory)]
 		[bool]$OneFile
 	)
+
+	Write-Host "This is Check-AppInstall"
 
 	if($OneFile) {
 		$FileToCheck = $Folder + '/' +$ArtifactData.ArtifactName
@@ -215,6 +231,8 @@ function Download-Artifact {
 		[string]$DownloadFolder
 	)
 
+	Write-Host "This is Download-Artifact"
+
 	Write-Host "Downloading "$ArtifactData.ArtifactName
 	Start-Sleep -Milliseconds 100
 	Write-Host $DownloadFolder
@@ -239,6 +257,8 @@ function Place-Artifact {
 		[bool]$OneFile
 	)
 
+	Write-Host "This is Place-Artifact"
+
 	New-Item -ItemType Directory -Path $FinalDestination
 
 	$FinalDestinationFile = $FinalDestination + "\" +$ArtifactData.ArtifactName
@@ -258,6 +278,9 @@ function Place-Artifact {
 }
 
 function New-TemporaryFolder {
+
+	Write-Host "This is New-TemporaryFolder"
+
 	# Make a new folder based upon a TempFileName
 	$T="$($env:TEMP)\tmp$([convert]::tostring((get-random 65535),16).padleft(4,'0')).tmp"
 	#$T="$($env:TMPDIR)/tmp$([convert]::tostring((get-random 65535),16).padleft(4,'0')).tmp"
@@ -273,6 +296,8 @@ function Create-SymLinkToApp {
 		[parameter()]
 		[bool]$OneFile
 	)
+
+	Write-Host "This is Create-SymLinkToApp"
 
 	$artifact_name = $ArtifactData.ArtifactName
 
@@ -329,6 +354,8 @@ function Add-SymLinkFolderToPath {
 		[parameter(Mandatory, ValueFromPipeline, ValueFromPipelineByPropertyName)]
 		[string]$AliasFile
 	)
+
+	Write-Host "This is Add-SymLunkFolderToPath"
 
 	if(-Not (Test-Path $profile)) {
 		New-Item -Path $profile -Type File
