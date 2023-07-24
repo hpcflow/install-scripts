@@ -86,7 +86,7 @@ function Install-MatFlowApplication {
 	Check-AppInstall -Folder $Folder -OneFile $OneFileFlag | `
 	Download-Artifact -DownloadFolder $DownloadFolder | `
 	Place-Artifact -FinalDestination $Folder -OneFile $OneFileFlag | `
-	Create-SymLinkToApp | `
+	Create-SymLinkToApp -Folder $Folder -OneFile $OneFileFlag | `
 	Add-SymLinkFolderToPath
 
 	
