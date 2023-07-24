@@ -237,6 +237,8 @@ function Place-Artifact {
 		[bool]$OneFile
 	)
 
+	New-Item -ItemType Directory -Path $FinalDestination
+
 	$FinalDestinationFile = $FinalDestination + "\" +$ArtifactData.ArtifactName
 
 	if ($OneFile) {
