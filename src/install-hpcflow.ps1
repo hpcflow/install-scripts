@@ -22,20 +22,20 @@ function Install-HPCFlowApplication {
 		[Parameter()]
 		[switch]$PreRelease
 	)
-	trap{
+	#trap{
 		# Check if DownloadFolder variable has been created. If it has, delete folder it points to.
 
 		# First check variable exists (i.e. is not null)
-		if($DownloadFolder){
+#		if($DownloadFolder){
 			# Next check if folder exists
-			if(Test-Path -Path $DownloadFolder){
-				Remove-Item $DownloadFolder
-				}
-		}
-		Write-Host "Installation of" $AppName "unsuccessful"
+#			if(Test-Path -Path $DownloadFolder){
+	#			Remove-Item $DownloadFolder
+		#		}
+	#	}
+	#	Write-Host "Installation of" $AppName "unsuccessful. $_"
 		#Exit
-		Return
-	}
+	#	Return
+	#}
 
 	$AppName = "hpcflow"
 
