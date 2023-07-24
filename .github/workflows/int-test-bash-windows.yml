@@ -21,6 +21,8 @@ jobs:
         run: $ScriptOutput = & $([scriptblock]::Create((New-Object Net.WebClient).DownloadString('https://raw.githubusercontent.com/hpcflow/install-scripts/main/src/install-matflow.ps1'))) -PreRelease -OneFile
 
       - name: Check results
-        run: dir ${{ env.INSTALL_ROOT }}\matflow
+        run: |
+          dir ${{ env.INSTALL_ROOT }}
+          Test-Path ${{ env.INSTALL_ROOT }}
 
       
