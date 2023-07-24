@@ -265,13 +265,14 @@ function New-TemporaryFolder {
 function Create-SymLinkToApp {
 	param(
 		[parameter(Mandatory, ValueFromPipeline, ValueFromPipelineByPropertyName)]
-		[hashtable]$ArtifactData
+		[hashtable]$ArtifactData,
+		[parameter(Mandatory)]
+		[string]$Folder,
+		[parameter()]
+		[bool]$OneFile
 	)
 
-	$OneFile = true
-
 	$artifact_name = $ArtifactData.ArtifactName
-	$Folder = $ArtifactData.FinalDestination
 
 	$AliasFolderExists = Test-Path -PathType container "$Folder\aliases"
 	Write-Host "Alias folder exists: $AliasFolderExists"
