@@ -272,14 +272,14 @@ function Create-SymLinkToApp {
 
 	$artifact_name = $ArtifactData.ArtifactName
 
-	$AliasFolderExists = Test-Path -PathType container $Folder\aliases
+	$AliasFolderExists = Test-Path -PathType container "$Folder\aliases"
 	Write-Host "Alias folder exists: $AliasFolderExists"
 
-	if(-Not (Test-Path -PathType container $Folder\aliases))
+	if(-Not (Test-Path -PathType container "$Folder\aliases"))
 	{
-		Write-Host $Folder\aliases
-		New-Item -ItemType Directory -Path $Folder\aliases
-		$AliasFolderExists = Test-Path -PathType container $Folder\aliases
+		Write-Host "$Folder\aliases"
+		New-Item -ItemType Directory -Path "$Folder\aliases"
+		$AliasFolderExists = Test-Path -PathType container "$Folder\aliases"
 		Write-Host "Alias folder exists: $AliasFolderExists"
 
 	}
