@@ -73,6 +73,8 @@ function Install-MatFlowApplication {
 		Start-Sleep -Milliseconds 100
 	}
 
+	Write-Host $Folder
+
 	$DownloadFolder = New-TemporaryFolder
 
 	Get-ScriptParameters | `
