@@ -215,6 +215,7 @@ function Download-Artifact {
 
 	Write-Host "Downloading "$ArtifactData.ArtifactName
 	Start-Sleep -Milliseconds 100
+	Write-Host $DownloadFolder
 
 	$DownloadLocation = $DownloadFolder +"/" + $ArtifactData.ArtifactName
 
