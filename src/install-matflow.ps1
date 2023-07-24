@@ -265,7 +265,7 @@ function New-TemporaryFolder {
 function Create-SymLinkToApp {
 	param(
 		[parameter(Mandatory, ValueFromPipeline, ValueFromPipelineByPropertyName)]
-		[hashtable]$ArtifactData,
+		[hashtable]$ArtifactData
 	)
 
 	$OneFile = true
