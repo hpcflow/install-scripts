@@ -272,6 +272,8 @@ function Create-SymLinkToApp {
 
 	$artifact_name = $ArtifactData.ArtifactName
 
+	Test-Path -PathType container $Folder\aliases	
+
 	if(-Not (Test-Path -PathType container $Folder\aliases))
 	{
 		New-Item -Force -ItemType Directory -Path $Folder\aliases
