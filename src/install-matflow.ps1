@@ -238,7 +238,7 @@ function Place-Artifact {
 	)
 
 	if ($OneFile) {
-		Move-Item $ArtifactData.DownloadLocation "$FinalDestination/$ArtifactData.ArtifactName"
+		Move-Item $ArtifactData.DownloadLocation $FinalDestination/$ArtifactData.ArtifactName
 	}
 	else {
 		Expand-Archive $ArtifactData.DownloadLocation -DestinationPath $FinalDestination
