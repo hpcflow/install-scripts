@@ -282,7 +282,7 @@ function Create-SymLinkToApp {
 	$AliasFile=$Folder+"\aliases\matflow_aliases.csv"
 
 	if (-Not (Test-Path $AliasFile -PathType leaf)) {
-		New-Item -Path $AliasFile -Type File
+		New-Item -Force -Path $AliasFile -Type File
 	}
 
 	if($OneFile) {
