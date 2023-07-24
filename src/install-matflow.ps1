@@ -258,11 +258,13 @@ function Place-Artifact {
 	)
 
 	Write-Host "This is Place-Artifact"
-	Write-Host "Test"
+	Write-Host "Test1"
 
 	New-Item -ItemType Directory -Path $FinalDestination
+	Write-Host "Test2"
 
 	$FinalDestinationFile = $FinalDestination + "\" +$ArtifactData.ArtifactName
+	Write-Host "Test3"
 
 	Write-Host "Moving artifact to $FinalDestinationFile"
 
