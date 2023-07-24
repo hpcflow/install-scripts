@@ -8,7 +8,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  int-test-script-bash-linux:
+  int-test-script-powershell-windows:
     runs-on: windows-latest
 
     steps:
@@ -21,6 +21,6 @@ jobs:
         run: $ScriptOutput = & $([scriptblock]::Create((New-Object Net.WebClient).DownloadString('https://raw.githubusercontent.com/hpcflow/install-scripts/main/src/install-matflow.ps1'))) -PreRelease -OneFile
 
       - name: Check results
-        run: dir ${{ env.INSTALL_ROOT }}
+        run: dir ${{ env.INSTALL_ROOT }}\matflow
 
       
