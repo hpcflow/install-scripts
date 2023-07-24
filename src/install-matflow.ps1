@@ -263,7 +263,7 @@ function Place-Artifact {
 
 	$FinalDestinationFile = $FinalDestination + "\" +$ArtifactData.ArtifactName
 
-	Write-Hist "Moving artifact to $FinalDestinationFile"
+	Write-Host "Moving artifact to $FinalDestinationFile"
 
 	if ($OneFile) {
 		Move-Item $ArtifactData.DownloadLocation $FinalDestinationFile
