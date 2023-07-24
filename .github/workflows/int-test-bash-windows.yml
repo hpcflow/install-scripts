@@ -23,6 +23,6 @@ jobs:
       - name: Check results
         run: |
           dir ${{ env.INSTALL_ROOT }}
-          Test-Path ${{ env.INSTALL_ROOT }}
+          Test-Path ${{ env.INSTALL_ROOT }} -PathType Container
 
       
