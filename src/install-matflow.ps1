@@ -277,7 +277,7 @@ function Create-SymLinkToApp {
 
 	if(-Not (Test-Path -PathType container $Folder\aliases))
 	{
-		New-Item -Force -ItemType Directory -Path $Folder\aliases
+		New-Item -ItemType Directory -Path $Folder\aliases
 		$AliasFolderExists = Test-Path -PathType container $Folder\aliases
 		Write-Host "Alias folder exists: $AliasFolderExists"
 
