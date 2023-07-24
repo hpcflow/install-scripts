@@ -82,7 +82,7 @@ function Install-MatFlowApplication {
 	Check-AppInstall -Folder $Folder -OneFile $OneFileFlag | `
 	Download-Artifact -DownloadFolder $DownloadFolder | `
 	Place-Artifact -FinalDestination $Folder -OneFile $OneFileFlag | `
-	Create-SymLinkToApp -OneFile $OneFileFlag | `
+	Create-SymLinkToApp | `
 	Add-SymLinkFolderToPath
 
 	
@@ -266,10 +266,9 @@ function Create-SymLinkToApp {
 	param(
 		[parameter(Mandatory, ValueFromPipeline, ValueFromPipelineByPropertyName)]
 		[hashtable]$ArtifactData,
-
-		[parameter()]
-		[bool]$OneFile
 	)
+
+	$OneFile = true
 
 	$artifact_name = $ArtifactData.ArtifactName
 	$Folder = $ArtifactData.FinalDestination
