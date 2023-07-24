@@ -273,6 +273,8 @@ function Place-Artifact {
 
 	$ArtifactData = $ArtifactData + @{FinalDesination=$FinalDesination}
 
+	$ArtifactData.GetType()
+
 	Return $ArtifactData
 
 }
