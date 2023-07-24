@@ -258,6 +258,7 @@ function Place-Artifact {
 	)
 
 	Write-Host "This is Place-Artifact"
+	Write-Host "Test"
 
 	New-Item -ItemType Directory -Path $FinalDestination
 
