@@ -82,7 +82,7 @@ function Install-MatFlowApplication {
 	Check-AppInstall -Folder $Folder -OneFile $OneFileFlag | `
 	Download-Artifact -DownloadFolder $DownloadFolder | `
 	Place-Artifact -FinalDestination $Folder -OneFile $OneFileFlag | `
-	Create-SymLinkToApp -Folder $Folder -OneFile $OneFileFlag | `
+	Create-SymLinkToApp -OneFile $OneFileFlag | `
 	Add-SymLinkFolderToPath
 
 	
@@ -267,14 +267,12 @@ function Create-SymLinkToApp {
 		[parameter(Mandatory, ValueFromPipeline, ValueFromPipelineByPropertyName)]
 		[hashtable]$ArtifactData,
 
-		[parameter(Mandatory)]
-		[string]$Folder,
-
 		[parameter()]
 		[bool]$OneFile
 	)
 
 	$artifact_name = $ArtifactData.ArtifactName
+	$Folder = $ArtifactData.FinalDestination
 
 	$AliasFolderExists = Test-Path -PathType container "$Folder\aliases"
 	Write-Host "Alias folder exists: $AliasFolderExists"
