@@ -272,7 +272,7 @@ function Create-SymLinkToApp {
 
 	$artifact_name = $ArtifactData.ArtifactName
 
-	Test-Path -PathType container $Folder\aliases	
+	Test-Path -PathType container $Folder\aliases | Write-Host
 
 	if(-Not (Test-Path -PathType container $Folder\aliases))
 	{
