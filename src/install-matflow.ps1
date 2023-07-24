@@ -286,39 +286,31 @@ function New-TemporaryFolder {
 	#$T="$($env:TMPDIR)/tmp$([convert]::tostring((get-random 65535),16).padleft(4,'0')).tmp"
 	New-Item -ItemType Directory -Path $T
 }
-
 function Create-SymLinkToApp {
 	param(
 		[parameter(Mandatory, ValueFromPipeline, ValueFromPipelineByPropertyName)]
 		[hashtable]$ArtifactData,
+
 		[parameter(Mandatory)]
 		[string]$Folder,
+
 		[parameter()]
 		[bool]$OneFile
 	)
 
-	Write-Host "This is Create-SymLinkToApp"
-
 	$artifact_name = $ArtifactData.ArtifactName
 
-	$AliasFolderExists = Test-Path -PathType container "$Folder\aliases"
-	Write-Host "Alias folder exists: $AliasFolderExists"
-
-	if(-Not (Test-Path -PathType container "$Folder\aliases"))
+	if(-Not (Test-Path -PathType container $Folder\aliases))
 	{
-		Write-Host "$Folder\aliases"
-		New-Item -ItemType Directory -Path "$Folder\aliases"
-		$AliasFolderExists = Test-Path -PathType container "$Folder\aliases"
-		Write-Host "Alias folder exists: $AliasFolderExists"
-
+		New-Item -ItemType Directory -Path $Folder\aliases
 	}
 
 	# First create folder to store alias files if it doesn't exist
 
-	$AliasFile=$Folder+"\aliases\matflow_aliases.csv"
+	$AliasFile=$Folder+"\aliases\hpcflow_aliases.csv"
 
 	if (-Not (Test-Path $AliasFile -PathType leaf)) {
-		New-Item -Force -Path $AliasFile -Type File
+		New-Item -Path $AliasFile -Type File
 	}
 
 	if($OneFile) {
