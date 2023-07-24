@@ -22,7 +22,7 @@ function Install-MatFlowApplication {
 		[Parameter()]
 		[switch]$PreRelease
 	)
-	trap{
+	#trap{
 		# Check if DownloadFolder variable has been created. If it has, delete folder it points to.
 
 		# First check variable exists (i.e. is not null)
