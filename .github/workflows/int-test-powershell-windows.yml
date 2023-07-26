@@ -1,4 +1,4 @@
-name: Integration test - Matflow, powershell, Windows
+name: Integration test - MatFlow, powershell, Windows
 
 env:
   APP_NAME: "matflow"
@@ -22,7 +22,6 @@ jobs:
 
       - name: Check results
         run: |
-          dir ${{ env.INSTALL_ROOT }}
-          Test-Path ${{ env.INSTALL_ROOT }} -PathType Container
+          .\${{ env.INSTALL_ROOT }}\matflow-v0.3.0a35-win.exe
 
       
