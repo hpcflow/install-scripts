@@ -22,22 +22,20 @@ function Install-MatFlowApplication {
 		[Parameter()]
 		[switch]$PreRelease
 	)
-	#trap{
+	trap{
 		# Check if DownloadFolder variable has been created. If it has, delete folder it points to.
 
 		# First check variable exists (i.e. is not null)
-		#if($DownloadFolder){
+		if($DownloadFolder){
 			# Next check if folder exists
-		#	if(Test-Path -Path $DownloadFolder){
-		#		Remove-Item $DownloadFolder
-		#		}
-		#}
-		#Write-Host "Installation of" $AppName "unsuccessful"
+			if(Test-Path -Path $DownloadFolder){
+				Remove-Item $DownloadFolder
+				}
+		}
+		Write-Host "Installation of" $AppName "unsuccessful"
 		#Exit
-		#Return
-	#}
-
-	Write-Host "This is Install-MatFlowApplication"
+		Return
+	}
 
 	$AppName = "matflow"
 
@@ -75,7 +73,7 @@ function Install-MatFlowApplication {
 		Start-Sleep -Milliseconds 100
 	}
 
-	Write-Host $Folder
+	Check-InstallDir $Folder
 
 	$DownloadFolder = New-TemporaryFolder
 
@@ -94,18 +92,20 @@ function Install-MatFlowApplication {
 }
 
 function Get-InstallDir {
-
-	Write-Host "This is Get-InstallDir"
-
 	$WindowsInstallDir = "${env:USERPROFILE}\AppData\Local\matflow"
 
 	return $WindowsInstallDir
 }
 
+function Check-InstallDir {
+
+	if(-Not (Test-Path $Folder)) {
+		New-Item -Force -ItemType Directory $Folder
+	}
+
+}
+
 function  Get-ScriptParameters {
-
-	Write-Host "This is Get-ScriptParameters"
-
     $params = @{
         AppName = "matflow"
         BaseLink = "https://github.com/hpcflow/matflow-new/releases/download"
@@ -132,13 +132,11 @@ function Get-LatestReleaseInfo {
 		[bool]$PreRelease
 	)
 
-	Write-Host "This is Get-LatestReleaseInfo"
-
 	if ($PreRelease) {
-		$PageHTML = Invoke-WebRequest -Uri $param.LatestPrereleaseReleases -Method Get
+		$PageHTML = Invoke-WebRequest -UseBasicParsing -Uri $param.LatestPrereleaseReleases -Method Get
 	}
 	else {
-		$PageHTML = Invoke-WebRequest -Uri $param.LatestStableReleases -Method Get
+		$PageHTML = Invoke-WebRequest -UseBasicParsing -Uri $param.LatestStableReleases -Method Get
 	}
 	
 	$PageContents = $PageHTML.Content
@@ -155,8 +153,6 @@ function Extract-WindowsInfo {
 		[string]$FileEnding
 	)
 
-	Write-Host "This is Extract-WindowsInfo"
-
 	$StablePageContentsSplit = $PageContents -Split "\n"
 
 	foreach ($VersionInfo in $StablePageContentsSplit) {
@@ -171,8 +167,6 @@ function Parse-WindowsInfo {
 		[parameter(Mandatory, ValueFromPipeline, ValueFromPipelineByPropertyName)]
 		[string]$VersionInfo
 	)
-
-	Write-Host "This is Parse-WindowsInfo"
 
 	$Parts = $VersionInfo -Split ': '
 	$ArtifactData = @{
@@ -193,8 +187,6 @@ function Check-AppInstall {
 		[parameter(Mandatory)]
 		[bool]$OneFile
 	)
-
-	Write-Host "This is Check-AppInstall"
 
 	if($OneFile) {
 		$FileToCheck = $Folder + '/' +$ArtifactData.ArtifactName
@@ -231,15 +223,12 @@ function Download-Artifact {
 		[string]$DownloadFolder
 	)
 
-	Write-Host "This is Download-Artifact"
-
 	Write-Host "Downloading "$ArtifactData.ArtifactName
 	Start-Sleep -Milliseconds 100
-	Write-Host $DownloadFolder
 
 	$DownloadLocation = $DownloadFolder +"/" + $ArtifactData.ArtifactName
 
-	Invoke-WebRequest $ArtifactData.ArtifactWebAddress -OutFile $DownloadLocation
+	Invoke-WebRequest -UseBasicParsing $ArtifactData.ArtifactWebAddress -OutFile $DownloadLocation
 
 	$ArtifactData = $ArtifactData + @{DownloadLocation=$DownloadLocation}
 
@@ -257,43 +246,27 @@ function Place-Artifact {
 		[bool]$OneFile
 	)
 
-	Write-Host "This is Place-Artifact"
-	Write-Host "Test1"
-
-	New-Item -ItemType Directory -Path $FinalDestination
-	Write-Host "Test2"
-
-	$FinalDestinationFile = $FinalDestination + "\" +$ArtifactData.ArtifactName
-	Write-Host "Test3"
-
-	Write-Host "Moving artifact to $FinalDestinationFile"
-
 	if ($OneFile) {
-		Move-Item $ArtifactData.DownloadLocation $FinalDestinationFile
+		Move-Item $ArtifactData.DownloadLocation $FinalDestination
 	}
 	else {
-		Expand-Archive $ArtifactData.DownloadLocation -DestinationPath $FinalDestinationFile
+		Expand-Archive $ArtifactData.DownloadLocation -DestinationPath $FinalDestination
 		Remove-Item $ArtifactData.DownloadLocation
 	}
 
 	$ArtifactData = $ArtifactData + @{FinalDesination=$FinalDesination}
-
-	$ArtType = $ArtifactData.GetType()
-	Write-Host "This is the type of artifact data: $ArtType"
 
 	Return $ArtifactData
 
 }
 
 function New-TemporaryFolder {
-
-	Write-Host "This is New-TemporaryFolder"
-
 	# Make a new folder based upon a TempFileName
 	$T="$($env:TEMP)\tmp$([convert]::tostring((get-random 65535),16).padleft(4,'0')).tmp"
 	#$T="$($env:TMPDIR)/tmp$([convert]::tostring((get-random 65535),16).padleft(4,'0')).tmp"
-	New-Item -ItemType Directory -Path $T
+	New-Item -Force -ItemType Directory -Path $T
 }
+
 function Create-SymLinkToApp {
 	param(
 		[parameter(Mandatory, ValueFromPipeline, ValueFromPipelineByPropertyName)]
@@ -310,15 +283,15 @@ function Create-SymLinkToApp {
 
 	if(-Not (Test-Path -PathType container $Folder\aliases))
 	{
-		New-Item -ItemType Directory -Path $Folder\aliases
+		New-Item -Force -ItemType Directory -Path $Folder\aliases
 	}
 
 	# First create folder to store alias files if it doesn't exist
 
-	$AliasFile=$Folder+"\aliases\hpcflow_aliases.csv"
+	$AliasFile=$Folder+"\aliases\matflow_aliases.csv"
 
 	if (-Not (Test-Path $AliasFile -PathType leaf)) {
-		New-Item -Path $AliasFile -Type File
+		New-Item -Force -Path $AliasFile -Type File
 	}
 
 	if($OneFile) {
@@ -355,10 +328,8 @@ function Add-SymLinkFolderToPath {
 		[string]$AliasFile
 	)
 
-	Write-Host "This is Add-SymLunkFolderToPath"
-
 	if(-Not (Test-Path $profile)) {
-		New-Item -Path $profile -Type File
+		New-Item -Force -Path $profile -Type File
 	}
 
 	$ImportString = "Import-Alias $AliasFile" 
