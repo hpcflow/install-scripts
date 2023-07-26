@@ -23,6 +23,6 @@ jobs:
       - name: Check results
         run: |
           $app_path = "${{ env.INSTALL_ROOT }}\\matflow-v0.3.0a35-win.exe"
-          .\$app_path
+          Invoke-Expression -Command $app_path
 
       
