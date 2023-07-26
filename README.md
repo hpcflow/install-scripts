@@ -17,7 +17,8 @@ temporary folder.
 
 2. The zip archive is extracted to a default installation folder. The installation folder depends on the OS.
 
-3. A symbolic link (Linux/macOS) or an alias (Windows) is created.
+3. A symbolic link (Linux/macOS) or an alias (Windows) is created. This link has the same name as the downloaded 
+    application.
 
 ### Windows only 
 
@@ -59,9 +60,52 @@ the two types of script.
 
 ## Using the scripts
 
+There are two ways that the scripts can be used.
+
 ### Copy from remote and execute locally
 
+The easiest way to use the script is to run one of the commands below that copy the script from GitHub and execute it.
+
+The current recommended commands for HPCFlow under Linux/macOS is:
+```bash
+(touch tmp.sh && curl -fsSL https://raw.githubusercontent.com/hpcflow/install-scripts/main/src/install-hpcflow.sh > tmp.sh && bash tmp.sh --prerelease --path) ; rm tmp.sh
+```
+and for MatFlow under Linux/macOS:
+```bash
+(touch tmp.sh && curl -fsSL https://raw.githubusercontent.com/hpcflow/install-scripts/main/src/install-matflow.sh > tmp.sh && bash tmp.sh --prerelease --path) ; rm tmp.sh
+```
+These commands download the code from the GitHub repo and place it in a file called `tmp.sh`, run the script with the 
+recommended settings, and then delete the file.
+
+The corresponding commands for HPCFlow under Windows is:
+```powershell
+& $([scriptblock]::Create((New-Object Net.WebClient).DownloadString('https://raw.githubusercontent.com/hpcflow/install-scripts/main/src/install-hpcflow.ps1'))) -PreRelease
+```
+and for MatFlow under Windows:
+```powershell
+& $([scriptblock]::Create((New-Object Net.WebClient).DownloadString('https://raw.githubusercontent.com/hpcflow/install-scripts/main/src/install-matflow.ps1'))) -PreRelease 
+```
+
+These commands download the relevant code from the GitHub repo and execute it as a script block.
+
 ### Clone the repository
+
+Clone the repo using:
+```bash
+git clone https://github.com/hpcflow/install-scripts.git
+```
+The scripts can then be executed locally in Linux/macOS using:
+```bash
+./install-hpcflow.sh
+./install-matflow.sh
+```
+and in Windows (powershell) using:
+```powershell
+.\install-hpcflow.ps1
+.\install-matflow.ps1
+```
+
+
 
 
 This repository contains scripts to install the pyinstaller folder version of 
