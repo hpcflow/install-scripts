@@ -19,12 +19,13 @@ jobs:
       - name: Run script
         id: run-script
         run: |
-          $ScriptOutput = & $([scriptblock]::Create((New-Object Net.WebClient).DownloadString('https://raw.githubusercontent.com/hpcflow/install-scripts/feat/gha-int-test-all/src/install-matflow.ps1'))) -PreRelease -OneFile
+          $ScriptOutput = & $([scriptblock]::Create((New-Object Net.WebClient).DownloadString('https://raw.githubusercontent.com/hpcflow/install-scripts/feat/gha-int-test-all/src/install-matflow.ps1'))) -PreRelease -OneFile >> $GITHUB_OUTPUT
           dir ${{ env.INSTALL_ROOT }}
 
       - name: Check results
         run: |
           $app_path = "${{ env.INSTALL_ROOT }}\\matflow-v0.3.0a35-win.exe test"
           Invoke-Expression -Command $app_path
+          Write-Host steps.run-script.outputs
 
       
