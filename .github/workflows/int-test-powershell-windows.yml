@@ -26,6 +26,6 @@ jobs:
         run: |
           $app_path = "${{ env.INSTALL_ROOT }}\\matflow-v0.3.0a35-win.exe test"
           Invoke-Expression -Command $app_path
-          Write-Host steps.run-script.outputs
+          Write-Host ${{ steps.run-script.outputs }}
 
       
