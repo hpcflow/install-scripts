@@ -20,7 +20,7 @@ jobs:
         id: run-script
         run: |
           $ScriptOutput = & $([scriptblock]::Create((New-Object Net.WebClient).DownloadString('https://raw.githubusercontent.com/hpcflow/install-scripts/feat/gha-int-test-all/src/install-matflow.ps1'))) -PreRelease -OneFile
-          Write-Host $ScriptOutput
+          $test = & dir ${{ env.INSTALL_ROOT }}
 
       - name: Check results
         run: |
