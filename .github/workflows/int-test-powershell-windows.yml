@@ -21,12 +21,12 @@ jobs:
         run: |
           $ScriptOutput = & $([scriptblock]::Create((New-Object Net.WebClient).DownloadString('https://raw.githubusercontent.com/hpcflow/install-scripts/feat/gha-int-test-all/src/install-matflow.ps1'))) -PreRelease -OneFile 6>&1
           $ScriptOutputSplit = $ScriptOutput -Split " "
-          Write-Host $ScriptOutputSplit[15]
+          echo "ART_NAME=$ScriptOutputSplit[15]" >> $env:GITHUB_ENV
 
 
       - name: Check results
         run: |
-          $app_path = "${{ env.INSTALL_ROOT }}\\matflow-v0.3.0a36-win.exe test"
+          $app_path = "${{ env.INSTALL_ROOT }}\\${{ env.ART_NAME }} test"
           Invoke-Expression -Command $app_path
 
       
