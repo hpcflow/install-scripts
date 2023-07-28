@@ -73,6 +73,8 @@ function Install-MatFlowApplication {
 		Start-Sleep -Milliseconds 100
 	}
 
+	Check-InstallDir $Folder
+
 	$DownloadFolder = New-TemporaryFolder
 
 	Get-ScriptParameters | `
@@ -93,6 +95,14 @@ function Get-InstallDir {
 	$WindowsInstallDir = "${env:USERPROFILE}\AppData\Local\matflow"
 
 	return $WindowsInstallDir
+}
+
+function Check-InstallDir {
+
+	if(-Not (Test-Path $Folder)) {
+		New-Item -Force -ItemType Directory $Folder
+	}
+
 }
 
 function  Get-ScriptParameters {
@@ -123,10 +133,10 @@ function Get-LatestReleaseInfo {
 	)
 
 	if ($PreRelease) {
-		$PageHTML = Invoke-WebRequest -Uri $param.LatestPrereleaseReleases -Method Get
+		$PageHTML = Invoke-WebRequest -UseBasicParsing -Uri $param.LatestPrereleaseReleases -Method Get
 	}
 	else {
-		$PageHTML = Invoke-WebRequest -Uri $param.LatestStableReleases -Method Get
+		$PageHTML = Invoke-WebRequest -UseBasicParsing -Uri $param.LatestStableReleases -Method Get
 	}
 	
 	$PageContents = $PageHTML.Content
@@ -218,7 +228,7 @@ function Download-Artifact {
 
 	$DownloadLocation = $DownloadFolder +"/" + $ArtifactData.ArtifactName
 
-	Invoke-WebRequest $ArtifactData.ArtifactWebAddress -OutFile $DownloadLocation
+	Invoke-WebRequest -UseBasicParsing $ArtifactData.ArtifactWebAddress -OutFile $DownloadLocation
 
 	$ArtifactData = $ArtifactData + @{DownloadLocation=$DownloadLocation}
 
@@ -254,7 +264,7 @@ function New-TemporaryFolder {
 	# Make a new folder based upon a TempFileName
 	$T="$($env:TEMP)\tmp$([convert]::tostring((get-random 65535),16).padleft(4,'0')).tmp"
 	#$T="$($env:TMPDIR)/tmp$([convert]::tostring((get-random 65535),16).padleft(4,'0')).tmp"
-	New-Item -ItemType Directory -Path $T
+	New-Item -Force -ItemType Directory -Path $T
 }
 
 function Create-SymLinkToApp {
@@ -273,7 +283,7 @@ function Create-SymLinkToApp {
 
 	if(-Not (Test-Path -PathType container $Folder\aliases))
 	{
-		New-Item -ItemType Directory -Path $Folder\aliases
+		New-Item -Force -ItemType Directory -Path $Folder\aliases
 	}
 
 	# First create folder to store alias files if it doesn't exist
@@ -281,7 +291,7 @@ function Create-SymLinkToApp {
 	$AliasFile=$Folder+"\aliases\matflow_aliases.csv"
 
 	if (-Not (Test-Path $AliasFile -PathType leaf)) {
-		New-Item -Path $AliasFile -Type File
+		New-Item -Force -Path $AliasFile -Type File
 	}
 
 	if($OneFile) {
@@ -319,7 +329,7 @@ function Add-SymLinkFolderToPath {
 	)
 
 	if(-Not (Test-Path $profile)) {
-		New-Item -Path $profile -Type File
+		New-Item -Force -Path $profile -Type File
 	}
 
 	$ImportString = "Import-Alias $AliasFile" 
