@@ -32,5 +32,3 @@ jobs:
         run: |
           $app_path = "${{ env.INSTALL_ROOT }}\\${{ env.ART_NAME }} test"
           Invoke-Expression -Command $app_path
-
-      
