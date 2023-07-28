@@ -21,7 +21,7 @@ jobs:
         run: |
           $ScriptOutput = & $([scriptblock]::Create((New-Object Net.WebClient).DownloadString('https://raw.githubusercontent.com/hpcflow/install-scripts/feat/gha-int-test-all/src/install-matflow.ps1'))) -PreRelease -OneFile 6>&1
           $ScriptOutputSplit = $ScriptOutput -Split " "
-          Write-Host $ScriptOutputSplit[14]
+          Write-Host $ScriptOutputSplit[10]
 
 
       - name: Check results
