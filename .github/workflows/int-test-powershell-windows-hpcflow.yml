@@ -2,7 +2,7 @@ name: Integration test - HPCFlow, powershell, Windows
 
 env:
   APP_NAME: "matflow"
-  INSTALL_ROOT: "${env:USERPROFILE}\\AppData\\Local\\matflow"
+  INSTALL_ROOT: "${env:USERPROFILE}\\AppData\\Local\\hpcflow"
 
 on:
   workflow_dispatch:  
