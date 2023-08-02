@@ -22,7 +22,7 @@ jobs:
       - name: Run script
         id: run-script
         run: |
-          $ScriptOutput = & $([scriptblock]::Create((New-Object Net.WebClient).DownloadString('https://raw.githubusercontent.com/hpcflow/install-scripts/feat/gha-int-test-all/src/install-matflow.ps1'))) -PreRelease -OneFile 6>&1
+          $ScriptOutput = & $([scriptblock]::Create((New-Object Net.WebClient).DownloadString('https://raw.githubusercontent.com/hpcflow/install-scripts/main/src/install-matflow.ps1'))) -PreRelease -OneFile 6>&1
           $ScriptOutputSplit = $ScriptOutput -Split " "
           $artifact_name = $ScriptOutputSplit[15]
           echo "ART_NAME=$artifact_name" >> $env:GITHUB_ENV

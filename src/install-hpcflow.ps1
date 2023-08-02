@@ -292,7 +292,7 @@ function Create-SymLinkToApp {
 	$AliasFile=$Folder+"\aliases\hpcflow_aliases.csv"
 
 	if (-Not (Test-Path $AliasFile -PathType leaf)) {
-		New-Item Force -Path $AliasFile -Type File
+		New-Item -Force -Path $AliasFile -Type File
 	}
 
 	if($OneFile) {

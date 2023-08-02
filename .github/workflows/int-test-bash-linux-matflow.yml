@@ -1,8 +1,8 @@
-name: Integration test - Matflow, BASH, macos
+name: Integration test - MatFlow, BASH, Linux
 
 env:
   APP_NAME: "matflow"
-  INSTALL_ROOT: "~/Library/Application\\ Support"
+  INSTALL_ROOT: "~/.local/share"
 
 on:
   workflow_dispatch:
@@ -11,8 +11,8 @@ on:
     branches: [main, develop]
 
 jobs:
-  int-test-script-bash-macos:
-    runs-on: macos-latest
+  int-test-script-bash-linux:
+    runs-on: ubuntu-latest
 
     steps:
 
