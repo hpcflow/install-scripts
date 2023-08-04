@@ -69,6 +69,9 @@ function Install-HPCFlowApplication {
 	if( $UnivLink.IsPresent) {
 		$UnivLinkFlag = $true
 	}
+	else {
+		$UnivLinkFlag = $true
+	}
 
 
 	Write-Host "Installing $AppName $VersionType $AppType version..."

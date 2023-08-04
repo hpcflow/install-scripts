@@ -69,6 +69,9 @@ function Install-MatFlowApplication {
 	if ($UnivLink.IsPresnet) {
 		$UnivLinkFlag = $true
 	}
+	else {
+		$UnivLinkFlag = $false
+	}
 
 
 	Write-Host "Installing $AppName $VersionType $AppType version..."
