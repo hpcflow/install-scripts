@@ -6,7 +6,10 @@ param(
 	[switch]$OneFile,
 
 	[Parameter()]
-	[switch]$PreRelease
+	[switch]$PreRelease,
+
+	[Parameter()]
+	[switch]$UnivLink
 
 )
 
@@ -20,7 +23,11 @@ function Install-MatFlowApplication {
 		[switch]$OneFile,
 
 		[Parameter()]
-		[switch]$PreRelease
+		[switch]$PreRelease,
+
+		[Parameter()]
+		[switch]$UnivLink
+
 	)
 	trap{
 		# Check if DownloadFolder variable has been created. If it has, delete folder it points to.
@@ -59,6 +66,10 @@ function Install-MatFlowApplication {
 		$VersionType = "latest stable"
 	}
 
+	if ($UnivLink.IsPresnet) {
+		$UnivLinkFlag = $true
+	}
+
 
 	Write-Host "Installing $AppName $VersionType $AppType version..."
 	Start-Sleep -Milliseconds 100
@@ -84,7 +95,7 @@ function Install-MatFlowApplication {
 	Check-AppInstall -Folder $Folder -OneFile $OneFileFlag | `
 	Download-Artifact -DownloadFolder $DownloadFolder | `
 	Place-Artifact -FinalDestination $Folder -OneFile $OneFileFlag | `
-	Create-SymLinkToApp -Folder $Folder -OneFile $OneFileFlag | `
+	Create-SymLinkToApp -Folder $Folder -OneFile $OneFileFlag -PreRelease $PreReleaseFlag -UnivLink $UnivLinkFlag| `
 	Add-SymLinkFolderToPath
 
 	
@@ -276,7 +287,13 @@ function Create-SymLinkToApp {
 		[string]$Folder,
 
 		[parameter()]
-		[bool]$OneFile
+		[bool]$OneFile,
+
+		[parameter()]
+		[bool]$PreRelease,
+
+		[parameter()]
+		[bool]$UnivLink
 	)
 
 	$artifact_name = $ArtifactData.ArtifactName
@@ -299,6 +316,17 @@ function Create-SymLinkToApp {
 		if (-Not (Get-Content $AliasFile | %{$_ -match $artifact_name})) {
 			Add-Content $AliasFile "`"$artifact_name`",`"$Folder\$artifact_name`",`"`",`"None`""
 		}
+
+		if($UnivLink) {
+			if($PreRelease) {
+				$univ_link_name = "matflow-dev"
+			}
+			else {
+				$univ_link_name = "matflow"
+			}
+			Add-Content $AliasFile "`"$univ_link_name`",`"$Folder\$artifact_name`",`"`",`"None`""
+		}
+
 		
 		Write-Host "Type $artifact_name to get started!"
 		Start-Sleep -Milliseconds 100
@@ -313,6 +341,17 @@ function Create-SymLinkToApp {
 		if (-Not (Get-Content $AliasFile | %{$_ -match $link_name})) {
 			Add-Content $AliasFile "`"$link_name`",`"$Folder\$folder_name\$exe_name`",`"`",`"None`""
 		}
+
+		if($UnivLink) {
+			if($PreRelease) {
+				$univ_link_name = "matflow-dev"
+			}
+			else {
+				$univ_link_name = "matflow"
+			}
+			Add-Content $AliasFile "`"$univ_link_name`",`"$Folder\$artifact_name`",`"`",`"None`""
+		}
+
 		Write-Host "Type $link_name to get started!"
 		Start-Sleep -Milliseconds 100
 	}
