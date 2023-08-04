@@ -295,7 +295,7 @@ function Create-SymLinkToApp {
 		[bool]$OneFile,
 
 		[parameter()]
-		[bool]$PreRelese,
+		[bool]$PreRelease,
 
 		[parameter()]
 		[bool]$UnivLink
