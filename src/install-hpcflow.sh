@@ -394,7 +394,7 @@ create_universal_symlink () {
 create_universal_symlink_dev () {
 
 	ln -sf "${folder}/${folder_name}/${folder_name}" "${folder}/links/${app_name}-dev"
-	symstring="${app_name} or ${folder_name}"
+	symstring="${app_name}-dev or ${folder_name}"
 
 }
 
