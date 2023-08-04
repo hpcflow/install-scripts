@@ -402,7 +402,7 @@ create_universal_symlink () {
 
 create_universal_symlink_dev () {
 
-	if ["onefile" == true]; then
+	if [ "onefile" == true ]; then
 
 		ln -sf "${folder}/${artifact_name}" "${folder}/links/${app_name}-dev"
 		symstring="${app_name}-dev or ${artifact_name}"
