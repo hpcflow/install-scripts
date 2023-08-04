@@ -386,15 +386,33 @@ create_versioned_symlink_user_one_folder () {
 
 create_universal_symlink () {
 
-	ln -sf "${folder}/${folder_name}/${folder_name}" "${folder}/links/${app_name}"
-	symstring="${app_name} or ${folder_name}"
+	if [ "$onefile" == true ]; then
+
+		ln -sf "${folder}/${artifact_name}" "${folder}/links/${app_name}}"
+		symstring="${app_name} or ${artifact_name}"
+
+	else
+
+		ln -sf "${folder}/${folder_name}/${folder_name}" "${folder}/links/${app_name}"
+		symstring="${app_name} or ${folder_name}"
+
+	fi
 
 }
 
 create_universal_symlink_dev () {
 
-	ln -sf "${folder}/${folder_name}/${folder_name}" "${folder}/links/${app_name}-dev"
-	symstring="${app_name}-dev or ${folder_name}"
+	if ["onefile" == true]; then
+
+		ln -sf "${folder}/${artifact_name}" "${folder}/links/${app_name}-dev"
+		symstring="${app_name}-dev or ${artifact_name}"
+
+	else
+
+		ln -sf "${folder}/${folder_name}/${folder_name}" "${folder}/links/${app_name}-dev"
+		symstring="${app_name}-dev or ${folder_name}"
+
+	fi
 
 }
 
