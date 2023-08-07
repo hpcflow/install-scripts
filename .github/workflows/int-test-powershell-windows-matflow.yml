@@ -11,13 +11,10 @@ on:
     branches: [main, develop]
 
 jobs:
-  int-test-script-powershell-windows:
+  int-test-script-powershell-windows-default:
     runs-on: windows-latest
 
     steps:
-
-      - name: Checkout
-        uses: actions/checkout@v3
 
       - name: Run script
         id: run-script
@@ -30,5 +27,22 @@ jobs:
 
       - name: Check results
         run: |
-          $app_path = "${{ env.INSTALL_ROOT }}\\${{ env.ART_NAME }} test"
+          $app_path = "${{ env.INSTALL_ROOT }}${{ env.ART_NAME }} test"
+          Invoke-Expression -Command $app_path
+
+  int-test-script-powershell-windows-prerelease-univlink:
+    runs-on: windows-latest
+
+    steps:
+
+      - name: Run script
+        id: run-script
+        run: |
+          $ScriptOutput = & $([scriptblock]::Create((New-Object Net.WebClient).DownloadString('https://raw.githubusercontent.com/hpcflow/install-scripts/main/src/install-matflow.ps1'))) -PreRelease -OneFile -UnivLink 6>&1
+          echo "ART_NAME_UNIV=matflow-dev" >> $env:GITHUB_ENV
+
+
+      - name: Check results
+        run: |
+          $app_path = "${{ env.ART_NAME_UNIV }} test"
           Invoke-Expression -Command $app_path
