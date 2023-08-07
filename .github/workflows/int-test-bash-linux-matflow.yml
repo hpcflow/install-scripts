@@ -16,11 +16,7 @@ jobs:
 
     steps:
 
-      - name: Checkout
-        uses: actions/checkout@v3
-
       - name: Run script
-        id: run-script
         run: |
           script_output=`(touch tmp.sh && curl -fsSL https://raw.githubusercontent.com/hpcflow/install-scripts/main/src/install-matflow.sh > tmp.sh && bash tmp.sh --prerelease --path --onefile) ; rm tmp.sh`
           artifact_name=`echo $script_output | grep matflow- | cut -d " " -f 30`
@@ -28,4 +24,24 @@ jobs:
 
       - name: Run Matflow test suite
         run: |
-          ${{ env.INSTALL_ROOT }}/${{ env.APP_NAME }}/${{ env.ART_NAME }} test
+          ${{ env.INSTALL_ROOT }}/${{ env.APP_NAME }}/links/${{ env.ART_NAME }} test
+
+      - name: Cleanup
+        run: rm -r {{ env.INSTALL_ROOT }}/${{ env.APP_NAME }}
+  
+  int-test-script-bash-linux-prerelease-univlink:
+    runs-on: ubuntu-latest
+
+    steps:
+
+      - name: Run script
+        run: |
+          script_output=`(touch tmp.sh && curl -fsSL https://raw.githubusercontent.com/hpcflow/install-scripts/main/src/install-matflow.sh > tmp.sh && bash tmp.sh --prerelease --path --onefile) ; rm tmp.sh`
+          echo "ART_NAME_UNIV=matflow-dev" >> $GITHUB_ENV
+
+      - name: Run Matflow test suite
+        run: |
+          ${{ env.INSTALL_ROOT }}/${{ env.APP_NAME }}/links/${{ env.ART_NAME_UNIV }} test
+
+      - name: Cleanup
+        run: rm -r {{ env.INSTALL_ROOT }}/${{ env.APP_NAME }}
