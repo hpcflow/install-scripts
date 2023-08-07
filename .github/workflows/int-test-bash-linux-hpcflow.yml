@@ -27,7 +27,7 @@ jobs:
           ${{ env.INSTALL_ROOT }}/${{ env.APP_NAME }}/links/${{ env.ART_NAME }} test
 
       - name: Cleanup
-        run: rm -r ${{ env.INSTALL_ROOT }}${{ env.APP_NAME }}
+        run: rm -r ${{ env.INSTALL_ROOT }}/${{ env.APP_NAME }}
 
   int-test-script-bash-linux-prerelease-univlink:
     runs-on: ubuntu-latest
@@ -40,7 +40,7 @@ jobs:
           artifact_name=`echo $script_output | grep hpcflow- | cut -d " " -f 30`
           echo "ART_NAME=$artifact_name" >> $GITHUB_ENV
 
-      - name: Run Matflow test suite
+      - name: Run HPCFlow test suite
         run: |
           ${{ env.INSTALL_ROOT }}/${{ env.APP_NAME }}/links/${{ env.ART_NAME }} test
 
