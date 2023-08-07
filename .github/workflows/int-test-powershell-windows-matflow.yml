@@ -27,7 +27,7 @@ jobs:
 
       - name: Check results
         run: |
-          $app_path = "${{ env.INSTALL_ROOT }}${{ env.ART_NAME }} test"
+          $app_path = "${{ env.INSTALL_ROOT }}\\${{ env.ART_NAME }} test"
           Invoke-Expression -Command $app_path
 
   int-test-script-powershell-windows-prerelease-univlink:
@@ -44,5 +44,6 @@ jobs:
 
       - name: Check results
         run: |
+          & $profile
           $app_path = "${{ env.ART_NAME_UNIV }} test"
           Invoke-Expression -Command $app_path
