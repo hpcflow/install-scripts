@@ -17,7 +17,6 @@ jobs:
     steps:
 
       - name: Run script
-        id: run-script
         run: |
           script_output=`(touch tmp.sh && curl -fsSL https://raw.githubusercontent.com/hpcflow/install-scripts/main/src/install-hpcflow.sh > tmp.sh && bash tmp.sh --prerelease --path --onefile) ; rm tmp.sh`
           artifact_name=`echo $script_output | grep hpcflow- | cut -d " " -f 30`
@@ -31,11 +30,11 @@ jobs:
         run: rm -r ${{ env.INSTALL_ROOT }}/${{ env.APP_NAME }}
   
   int-test-script-bash-macos-prerelease-univlink:
-    runs-on: ubuntu-latest
+    runs-on: macos-latest
+
     steps:
 
       - name: Run script
-        id: run-script
         run: |
           script_output=`(touch tmp.sh && curl -fsSL https://raw.githubusercontent.com/hpcflow/install-scripts/main/src/install-hpcflow.sh > tmp.sh && bash tmp.sh --prerelease --path --onefile --univlink) ; rm tmp.sh`
           echo "ART_NAME_UNIV=hpcflow-dev" >> $GITHUB_ENV
