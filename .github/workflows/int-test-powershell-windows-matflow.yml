@@ -30,7 +30,9 @@ jobs:
           Invoke-Expression -Command $app_path
 
       - name: Cleanup
-        run: Remove-Item ${{ env.INSTALL_ROOT }} -Recurse
+        run: |
+          Remove-Item ${{ env.INSTALL_ROOT }} -Recurse
+          Remove-Alias ${{ env.ART_NAME }}
 
   int-test-script-powershell-windows-prerelease-univlink:
     runs-on: windows-latest
