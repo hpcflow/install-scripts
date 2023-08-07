@@ -27,7 +27,7 @@ jobs:
           ${{ env.INSTALL_ROOT }}/${{ env.APP_NAME }}/${{ env.ART_NAME }} test
 
       - name: Cleanup
-        run: rm -r ${{ env.INSTALL_ROOT }}/${{ env.APP_NAME }}
+        run: rm -r ${{ env.INSTALL_ROOT }}/links/${{ env.APP_NAME }}
 
   int-test-script-bash-linux-prerelease-univlink:
     runs-on: ubuntu-latest
@@ -39,10 +39,10 @@ jobs:
           script_output=`(touch tmp.sh && curl -fsSL https://raw.githubusercontent.com/hpcflow/install-scripts/main/src/install-hpcflow.sh > tmp.sh && bash tmp.sh --prerelease --path --onefile --univlink) ; rm tmp.sh`
           artifact_name=`echo $script_output | grep hpcflow- | cut -d " " -f 30`
           echo "ART_NAME=$artifact_name" >> $GITHUB_ENV
-          
+
       - name: Run Matflow test suite
         run: |
-          ${{ env.INSTALL_ROOT }}/${{ env.APP_NAME }}/${{ env.ART_NAME }} test
+          ${{ env.INSTALL_ROOT }}/${{ env.APP_NAME }}/links/${{ env.ART_NAME }} test
 
       - name: Cleanup
         run: rm -r ${{ env.INSTALL_ROOT }}/${{ env.APP_NAME }}
