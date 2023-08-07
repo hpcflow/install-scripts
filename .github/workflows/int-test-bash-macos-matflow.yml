@@ -41,7 +41,7 @@ jobs:
 
       - name: Run Matflow test suite
         run: |
-          ${{ env.INSTALL_ROOT }}/${{ env.APP_NAME }}/links/${{ env.ART_NAME }} test
+          ${{ env.INSTALL_ROOT }}/${{ env.APP_NAME }}/links/${{ env.ART_NAME_UNIV }} test
 
       - name: Cleanup
         run: rm -r ${{ env.INSTALL_ROOT }}/${{ env.APP_NAME }}
