@@ -48,6 +48,6 @@ jobs:
 
       - name: Check results
         run: |
-          Get-Alias -Scope User
+          Get-Alias -Scope Global
           $app_path = "${{ env.ART_NAME_UNIV }} test"
           Invoke-Expression -Command $app_path
