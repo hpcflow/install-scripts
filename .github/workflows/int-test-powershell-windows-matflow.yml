@@ -48,5 +48,6 @@ jobs:
 
       - name: Check results
         run: |
+          Get-Aliase -Scope User
           $app_path = "${{ env.ART_NAME_UNIV }} test"
           Invoke-Expression -Command $app_path
