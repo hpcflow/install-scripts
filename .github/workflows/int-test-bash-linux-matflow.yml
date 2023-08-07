@@ -36,7 +36,7 @@ jobs:
 
       - name: Run script
         run: |
-          script_output=`(touch tmp.sh && curl -fsSL https://raw.githubusercontent.com/hpcflow/install-scripts/main/src/install-matflow.sh > tmp.sh && bash tmp.sh --prerelease --path --onefile) ; rm tmp.sh`
+          script_output=`(touch tmp.sh && curl -fsSL https://raw.githubusercontent.com/hpcflow/install-scripts/main/src/install-matflow.sh > tmp.sh && bash tmp.sh --prerelease --path --onefile --univlink) ; rm tmp.sh`
           echo "ART_NAME_UNIV=matflow-dev" >> $GITHUB_ENV
 
       - name: Run Matflow test suite
