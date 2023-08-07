@@ -30,5 +30,6 @@ jobs:
 
       - name: Check results
         run: |
+          Get-Alias -Scope User
           $app_path = "${{ env.INSTALL_ROOT }}\\${{ env.ART_NAME }} test"
           Invoke-Expression -Command $app_path
