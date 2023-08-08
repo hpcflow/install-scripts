@@ -11,6 +11,15 @@ on:
     branches: [main, develop]
 
 jobs:
+  get-branch-name:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Get and store current branch name
+        run: |
+          $branch_name="${GITHUB_REF#refs/heads/}"
+          echo $branch_name
+
   int-test-script-bash-linux-default:
     runs-on: ubuntu-latest
 
