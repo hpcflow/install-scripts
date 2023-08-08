@@ -91,6 +91,8 @@ function Install-MatFlowApplication {
 
 	$DownloadFolder = New-TemporaryFolder
 
+	Write-Host $UnivLinkFlag
+
 	Get-ScriptParameters | `
 	Get-LatestReleaseInfo -PreRelease $PreReleaseFlag | `
 	Extract-WindowsInfo -FileEnding $ArtifactEnding | `
@@ -98,10 +100,8 @@ function Install-MatFlowApplication {
 	Check-AppInstall -Folder $Folder -OneFile $OneFileFlag | `
 	Download-Artifact -DownloadFolder $DownloadFolder | `
 	Place-Artifact -FinalDestination $Folder -OneFile $OneFileFlag | `
-	Create-SymLinkToApp -Folder $Folder -OneFile $OneFileFlag -PreRelease $PreReleaseFlag -UnivLink $UnivLinkFlag| `
+	Create-SymLinkToApp -Folder $Folder -OneFile $OneFileFlag -PreRelease $PreReleaseFlag -UnivLink $UnivLinkFlag | `
 	Add-SymLinkFolderToPath
-
-	
 
 }
 
