@@ -66,7 +66,7 @@ function Install-MatFlowApplication {
 		$VersionType = "latest stable"
 	}
 
-	if ($UnivLink.IsPresnet) {
+	if ($UnivLink.IsPresent) {
 		$UnivLinkFlag = $true
 	}
 	else {
@@ -320,8 +320,8 @@ function Create-SymLinkToApp {
 			Add-Content $AliasFile "`"$artifact_name`",`"$Folder\$artifact_name`",`"`",`"None`""
 		}
 
-		if($UnivLink) {
-			if($PreRelease) {
+		if ($UnivLink) {
+			if ($PreRelease) {
 				$univ_link_name = "matflow-dev"
 			}
 			else {
@@ -345,8 +345,8 @@ function Create-SymLinkToApp {
 			Add-Content $AliasFile "`"$link_name`",`"$Folder\$folder_name\$exe_name`",`"`",`"None`""
 		}
 
-		if($UnivLink) {
-			if($PreRelease) {
+		if ($UnivLink) {
+			if ($PreRelease) {
 				$univ_link_name = "matflow-dev"
 			}
 			else {
