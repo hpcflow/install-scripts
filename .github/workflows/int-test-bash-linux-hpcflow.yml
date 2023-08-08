@@ -17,7 +17,7 @@ jobs:
     steps:
       - name: Get and store current branch name
         run: |
-          $branch_name="${GITHUB_REF#refs/heads/}"
+          branch_name="${GITHUB_REF#refs/heads/}"
           echo $branch_name
 
   int-test-script-bash-linux-default:
