@@ -66,7 +66,7 @@ function Install-MatFlowApplication {
 		$VersionType = "latest stable"
 	}
 
-	if ($UnivLink.IsPresnet) {
+	if ($UnivLink.IsPresent) {
 		$UnivLinkFlag = $true
 	}
 	else {
