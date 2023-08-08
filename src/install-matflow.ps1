@@ -91,8 +91,6 @@ function Install-MatFlowApplication {
 
 	$DownloadFolder = New-TemporaryFolder
 
-	Write-Host $UnivLinkFlag
-
 	Get-ScriptParameters | `
 	Get-LatestReleaseInfo -PreRelease $PreReleaseFlag | `
 	Extract-WindowsInfo -FileEnding $ArtifactEnding | `
