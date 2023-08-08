@@ -98,10 +98,8 @@ function Install-MatFlowApplication {
 	Check-AppInstall -Folder $Folder -OneFile $OneFileFlag | `
 	Download-Artifact -DownloadFolder $DownloadFolder | `
 	Place-Artifact -FinalDestination $Folder -OneFile $OneFileFlag | `
-	Create-SymLinkToApp -Folder $Folder -OneFile $OneFileFlag -PreRelease $PreReleaseFlag -UnivLink $UnivLinkFlag| `
+	Create-SymLinkToApp -Folder $Folder -OneFile $OneFileFlag -PreRelease $PreReleaseFlag -UnivLink $UnivLinkFlag | `
 	Add-SymLinkFolderToPath
-
-	
 
 }
 
@@ -320,8 +318,8 @@ function Create-SymLinkToApp {
 			Add-Content $AliasFile "`"$artifact_name`",`"$Folder\$artifact_name`",`"`",`"None`""
 		}
 
-		if($UnivLink) {
-			if($PreRelease) {
+		if ($UnivLink) {
+			if ($PreRelease) {
 				$univ_link_name = "matflow-dev"
 			}
 			else {
@@ -345,8 +343,8 @@ function Create-SymLinkToApp {
 			Add-Content $AliasFile "`"$link_name`",`"$Folder\$folder_name\$exe_name`",`"`",`"None`""
 		}
 
-		if($UnivLink) {
-			if($PreRelease) {
+		if ($UnivLink) {
+			if ($PreRelease) {
 				$univ_link_name = "matflow-dev"
 			}
 			else {

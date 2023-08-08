@@ -28,8 +28,31 @@ jobs:
           $artifact_name = $ScriptOutputSplit[15]
           echo "ART_NAME=$artifact_name" >> $env:GITHUB_ENV
 
-
       - name: Check results
         run: |
           $app_path = "${{ env.INSTALL_ROOT }}\\${{ env.ART_NAME }} test"
           Invoke-Expression -Command $app_path
+
+      - name: Cleanup
+        run: |
+          Remove-Item ${{ env.INSTALL_ROOT }} -Recurse
+
+  int-test-script-powershell-windows-prerelease-univlink:
+    runs-on: windows-latest
+
+    steps:
+
+      - name: Run script
+        id: run-script
+        run: |
+          $ScriptOutput = & $([scriptblock]::Create((New-Object Net.WebClient).DownloadString('https://raw.githubusercontent.com/hpcflow/install-scripts/main/src/install-hpcflow.ps1'))) -PreRelease -OneFile -UnivLink 6>&1
+          echo "ART_NAME_UNIV=hpcflow-dev" >> $env:GITHUB_ENV
+
+      - name: Check results
+        run: |
+          $app_path = "${{ env.ART_NAME_UNIV }} test"
+          Invoke-Expression -Command $app_path
+          
+      - name: Cleanup
+        run: |
+          Remove-Item ${{ env.INSTALL_ROOT }} -Recurse
