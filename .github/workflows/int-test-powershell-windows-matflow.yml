@@ -32,7 +32,6 @@ jobs:
       - name: Cleanup
         run: |
           Remove-Item ${{ env.INSTALL_ROOT }} -Recurse
-          Remove-Alias ${{ env.ART_NAME }}
 
   int-test-script-powershell-windows-prerelease-univlink:
     runs-on: windows-latest
@@ -47,7 +46,9 @@ jobs:
 
       - name: Check results
         run: |
-          type ${{ env.INSTALL_ROOT }}\\aliases\\matflow_aliases.csv
-          Get-Alias -Scope Global
           $app_path = "${{ env.ART_NAME_UNIV }} test"
           Invoke-Expression -Command $app_path
+          
+      - name: Cleanup
+        run: |
+          Remove-Item ${{ env.INSTALL_ROOT }} -Recurse
