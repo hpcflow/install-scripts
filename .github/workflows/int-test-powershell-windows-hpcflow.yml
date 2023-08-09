@@ -11,8 +11,23 @@ on:
     branches: [main, develop]
 
 jobs:
+
+  get-branch-name:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Get and store current branch name
+        id: parse_branch_name
+        run: |
+          branch_name="${GITHUB_REF#refs/heads/}"
+          echo "BRANCH_NAME=$branch_name" >> "$GITHUB_OUTPUT"
+
+    outputs:
+      branch_name: ${{ steps.parse_branch_name.outputs.branch_name }}
+
   int-test-script-powershell-windows:
     runs-on: windows-latest
+    needs: get-branch-name
 
     steps:
 
@@ -22,7 +37,7 @@ jobs:
       - name: Run script
         id: run-script
         run: |
-          $ScriptOutput = & $([scriptblock]::Create((New-Object Net.WebClient).DownloadString('https://raw.githubusercontent.com/hpcflow/install-scripts/main/src/install-hpcflow.ps1'))) -PreRelease -OneFile 6>&1
+          $ScriptOutput = & $([scriptblock]::Create((New-Object Net.WebClient).DownloadString('https://raw.githubusercontent.com/hpcflow/install-scripts/${{ needs.get-branch-name.outputs.branch_name }}/src/install-hpcflow.ps1'))) -PreRelease -OneFile 6>&1
           Write-Host $ScriptOutput
           $ScriptOutputSplit = $ScriptOutput -Split " "
           $artifact_name = $ScriptOutputSplit[15]
@@ -39,13 +54,14 @@ jobs:
 
   int-test-script-powershell-windows-prerelease-univlink:
     runs-on: windows-latest
+    needs: get-branch-name
 
     steps:
 
       - name: Run script
         id: run-script
         run: |
-          $ScriptOutput = & $([scriptblock]::Create((New-Object Net.WebClient).DownloadString('https://raw.githubusercontent.com/hpcflow/install-scripts/main/src/install-hpcflow.ps1'))) -PreRelease -OneFile -UnivLink 6>&1
+          $ScriptOutput = & $([scriptblock]::Create((New-Object Net.WebClient).DownloadString('https://raw.githubusercontent.com/hpcflow/install-scripts/${{ needs.get-branch-name.outputs.branch_name }}/src/install-hpcflow.ps1'))) -PreRelease -OneFile -UnivLink 6>&1
           echo "ART_NAME_UNIV=hpcflow-dev" >> $env:GITHUB_ENV
 
       - name: Check results
