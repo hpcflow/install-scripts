@@ -18,6 +18,7 @@ jobs:
       - name: Get and store current branch name
         run: |
           branch_name="${GITHUB_REF#refs/heads/}"
+          echo $branch_name
           echo "BRANCH_NAME=$branch_name" >> $GITHUB_ENV
           echo $${{ env.BRANCH_NAME }}
 
