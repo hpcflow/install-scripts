@@ -19,7 +19,7 @@ jobs:
         run: |
           branch_name="${GITHUB_REF#refs/heads/}"
           echo $branch_name
-          echo "BRANCH_NAME=$branch_name" >> "$GITHUB_ENV"
+          echo "BRANCH_NAME=$branch_name" >> $GITHUB_ENV
           echo ${{ env.BRANCH_NAME }}
 
   int-test-script-bash-linux-default:
@@ -33,7 +33,7 @@ jobs:
           echo ${{ env.BRANCH_NAME }}
           script_output=`(touch tmp.sh && curl -fsSL https://raw.githubusercontent.com/hpcflow/install-scripts/${{ env.BRANCH_NAME }}/src/install-hpcflow.sh > tmp.sh && bash tmp.sh --prerelease --path --onefile) ; rm tmp.sh`
           artifact_name=`echo $script_output | grep hpcflow- | cut -d " " -f 30`
-          echo "ART_NAME=$artifact_name" >> "$GITHUB_ENV"
+          echo "ART_NAME=$artifact_name" >> $GITHUB_ENV
 
       - name: Run HPCFlow test suite
         run: |
@@ -51,7 +51,7 @@ jobs:
       - name: Run script
         run: |
           script_output=`(touch tmp.sh && curl -fsSL https://raw.githubusercontent.com/hpcflow/install-scripts/${{ env.BRANCH_NAME }}/src/install-hpcflow.sh > tmp.sh && bash tmp.sh --prerelease --path --onefile --univlink) ; rm tmp.sh`
-          echo "ART_NAME_UNIV=hpcflow-dev" >> "$GITHUB_ENV"
+          echo "ART_NAME_UNIV=hpcflow-dev" >> $GITHUB_ENV
 
       - name: Run HPCFlow test suite
         run: |
