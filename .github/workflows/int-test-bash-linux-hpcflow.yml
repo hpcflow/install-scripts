@@ -23,6 +23,9 @@ jobs:
           echo ${{ env.BRANCH_NAME }}
           echo $BRANCH_NAME
 
+      - name: Check variable
+        run: echo ${{ env.BRANCH_NAME }}
+
   int-test-script-bash-linux-default:
     needs: get-branch-name
     runs-on: ubuntu-latest
