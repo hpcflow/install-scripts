@@ -16,8 +16,16 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Get and store current branch name
-        id: parse_branch_name
+      - name: Get and store current branch name dispatch
+        if: ${{ github.event_name == 'workflow_dispatch' }}
+        id: parse_branch_name_wd
+        run: |
+          branch_name="${GITHUB_REF#refs/heads/}"
+          echo "BRANCH_NAME=$branch_name" >> "$GITHUB_OUTPUT"
+
+      - name: Get and store current branch name pull request
+        if: ${{ github.event_name == 'pull_request' }}
+        id: parse_branch_name_pr
         run: |
           branch_name="${GITHUB_BASE_REF#refs/heads/}"
           echo "BRANCH_NAME=$branch_name" >> "$GITHUB_OUTPUT"
