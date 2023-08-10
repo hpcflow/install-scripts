@@ -31,7 +31,8 @@ jobs:
           echo "BRANCH_NAME=$branch_name" >> "$GITHUB_OUTPUT"
 
     outputs:
-      branch_name: ${{ steps.parse_branch_name.outputs.branch_name }}
+      branch_name_wd: ${{ steps.parse_branch_name_wd.outputs.branch_name }}
+      branch_name_pr: ${{ steps.parse_branch_name_pr.outputs.branch_name }}
 
   int-test-script-bash-macos-default:
     runs-on: macos-latest
@@ -39,9 +40,17 @@ jobs:
 
     steps:
 
+      - name: Get branch name (WD)
+        if: ${{ github.event_name == 'workflow_dispatch' }}
+        run: echo "BRANCH_NAME=${{ needs.get-branch-name.outputs.branch_name_wd }}" >> $GITHUB_ENV
+
+      - name: Get branch name (WD)
+        if: ${{ github.event_name == 'pull_request' }}
+        run: echo "BRANCH_NAME=${{ needs.get-branch-name.outputs.branch_name_wd }}" >> $GITHUB_ENV
+
       - name: Run script
         run: |
-          script_output=`(touch tmp.sh && curl -fsSL https://raw.githubusercontent.com/hpcflow/install-scripts/${{ needs.get-branch-name.outputs.branch_name }}/src/install-matflow.sh > tmp.sh && bash tmp.sh --prerelease --path --onefile) ; rm tmp.sh`
+          script_output=`(touch tmp.sh && curl -fsSL https://raw.githubusercontent.com/hpcflow/install-scripts/${{ env.BRANCH_NAME }}/src/install-matflow.sh > tmp.sh && bash tmp.sh --prerelease --path --onefile) ; rm tmp.sh`
           artifact_name=`echo $script_output | grep matflow- | cut -d " " -f 30`
           echo "ART_NAME=$artifact_name" >> $GITHUB_ENV
 
