@@ -11,14 +11,45 @@ on:
     branches: [main, develop]
 
 jobs:
+  get-branch-name:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Get and store current branch name dispatch
+        if: ${{ github.event_name == 'workflow_dispatch' }}
+        id: parse_branch_name_wd
+        run: |
+          branch_name="${GITHUB_REF#refs/heads/}"
+          echo "BRANCH_NAME=$branch_name" >> "$GITHUB_OUTPUT"
+
+      - name: Get and store current branch name pull request
+        if: ${{ github.event_name == 'pull_request' }}
+        id: parse_branch_name_pr
+        run: |
+          branch_name="${GITHUB_HEAD_REF#refs/heads/}"
+          echo "BRANCH_NAME=$branch_name" >> "$GITHUB_OUTPUT"
+
+    outputs:
+      branch_name_wd: ${{ steps.parse_branch_name_wd.outputs.branch_name }}
+      branch_name_pr: ${{ steps.parse_branch_name_pr.outputs.branch_name }}
+
   int-test-script-bash-linux-default:
+    needs: get-branch-name
     runs-on: ubuntu-latest
 
     steps:
 
+      - name: Get branch name (WD)
+        if: ${{ github.event_name == 'workflow_dispatch' }}
+        run: echo "BRANCH_NAME=${{ needs.get-branch-name.outputs.branch_name_wd }}" >> $GITHUB_ENV
+
+      - name: Get branch name (PR)
+        if: ${{ github.event_name == 'pull_request' }}
+        run: echo "BRANCH_NAME=${{ needs.get-branch-name.outputs.branch_name_pr }}" >> $GITHUB_ENV
+
       - name: Run script
         run: |
-          script_output=`(touch tmp.sh && curl -fsSL https://raw.githubusercontent.com/hpcflow/install-scripts/main/src/install-hpcflow.sh > tmp.sh && bash tmp.sh --prerelease --path --onefile) ; rm tmp.sh`
+          script_output=`(touch tmp.sh && curl -fsSL https://raw.githubusercontent.com/hpcflow/install-scripts/${{ env.BRANCH_NAME }}/src/install-hpcflow.sh > tmp.sh && bash tmp.sh --prerelease --path --onefile) ; rm tmp.sh`
           artifact_name=`echo $script_output | grep hpcflow- | cut -d " " -f 30`
           echo "ART_NAME=$artifact_name" >> $GITHUB_ENV
 
@@ -30,13 +61,22 @@ jobs:
         run: rm -r ${{ env.INSTALL_ROOT }}/${{ env.APP_NAME }}
 
   int-test-script-bash-linux-prerelease-univlink:
+    needs: get-branch-name
     runs-on: ubuntu-latest
 
     steps:
 
+      - name: Get branch name (WD)
+        if: ${{ github.event_name == 'workflow_dispatch' }}
+        run: echo "BRANCH_NAME=${{ needs.get-branch-name.outputs.branch_name_wd }}" >> $GITHUB_ENV
+
+      - name: Get branch name (PR)
+        if: ${{ github.event_name == 'pull_request' }}
+        run: echo "BRANCH_NAME=${{ needs.get-branch-name.outputs.branch_name_pr }}" >> $GITHUB_ENV
+
       - name: Run script
         run: |
-          script_output=`(touch tmp.sh && curl -fsSL https://raw.githubusercontent.com/hpcflow/install-scripts/main/src/install-hpcflow.sh > tmp.sh && bash tmp.sh --prerelease --path --onefile --univlink) ; rm tmp.sh`
+          script_output=`(touch tmp.sh && curl -fsSL https://raw.githubusercontent.com/hpcflow/install-scripts/${{ env.BRANCH_NAME }}/src/install-hpcflow.sh > tmp.sh && bash tmp.sh --prerelease --path --onefile --univlink) ; rm tmp.sh`
           echo "ART_NAME_UNIV=hpcflow-dev" >> $GITHUB_ENV
 
       - name: Run HPCFlow test suite

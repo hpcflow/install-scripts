@@ -11,18 +11,47 @@ on:
     branches: [main, develop]
 
 jobs:
+
+  get-branch-name:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Get and store current branch name dispatch
+        if: ${{ github.event_name == 'workflow_dispatch' }}
+        id: parse_branch_name_wd
+        run: |
+          branch_name="${GITHUB_REF#refs/heads/}"
+          echo "BRANCH_NAME=$branch_name" >> "$GITHUB_OUTPUT"
+
+      - name: Get and store current branch name pull request
+        if: ${{ github.event_name == 'pull_request' }}
+        id: parse_branch_name_pr
+        run: |
+          branch_name="${GITHUB_HEAD_REF#refs/heads/}"
+          echo "BRANCH_NAME=$branch_name" >> "$GITHUB_OUTPUT"
+
+    outputs:
+      branch_name_wd: ${{ steps.parse_branch_name_wd.outputs.branch_name }}
+      branch_name_pr: ${{ steps.parse_branch_name_pr.outputs.branch_name }}
+
   int-test-script-powershell-windows:
     runs-on: windows-latest
+    needs: get-branch-name
 
     steps:
 
-      - name: Checkout
-        uses: actions/checkout@v3
+      - name: Get branch name (WD)
+        if: ${{ github.event_name == 'workflow_dispatch' }}
+        run: echo "BRANCH_NAME=${{ needs.get-branch-name.outputs.branch_name_wd }}" >> $env:GITHUB_ENV
+
+      - name: Get branch name (PR)
+        if: ${{ github.event_name == 'pull_request' }}
+        run: echo "BRANCH_NAME=${{ needs.get-branch-name.outputs.branch_name_pr }}" >> $env:GITHUB_ENV
 
       - name: Run script
         id: run-script
         run: |
-          $ScriptOutput = & $([scriptblock]::Create((New-Object Net.WebClient).DownloadString('https://raw.githubusercontent.com/hpcflow/install-scripts/main/src/install-hpcflow.ps1'))) -PreRelease -OneFile 6>&1
+          $ScriptOutput = & $([scriptblock]::Create((New-Object Net.WebClient).DownloadString('https://raw.githubusercontent.com/hpcflow/install-scripts/${{ env.BRANCH_NAME }}/src/install-hpcflow.ps1'))) -PreRelease -OneFile 6>&1
           Write-Host $ScriptOutput
           $ScriptOutputSplit = $ScriptOutput -Split " "
           $artifact_name = $ScriptOutputSplit[15]
@@ -39,13 +68,22 @@ jobs:
 
   int-test-script-powershell-windows-prerelease-univlink:
     runs-on: windows-latest
+    needs: get-branch-name
 
     steps:
+
+      - name: Get branch name (WD)
+        if: ${{ github.event_name == 'workflow_dispatch' }}
+        run: echo "BRANCH_NAME=${{ needs.get-branch-name.outputs.branch_name_wd }}" >> $env:GITHUB_ENV
+
+      - name: Get branch name (PR)
+        if: ${{ github.event_name == 'pull_request' }}
+        run: echo "BRANCH_NAME=${{ needs.get-branch-name.outputs.branch_name_pr }}" >> $env:GITHUB_ENV
 
       - name: Run script
         id: run-script
         run: |
-          $ScriptOutput = & $([scriptblock]::Create((New-Object Net.WebClient).DownloadString('https://raw.githubusercontent.com/hpcflow/install-scripts/main/src/install-hpcflow.ps1'))) -PreRelease -OneFile -UnivLink 6>&1
+          $ScriptOutput = & $([scriptblock]::Create((New-Object Net.WebClient).DownloadString('https://raw.githubusercontent.com/hpcflow/install-scripts/${{ env.BRANCH_NAME }}/src/install-hpcflow.ps1'))) -PreRelease -OneFile -UnivLink 6>&1
           echo "ART_NAME_UNIV=hpcflow-dev" >> $env:GITHUB_ENV
 
       - name: Check results
