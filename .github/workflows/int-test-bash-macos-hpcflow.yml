@@ -19,7 +19,7 @@ jobs:
       - name: Get and store current branch name
         id: parse_branch_name
         run: |
-          branch_name="${GITHUB_REF#refs/heads/}"
+          branch_name="${GITHUB_BASE_REF#refs/heads/}"
           echo "BRANCH_NAME=$branch_name" >> "$GITHUB_OUTPUT"
 
     outputs:
