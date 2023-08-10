@@ -44,9 +44,9 @@ jobs:
         if: ${{ github.event_name == 'workflow_dispatch' }}
         run: echo "BRANCH_NAME=${{ needs.get-branch-name.outputs.branch_name_wd }}" >> $GITHUB_ENV
 
-      - name: Get branch name (WD)
+      - name: Get branch name (PR)
         if: ${{ github.event_name == 'pull_request' }}
-        run: echo "BRANCH_NAME=${{ needs.get-branch-name.outputs.branch_name_wd }}" >> $GITHUB_ENV
+        run: echo "BRANCH_NAME=${{ needs.get-branch-name.outputs.branch_name_pr }}" >> $GITHUB_ENV
 
       - name: Run script
         run: |
