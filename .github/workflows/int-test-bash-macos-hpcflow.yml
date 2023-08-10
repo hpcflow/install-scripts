@@ -27,7 +27,7 @@ jobs:
         if: ${{ github.event_name == 'pull_request' }}
         id: parse_branch_name_pr
         run: |
-          branch_name="${GITHUB_BASE_REF#refs/heads/}"
+          branch_name="${GITHUB_HEAD_REF#refs/heads/}"
           echo "BRANCH_NAME=$branch_name" >> "$GITHUB_OUTPUT"
 
     outputs:
