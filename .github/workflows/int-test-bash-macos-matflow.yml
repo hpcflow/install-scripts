@@ -67,9 +67,17 @@ jobs:
 
     steps:
 
+      - name: Get branch name (WD)
+        if: ${{ github.event_name == 'workflow_dispatch' }}
+        run: echo "BRANCH_NAME=${{ needs.get-branch-name.outputs.branch_name_wd }}" >> $GITHUB_ENV
+
+      - name: Get branch name (PR)
+        if: ${{ github.event_name == 'pull_request' }}
+        run: echo "BRANCH_NAME=${{ needs.get-branch-name.outputs.branch_name_pr }}" >> $GITHUB_ENV
+
       - name: Run script
         run: |
-          script_output=`(touch tmp.sh && curl -fsSL https://raw.githubusercontent.com/hpcflow/install-scripts/${{ needs.get-branch-name.outputs.branch_name }}/src/install-matflow.sh > tmp.sh && bash tmp.sh --prerelease --path --onefile --univlink) ; rm tmp.sh`
+          script_output=`(touch tmp.sh && curl -fsSL https://raw.githubusercontent.com/hpcflow/install-scripts/${{ env.BRANCH_NAME }}/src/install-matflow.sh > tmp.sh && bash tmp.sh --prerelease --path --onefile --univlink) ; rm tmp.sh`
           echo "ART_NAME_UNIV=matflow-dev" >> $GITHUB_ENV
 
       - name: Run Matflow test suite
