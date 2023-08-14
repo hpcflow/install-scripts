@@ -413,7 +413,7 @@ print_post_install_info () {
 	fi
 	echo
 	echo
-	echo "Re-open terminal and then type ${symstring} to get started."
+	echo "Re-open terminal and then type ${versioned_symstring} to get started."
 
 }
 
