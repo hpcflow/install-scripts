@@ -322,7 +322,7 @@ create_versioned_symlink() {
 
 	fi
 
-	if [ "$versionspec" == true]; then
+	if [ "$versionspec" == true ]; then
 		echo "-not -name ${install_name}" >>"${folder}"/user_versions.txt
 	elif [ "$prerelease" == true ]; then
 		echo "-not -name ${install_name}" >>"${folder}"/prerelease_versions.txt
