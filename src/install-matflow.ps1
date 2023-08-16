@@ -13,7 +13,7 @@ param(
 
 )
 
-function Install-MatFlowApplication {
+function Install-Application {
 
 	param(
 		[Parameter()]
@@ -29,20 +29,20 @@ function Install-MatFlowApplication {
 		[switch]$UnivLink
 
 	)
-	trap{
+	#trap{
 		# Check if DownloadFolder variable has been created. If it has, delete folder it points to.
 
 		# First check variable exists (i.e. is not null)
-		if($DownloadFolder){
+#		if($DownloadFolder){
 			# Next check if folder exists
-			if(Test-Path -Path $DownloadFolder){
-				Remove-Item $DownloadFolder
-				}
-		}
-		Write-Host "Installation of" $AppName "unsuccessful"
+#			if(Test-Path -Path $DownloadFolder){
+	#			Remove-Item $DownloadFolder
+		#		}
+	#	}
+	#	Write-Host "Installation of" $AppName "unsuccessful. $_"
 		#Exit
-		Return
-	}
+	#	Return
+	#}
 
 	$AppName = "matflow"
 
@@ -66,11 +66,11 @@ function Install-MatFlowApplication {
 		$VersionType = "latest stable"
 	}
 
-	if ($UnivLink.IsPresent) {
+	if( $UnivLink.IsPresent) {
 		$UnivLinkFlag = $true
 	}
 	else {
-		$UnivLinkFlag = $false
+		$UnivLinkFlag = $true
 	}
 
 
@@ -82,7 +82,7 @@ function Install-MatFlowApplication {
 		Start-Sleep -Milliseconds 100
 	}
 	else {
-		$Folder = Get-InstallDir
+		$Folder = Get-InstallDir -AppName $AppName
 		Write-Host "Installing to default location $Folder..."
 		Start-Sleep -Milliseconds 100
 	}
@@ -91,20 +91,28 @@ function Install-MatFlowApplication {
 
 	$DownloadFolder = New-TemporaryFolder
 
-	Get-ScriptParameters | `
+	Get-ScriptParameters -AppName $AppName | `
 	Get-LatestReleaseInfo -PreRelease $PreReleaseFlag | `
 	Extract-WindowsInfo -FileEnding $ArtifactEnding | `
 	Parse-WindowsInfo | `
 	Check-AppInstall -Folder $Folder -OneFile $OneFileFlag | `
 	Download-Artifact -DownloadFolder $DownloadFolder | `
 	Place-Artifact -FinalDestination $Folder -OneFile $OneFileFlag | `
-	Create-SymLinkToApp -Folder $Folder -OneFile $OneFileFlag -PreRelease $PreReleaseFlag -UnivLink $UnivLinkFlag | `
+	Create-SymLinkToApp -Folder $Folder -OneFile $OneFileFlag -PreRelease $PreReleaseFlag -UnivLink $UnivLinkFlag -AppName $AppName| `
+	 
 	Add-SymLinkFolderToPath
+
+	
 
 }
 
 function Get-InstallDir {
-	$WindowsInstallDir = "${env:USERPROFILE}\AppData\Local\matflow"
+	param(
+		[Parameter()]
+		[string]$AppName
+	)
+
+	$WindowsInstallDir = "${env:USERPROFILE}\AppData\Local\$AppName"
 
 	return $WindowsInstallDir
 }
@@ -118,15 +126,20 @@ function Check-InstallDir {
 }
 
 function  Get-ScriptParameters {
+
+	param(
+		[Parameter()]
+		[string]$AppName
+	)
     $params = @{
-        AppName = "matflow"
-        BaseLink = "https://github.com/hpcflow/matflow-new/releases/download"
+        AppName = $AppName
+        BaseLink = "https://github.com/hpcflow/$AppName-new/releases/download"
         WindowsEndingFolder ="win-dir"
 	    WindowsEndingFile = "win.exe"
-        WindowsInstallDir = "${env:USERPROFILE}\AppData\Local\matflow"
+        WindowsInstallDir = "${env:USERPROFILE}\AppData\Local\$AppName"
 
-	    LatestStableReleases = "https://raw.githubusercontent.com/hpcflow/matflow-new/dummy-stable/docs/source/released_binaries.yml"
-	    LatestPrereleaseReleases="https://raw.githubusercontent.com/hpcflow/matflow-new/develop/docs/source/released_binaries.yml"
+	    LatestStableReleases = "https://raw.githubusercontent.com/hpcflow/$AppName-new/dummy-stable/docs/source/released_binaries.yml"
+	    LatestPrereleaseReleases="https://raw.githubusercontent.com/hpcflow/$AppName-new/develop/docs/source/released_binaries.yml"
 
 	    ProgressString1="Step 1 of 2: Downloading $AppName ..."
 	    ProgressString2="Step 2 of 2: Installing $AppName ..."
@@ -294,7 +307,11 @@ function Create-SymLinkToApp {
 		[bool]$PreRelease,
 
 		[parameter()]
-		[bool]$UnivLink
+		[bool]$UnivLink,
+
+		[parameter()]
+		[string]$AppName
+
 	)
 
 	$artifact_name = $ArtifactData.ArtifactName
@@ -306,7 +323,7 @@ function Create-SymLinkToApp {
 
 	# First create folder to store alias files if it doesn't exist
 
-	$AliasFile=$Folder+"\aliases\matflow_aliases.csv"
+	$AliasFile=$Folder+"\aliases\aliases.csv"
 
 	if (-Not (Test-Path $AliasFile -PathType leaf)) {
 		New-Item -Force -Path $AliasFile -Type File
@@ -318,12 +335,12 @@ function Create-SymLinkToApp {
 			Add-Content $AliasFile "`"$artifact_name`",`"$Folder\$artifact_name`",`"`",`"None`""
 		}
 
-		if ($UnivLink) {
-			if ($PreRelease) {
-				$univ_link_name = "matflow-dev"
+		if($UnivLink) {
+			if($PreRelease) {
+				$univ_link_name = "$AppName-dev"
 			}
 			else {
-				$univ_link_name = "matflow"
+				$univ_link_name = "$AppName"
 			}
 			Add-Content $AliasFile "`"$univ_link_name`",`"$Folder\$artifact_name`",`"`",`"None`""
 		}
@@ -343,12 +360,12 @@ function Create-SymLinkToApp {
 			Add-Content $AliasFile "`"$link_name`",`"$Folder\$folder_name\$exe_name`",`"`",`"None`""
 		}
 
-		if ($UnivLink) {
-			if ($PreRelease) {
-				$univ_link_name = "matflow-dev"
+		if($UnivLink) {
+			if($PreRelease) {
+				$univ_link_name = "$AppName-dev"
 			}
 			else {
-				$univ_link_name = "matflow"
+				$univ_link_name = "$AppName"
 			}
 			Add-Content $AliasFile "`"$univ_link_name`",`"$Folder\$artifact_name`",`"`",`"None`""
 		}
@@ -381,4 +398,4 @@ function Add-SymLinkFolderToPath {
 
 }
 
-Install-MatFlowApplication @PSBoundParameters
+Install-Application @PSBoundParameters
