@@ -88,6 +88,7 @@ function Install-Application {
 	}
 
 	Check-InstallDir $Folder
+	Check-InstallTrackerFiles $Folder
 
 	$DownloadFolder = New-TemporaryFolder
 
@@ -118,11 +119,38 @@ function Get-InstallDir {
 }
 
 function Check-InstallDir {
+	param(
+		[Parameter()]
+		[string]$Folder
+	)
 
 	if(-Not (Test-Path $Folder)) {
 		New-Item -Force -ItemType Directory $Folder
 	}
 
+}
+
+function Check-InstallTrackerFiles {
+	param(
+		[Parameter()]
+		[string]$Folder
+	)
+
+	UserVersions = "$Folder\user_versions.txt"
+	StableVersions = "$Folder\stable_versions.txt"
+	PreReleaseVersions = "$Folder\prerelease_versions.txt"
+
+	if(-Not (Test-Path $UserVersions)) {
+		New-Item -Force -ItemType Directory $File
+	}
+
+	if(-Not (Test-Path $StableVersions)) {
+		New-Item -Force -ItemType Directory $File
+	}
+
+	if(-Not (Test-Path $PreReleaseVersions)) {
+		New-Item -Force -ItemType Directory $File
+	}
 }
 
 function  Get-ScriptParameters {
@@ -131,6 +159,7 @@ function  Get-ScriptParameters {
 		[Parameter()]
 		[string]$AppName
 	)
+
     $params = @{
         AppName = $AppName
         BaseLink = "https://github.com/hpcflow/$AppName-new/releases/download"
