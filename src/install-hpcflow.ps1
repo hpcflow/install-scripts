@@ -13,7 +13,7 @@ param(
 
 )
 
-function Install-HPCFlowApplication {
+function Install-Application {
 
 	param(
 		[Parameter()]
@@ -82,7 +82,7 @@ function Install-HPCFlowApplication {
 		Start-Sleep -Milliseconds 100
 	}
 	else {
-		$Folder = Get-InstallDir
+		$Folder = Get-InstallDir -AppName $AppName
 		Write-Host "Installing to default location $Folder..."
 		Start-Sleep -Milliseconds 100
 	}
@@ -91,14 +91,14 @@ function Install-HPCFlowApplication {
 
 	$DownloadFolder = New-TemporaryFolder
 
-	Get-ScriptParameters | `
+	Get-ScriptParameters -AppName $AppName | `
 	Get-LatestReleaseInfo -PreRelease $PreReleaseFlag | `
 	Extract-WindowsInfo -FileEnding $ArtifactEnding | `
 	Parse-WindowsInfo | `
 	Check-AppInstall -Folder $Folder -OneFile $OneFileFlag | `
 	Download-Artifact -DownloadFolder $DownloadFolder | `
 	Place-Artifact -FinalDestination $Folder -OneFile $OneFileFlag | `
-	Create-SymLinkToApp -Folder $Folder -OneFile $OneFileFlag -PreRelease $PreReleaseFlag -UnivLink $UnivLinkFlag | `
+	Create-SymLinkToApp -Folder $Folder -OneFile $OneFileFlag -PreRelease $PreReleaseFlag -UnivLink $UnivLinkFlag -AppName $AppName| `
 	 
 	Add-SymLinkFolderToPath
 
@@ -107,8 +107,12 @@ function Install-HPCFlowApplication {
 }
 
 function Get-InstallDir {
-	$WindowsInstallDir = "${env:USERPROFILE}\AppData\Local\hpcflow"
-	#$WindowsInstallDir = "/Users/user/Documents/hpcflow_test"
+	param(
+		[Parameter()]
+		[string]$AppName
+	)
+
+	$WindowsInstallDir = "${env:USERPROFILE}\AppData\Local\$AppName"
 
 	return $WindowsInstallDir
 }
@@ -122,15 +126,20 @@ function Check-InstallDir {
 }
 
 function  Get-ScriptParameters {
+
+	param(
+		[Parameter()]
+		[string]$AppName
+	)
     $params = @{
-        AppName = "hpcflow"
-        BaseLink = "https://github.com/hpcflow/hpcflow-new/releases/download"
+        AppName = $AppName
+        BaseLink = "https://github.com/hpcflow/$AppName-new/releases/download"
         WindowsEndingFolder ="win-dir"
 	    WindowsEndingFile = "win.exe"
-        WindowsInstallDir = "${env:USERPROFILE}\AppData\Local\hpcflow"
+        WindowsInstallDir = "${env:USERPROFILE}\AppData\Local\$AppName"
 
-	    LatestStableReleases = "https://raw.githubusercontent.com/hpcflow/hpcflow-new/dummy-stable/docs/source/released_binaries.yml"
-	    LatestPrereleaseReleases="https://raw.githubusercontent.com/hpcflow/hpcflow-new/develop/docs/source/released_binaries.yml"
+	    LatestStableReleases = "https://raw.githubusercontent.com/hpcflow/$AppName-new/dummy-stable/docs/source/released_binaries.yml"
+	    LatestPrereleaseReleases="https://raw.githubusercontent.com/hpcflow/$AppName-new/develop/docs/source/released_binaries.yml"
 
 	    ProgressString1="Step 1 of 2: Downloading $AppName ..."
 	    ProgressString2="Step 2 of 2: Installing $AppName ..."
@@ -298,7 +307,11 @@ function Create-SymLinkToApp {
 		[bool]$PreRelease,
 
 		[parameter()]
-		[bool]$UnivLink
+		[bool]$UnivLink,
+
+		[parameter()]
+		[string]$AppName
+
 	)
 
 	$artifact_name = $ArtifactData.ArtifactName
@@ -310,7 +323,7 @@ function Create-SymLinkToApp {
 
 	# First create folder to store alias files if it doesn't exist
 
-	$AliasFile=$Folder+"\aliases\hpcflow_aliases.csv"
+	$AliasFile=$Folder+"\aliases\aliases.csv"
 
 	if (-Not (Test-Path $AliasFile -PathType leaf)) {
 		New-Item -Force -Path $AliasFile -Type File
@@ -324,10 +337,10 @@ function Create-SymLinkToApp {
 
 		if($UnivLink) {
 			if($PreRelease) {
-				$univ_link_name = "hpcflow-dev"
+				$univ_link_name = "$AppName-dev"
 			}
 			else {
-				$univ_link_name = "hpcflow"
+				$univ_link_name = "$AppName"
 			}
 			Add-Content $AliasFile "`"$univ_link_name`",`"$Folder\$artifact_name`",`"`",`"None`""
 		}
@@ -349,10 +362,10 @@ function Create-SymLinkToApp {
 
 		if($UnivLink) {
 			if($PreRelease) {
-				$univ_link_name = "hpcflow-dev"
+				$univ_link_name = "$AppName-dev"
 			}
 			else {
-				$univ_link_name = "hpcflow"
+				$univ_link_name = "$AppName"
 			}
 			Add-Content $AliasFile "`"$univ_link_name`",`"$Folder\$artifact_name`",`"`",`"None`""
 		}
@@ -385,4 +398,4 @@ function Add-SymLinkFolderToPath {
 
 }
 
-Install-HPCFlowApplication @PSBoundParameters
+Install-Application @PSBoundParameters
