@@ -79,18 +79,18 @@ run_main() {
 set_variables() {
 
 	app_name="hpcflow"
-	base_link="https://github.com/hpcflow/hpcflow-new/releases/download"
+	base_link="https://github.com/${app_name}/${app_name}-new/releases/download"
 
 	linux_ending_folder="linux-dir"
 	macOS_ending_folder="macOS-dir"
 	linux_ending_file="linux"
 	macOS_ending_file="macOS"
 
-	linux_install_dir=~/.local/share/hpcflow
-	macOS_install_dir=~/Library/Application\ Support/hpcflow
+	linux_install_dir=~/.local/share/$app_name
+	macOS_install_dir=~/Library/Application\ Support/$app_name
 
-	latest_stable_releases="https://raw.githubusercontent.com/hpcflow/hpcflow-new/dummy-stable/docs/source/released_binaries.yml"
-	latest_prerelease_releases="https://raw.githubusercontent.com/hpcflow/hpcflow-new/develop/docs/source/released_binaries.yml"
+	latest_stable_releases="https://raw.githubusercontent.com/${app_name}/${app_name}-new/dummy-stable/docs/source/released_binaries.yml"
+	latest_prerelease_releases="https://raw.githubusercontent.com/${app_name}/${app_name}-new/develop/docs/source/released_binaries.yml"
 
 	progress_string_1="Step 1 of 2: Downloading ${app_name} ..."
 	progress_string_2="Step 2 of 2: Installing ${app_name} ..."
@@ -107,7 +107,7 @@ set_flags() {
 
 	# Flag to note if user specified version
 	versionspec=false
-	# Flag recording if hpcflow symlink folder is on path
+	# Flag recording if symlink folder is on path
 	onpath=false
 
 }
