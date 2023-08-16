@@ -108,6 +108,7 @@ function Install-Application {
 }
 
 function Get-InstallDir {
+
 	param(
 		[Parameter()]
 		[string]$AppName
@@ -119,6 +120,7 @@ function Get-InstallDir {
 }
 
 function Check-InstallDir {
+
 	param(
 		[Parameter()]
 		[string]$Folder
@@ -131,14 +133,15 @@ function Check-InstallDir {
 }
 
 function Check-InstallTrackerFiles {
+
 	param(
 		[Parameter()]
 		[string]$Folder
 	)
 
-	UserVersions=$Folder+"\user_versions.txt"
-	StableVersions=$Folder+"\stable_versions.txt"
-	PreReleaseVersions=$Folder+"\prerelease_versions.txt"
+	$UserVersions=$Folder+"\user_versions.txt"
+	$StableVersions=$Folder+"\stable_versions.txt"
+	$PreReleaseVersions=$Folder+"\prerelease_versions.txt"
 
 	if(-Not (Test-Path $UserVersions)) {
 		New-Item -Force -ItemType Directory $File
@@ -151,6 +154,7 @@ function Check-InstallTrackerFiles {
 	if(-Not (Test-Path $PreReleaseVersions)) {
 		New-Item -Force -ItemType Directory $File
 	}
+
 }
 
 function  Get-ScriptParameters {
