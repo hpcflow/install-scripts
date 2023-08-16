@@ -87,8 +87,8 @@ function Install-Application {
 		Start-Sleep -Milliseconds 100
 	}
 
-	Check-InstallDir $Folder
-	Check-InstallTrackerFiles $Folder
+	Check-InstallDir -Folder $Folder
+	Check-InstallTrackerFiles -Folder $Folder
 
 	$DownloadFolder = New-TemporaryFolder
 
@@ -136,9 +136,9 @@ function Check-InstallTrackerFiles {
 		[string]$Folder
 	)
 
-	UserVersions = "$Folder\user_versions.txt"
-	StableVersions = "$Folder\stable_versions.txt"
-	PreReleaseVersions = "$Folder\prerelease_versions.txt"
+	UserVersions=$Folder+"\user_versions.txt"
+	StableVersions=$Folder+"\stable_versions.txt"
+	PreReleaseVersions=$Folder+"\prerelease_versions.txt"
 
 	if(-Not (Test-Path $UserVersions)) {
 		New-Item -Force -ItemType Directory $File
