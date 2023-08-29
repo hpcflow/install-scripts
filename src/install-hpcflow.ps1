@@ -242,23 +242,23 @@ function Parse-WindowsInfo {
 		[string]$Version
 	)
 	
-	if ($VersionSpec) {
+	#if ($VersionSpec) {
 
-		$params = Get-ScriptParameters
+	#	$params = Get-ScriptParameters
 		
-		$Name = "$params.AppName-$Version-$params.WindowsFileEnding"
-		$WebAddress = "$params.BaseLink/$Version/$Name"
+	#	$Name = "$params.AppName-$Version-$params.WindowsFileEnding"
+	#	$WebAddress = "$params.BaseLink/$Version/$Name"
 
-		Write-Output $Name
-		Write-Output $WebAddress
+	#	Write-Output $Name
+	#	Write-Output $WebAddress
 
-		$ArtifactData = @{
-			ArtifactName = $Name
-			ArtifactWebAddress = $WebAddress
-		}
+	#	$ArtifactData = @{
+	#		ArtifactName = $Name
+	#		ArtifactWebAddress = $WebAddress
+	#	}
 
-	}
-	else {
+	#}
+#	else {
 
 		$Parts = $VersionInfo -Split ': '
 
@@ -266,7 +266,7 @@ function Parse-WindowsInfo {
 			ArtifactName = $Parts[0]
 			ArtifactWebAddress = $Parts[1]
 		}
-	}
+#	}
 
 	Write-Output $VersionSpec
 	Write-Output $ArtifactData.AppName
