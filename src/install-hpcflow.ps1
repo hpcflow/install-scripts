@@ -237,12 +237,12 @@ function Parse-WindowsInfo {
 		[parameter(Mandatory, ValueFromPipeline, ValueFromPipelineByPropertyName)]
 		[string]$VersionInfo,
 		[parameter(Mandatory)]
-		[bool]$VersionSpecFlag,
+		[bool]$VersionSpec,
 		[parameter()]
 		[string]$Version
 	)
 	
-	if($VersionSpecFlag) {
+	if($VersionSpec) {
 
 		$params = Get-ScriptParameters
 		
@@ -261,7 +261,7 @@ function Parse-WindowsInfo {
 	else {
 
 		$Parts = $VersionInfo -Split ': '
-		
+
 		$ArtifactData = @{
 			ArtifactName = $Parts[0]
 			ArtifactWebAddress = $Parts[1]
