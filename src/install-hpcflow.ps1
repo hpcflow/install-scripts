@@ -259,7 +259,9 @@ function Parse-WindowsInfo {
 
 	}
 	else {
+
 		$Parts = $VersionInfo -Split ': '
+		
 		$ArtifactData = @{
 			ArtifactName = $Parts[0]
 			ArtifactWebAddress = $Parts[1]
