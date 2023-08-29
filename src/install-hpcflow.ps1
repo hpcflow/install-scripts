@@ -235,7 +235,7 @@ function Extract-WindowsInfo {
 function Parse-WindowsInfo {
 	param(
 		[parameter(Mandatory, ValueFromPipeline, ValueFromPipelineByPropertyName)]
-		[string]$VersionInfo,
+		[string]$VersionInfo
 	#	[parameter(Mandatory)]
 	#	[bool]$VersionSpec,
 	#	[parameter()]
