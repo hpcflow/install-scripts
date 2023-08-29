@@ -242,7 +242,7 @@ function Parse-WindowsInfo {
 		[string]$Version
 	)
 	
-	if($VersionSpec) {
+	if ($VersionSpec) {
 
 		$params = Get-ScriptParameters
 		
