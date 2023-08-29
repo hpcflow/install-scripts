@@ -1,4 +1,4 @@
-name: Integration test - HPCFlow, powershell, Windows
+name: Test - HPCFlow, powershell, Windows
 
 env:
   APP_NAME: "matflow"
