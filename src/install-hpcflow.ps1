@@ -359,6 +359,9 @@ function Download-Artifact {
 	Write-Host "Downloading "$ArtifactData.ArtifactName
 	Start-Sleep -Milliseconds 100
 
+	Write-Host $ArtifactData.ArtifactName
+	Write-Host $ArtifactData.ArtifactWebAddress
+
 	$DownloadLocation = $DownloadFolder +"/" + $ArtifactData.ArtifactName
 
 	Invoke-WebRequest -UseBasicParsing $ArtifactData.ArtifactWebAddress -OutFile $DownloadLocation
