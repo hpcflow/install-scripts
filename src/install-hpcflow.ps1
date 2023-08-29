@@ -249,6 +249,9 @@ function Parse-WindowsInfo {
 		$Name = "$params.AppName-$Version-$params.WindowsFileEnding"
 		$WebAddress = "$params.BaseLink/$Version/$Name"
 
+		Write-Output $Name
+		Write-Output $WebAddress
+
 		$ArtifactData = @{
 			ArtifactName = $Name
 			ArtifactWebAddress = $WebAddress
