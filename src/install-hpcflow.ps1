@@ -106,10 +106,12 @@ function Install-Application {
 
 	$DownloadFolder = New-TemporaryFolder
 
+	$param = Get-ScriptParameters -AppName $AppName 
+
 	Get-ScriptParameters -AppName $AppName | `
 	Get-LatestReleaseInfo -PreRelease $PreReleaseFlag | `
 	Extract-WindowsInfo -FileEnding $ArtifactEnding | `
-	Parse-WindowsInfo -VersionSpec $VersionSpecFlag -Version $Version | `
+	Parse-WindowsInfo -VersionSpec $VersionSpecFlag -Version $Version -param $param| `
 	#Parse-WindowsInfo | `
 	Check-AppInstall -Folder $Folder -OneFile $OneFileFlag | `
 	Download-Artifact -DownloadFolder $DownloadFolder | `
@@ -240,15 +242,15 @@ function Parse-WindowsInfo {
 		[parameter()]
 		[bool]$VersionSpec,
 		[parameter()]
-		[string]$Version
+		[string]$Version,
+		[parameter()]
+		[hastable]$param
 	)
 
 	if ($VersionSpec) {
 
-		$params = Get-ScriptParameters -AppName "hpcflow"
-
-		$Name = "$params.AppName-$Version-$params.WindowsEndingFile"
-		$WebAddress = "$params.BaseLink/$Version/$Name"
+		$Name = "$param.AppName-$Version-$param.WindowsEndingFile"
+		$WebAddress = "$param.BaseLink/$Version/$Name"
 
 		$ArtifactData = @{
 			ArtifactName = $Name
