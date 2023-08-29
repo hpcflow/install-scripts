@@ -109,7 +109,8 @@ function Install-Application {
 	Get-ScriptParameters -AppName $AppName | `
 	Get-LatestReleaseInfo -PreRelease $PreReleaseFlag | `
 	Extract-WindowsInfo -FileEnding $ArtifactEnding | `
-	Parse-WindowsInfo | ` #-VersionSpec $VersionSpecFlag -Version $Version | `
+	#Parse-WindowsInfo -VersionSpec $VersionSpecFlag -Version $Version | `
+	Parse-WindowsInfo | `
 	Check-AppInstall -Folder $Folder -OneFile $OneFileFlag | `
 	Download-Artifact -DownloadFolder $DownloadFolder | `
 	Place-Artifact -FinalDestination $Folder -OneFile $OneFileFlag | `
@@ -236,11 +237,26 @@ function Parse-WindowsInfo {
 	param(
 		[parameter(Mandatory, ValueFromPipeline, ValueFromPipelineByPropertyName)]
 		[string]$VersionInfo
+	)
+
+	$Parts = $VersionInfo -Split ': '
+	$ArtifactData = @{
+		ArtifactName = $Parts[0]
+		ArtifactWebAddress = $Parts[1]
+	}
+
+	return $ArtifactData
+
+}
+#function Parse-WindowsInfo {
+#	param(
+#	[string]$VersionInfo
+	#		[parameter(Mandatory, ValueFromPipeline, ValueFromPipelineByPropertyName)]
 	#	[parameter(Mandatory)]
 	#	[bool]$VersionSpec,
 	#	[parameter()]
 	#	[string]$Version
-	)
+	#)
 	
 	#if ($VersionSpec) {
 
@@ -260,21 +276,21 @@ function Parse-WindowsInfo {
 	#}
 #	else {
 
-		$Parts = $VersionInfo -Split ': '
+#		$Parts = $VersionInfo -Split ': '
 
-		$ArtifactData = @{
-			ArtifactName = $Parts[0]
-			ArtifactWebAddress = $Parts[1]
-		}
+#		$ArtifactData = @{
+#	ArtifactWebAddress = $Parts[1]
+	#		ArtifactName = $Parts[0]
+#		}
 #	}
 
-	Write-Output $VersionSpec
-	Write-Output $ArtifactData.AppName
-	Write-Output $ArtifactData.ArtifactWebAddress
+#	Write-Output $VersionSpec
+	#Write-Output $ArtifactData.AppName
+	
+	#Write-Output $ArtifactData.ArtifactWebAddress
+	#return $ArtifactData
 
-	return $ArtifactData
-
-}
+#}
 
 function Check-AppInstall {
 	param(
