@@ -157,15 +157,15 @@ function Check-InstallTrackerFiles {
 	$PreReleaseVersions=$Folder+"\prerelease_versions.txt"
 
 	if(-Not (Test-Path $UserVersions)) {
-		New-Item -Force -ItemType File $UserVersions
+		$null = New-Item -Force -ItemType File $UserVersions 
 	}
 
 	if(-Not (Test-Path $StableVersions)) {
-		New-Item -Force -ItemType File $StableVersions
+		$null = New-Item -Force -ItemType File $StableVersions
 	}
 
 	if(-Not (Test-Path $PreReleaseVersions)) {
-		New-Item -Force -ItemType File $PreReleaseVersions
+		$null = New-Item -Force -ItemType File $PreReleaseVersions
 	}
 
 }
