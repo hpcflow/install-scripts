@@ -244,7 +244,7 @@ function Parse-WindowsInfo {
 		[parameter()]
 		[string]$Version,
 		[parameter()]
-		[hastable]$param
+		[hashtable]$param
 	)
 
 	if ($VersionSpec) {
