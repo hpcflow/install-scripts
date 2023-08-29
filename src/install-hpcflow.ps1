@@ -245,7 +245,7 @@ function Parse-WindowsInfo {
 
 	if ($VersionSpec) {
 
-		$params = Get-ScriptParameters
+		$params = Get-ScriptParameters -AppName "hpcflow"
 
 		$Name = "$params.AppName-$Version-$params.WindowsEndingFile"
 		$WebAddress = "$params.BaseLink/$Version/$Name"
