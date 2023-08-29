@@ -109,7 +109,7 @@ function Install-Application {
 	Get-ScriptParameters -AppName $AppName | `
 	Get-LatestReleaseInfo -PreRelease $PreReleaseFlag | `
 	Extract-WindowsInfo -FileEnding $ArtifactEnding | `
-	Parse-WindowsInfo -VersionSpec $VersionSpecFlag -Version $Version | `
+	Parse-WindowsInfo | ` #-VersionSpec $VersionSpecFlag -Version $Version | `
 	Check-AppInstall -Folder $Folder -OneFile $OneFileFlag | `
 	Download-Artifact -DownloadFolder $DownloadFolder | `
 	Place-Artifact -FinalDestination $Folder -OneFile $OneFileFlag | `
@@ -236,10 +236,10 @@ function Parse-WindowsInfo {
 	param(
 		[parameter(Mandatory, ValueFromPipeline, ValueFromPipelineByPropertyName)]
 		[string]$VersionInfo,
-		[parameter(Mandatory)]
-		[bool]$VersionSpec,
-		[parameter()]
-		[string]$Version
+	#	[parameter(Mandatory)]
+	#	[bool]$VersionSpec,
+	#	[parameter()]
+	#	[string]$Version
 	)
 	
 	#if ($VersionSpec) {
