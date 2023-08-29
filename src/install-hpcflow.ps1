@@ -3,6 +3,9 @@ param(
 	[string]$Folder,
 
 	[Parameter()]
+	[string]$Version,
+
+	[Parameter()]
 	[switch]$OneFile,
 
 	[Parameter()]
@@ -18,6 +21,9 @@ function Install-Application {
 	param(
 		[Parameter()]
 		[string]$Folder,
+
+		[Parameter()]
+		[string]$Version,
 
 		[Parameter()]
 		[switch]$OneFile,
@@ -87,6 +93,14 @@ function Install-Application {
 		Start-Sleep -Milliseconds 100
 	}
 
+	if ($PSBoundParameters.ContainsKey('Version')) {
+		$VersionSpecFlag = $true
+	}
+	else {
+		$VersionSpecFlag = $false
+		$Version = "latest"
+	}
+
 	Check-InstallDir -Folder $Folder
 	Check-InstallTrackerFiles -Folder $Folder
 
@@ -95,15 +109,13 @@ function Install-Application {
 	Get-ScriptParameters -AppName $AppName | `
 	Get-LatestReleaseInfo -PreRelease $PreReleaseFlag | `
 	Extract-WindowsInfo -FileEnding $ArtifactEnding | `
-	Parse-WindowsInfo | `
+	Parse-WindowsInfo -VersionSpec $VersionSpecFlag -Version $Version | `
 	Check-AppInstall -Folder $Folder -OneFile $OneFileFlag | `
 	Download-Artifact -DownloadFolder $DownloadFolder | `
 	Place-Artifact -FinalDestination $Folder -OneFile $OneFileFlag | `
 	Create-SymLinkToApp -Folder $Folder -OneFile $OneFileFlag -PreRelease $PreReleaseFlag -UnivLink $UnivLinkFlag -AppName $AppName| `
 	 
 	Add-SymLinkFolderToPath
-
-	
 
 }
 
@@ -223,13 +235,32 @@ function Extract-WindowsInfo {
 function Parse-WindowsInfo {
 	param(
 		[parameter(Mandatory, ValueFromPipeline, ValueFromPipelineByPropertyName)]
-		[string]$VersionInfo
+		[string]$VersionInfo,
+		[parameter(Mandatory)]
+		[bool]$VersionSpecFlag,
+		[parameter()]
+		[string]$Version
 	)
+	
+	if($VersionSpecFlag) {
 
-	$Parts = $VersionInfo -Split ': '
-	$ArtifactData = @{
-		ArtifactName = $Parts[0]
-		ArtifactWebAddress = $Parts[1]
+		$params = Get-ScriptParameters
+		
+		$Name = "$params.AppName-$Version-$params.WindowsFileEnding"
+		$WebAddress = "$params.BaseLink/$Version/$Name"
+
+		$ArtifactData = @{
+			ArtifactName = $Name
+			ArtifactWebAddress = $WebAddress
+		}
+
+	}
+	else {
+		$Parts = $VersionInfo -Split ': '
+		$ArtifactData = @{
+			ArtifactName = $Parts[0]
+			ArtifactWebAddress = $Parts[1]
+		}
 	}
 
 	return $ArtifactData
