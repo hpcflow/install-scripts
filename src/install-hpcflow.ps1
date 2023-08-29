@@ -268,6 +268,10 @@ function Parse-WindowsInfo {
 		}
 	}
 
+	Write-Output $VersionSpec
+	Write-Output $ArtifactData.AppName
+	Write-Output $ArtifactData.ArtifactWebAddress
+
 	return $ArtifactData
 
 }
