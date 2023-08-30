@@ -269,50 +269,6 @@ function Parse-WindowsInfo {
 	return $ArtifactData
 
 }
-#function Parse-WindowsInfo {
-#	param(
-#	[string]$VersionInfo
-	#		[parameter(Mandatory, ValueFromPipeline, ValueFromPipelineByPropertyName)]
-	#	[parameter(Mandatory)]
-	#	[bool]$VersionSpec,
-	#	[parameter()]
-	#	[string]$Version
-	#)
-	
-	#if ($VersionSpec) {
-
-	#	$params = Get-ScriptParameters
-		
-	#	$Name = "$params.AppName-$Version-$params.WindowsFileEnding"
-	#	$WebAddress = "$params.BaseLink/$Version/$Name"
-
-	#	Write-Output $Name
-	#	Write-Output $WebAddress
-
-	#	$ArtifactData = @{
-	#		ArtifactName = $Name
-	#		ArtifactWebAddress = $WebAddress
-	#	}
-
-	#}
-#	else {
-
-#		$Parts = $VersionInfo -Split ': '
-
-#		$ArtifactData = @{
-#	ArtifactWebAddress = $Parts[1]
-	#		ArtifactName = $Parts[0]
-#		}
-#	}
-
-#	Write-Output $VersionSpec
-	#Write-Output $ArtifactData.AppName
-	
-	#Write-Output $ArtifactData.ArtifactWebAddress
-	#return $ArtifactData
-
-#}
-
 function Check-AppInstall {
 	param(
 		[parameter(Mandatory, ValueFromPipeline, ValueFromPipelineByPropertyName)]
@@ -360,9 +316,6 @@ function Download-Artifact {
 
 	Write-Host "Downloading "$ArtifactData.ArtifactName
 	Start-Sleep -Milliseconds 100
-
-	Write-Host $ArtifactData.ArtifactName
-	Write-Host $ArtifactData.ArtifactWebAddress
 
 	$DownloadLocation = $DownloadFolder +"/" + $ArtifactData.ArtifactName
 
