@@ -249,8 +249,8 @@ function Parse-WindowsInfo {
 
 	if ($VersionSpec) {
 
-		$Name = "$param.AppName-$Version-$param.WindowsEndingFile"
-		$WebAddress = "$param.BaseLink/$Version/$Name"
+		$Name = "$param['AppName']-$Version-$param['WindowsEndingFile']"
+		$WebAddress = "$param['BaseLink']/$Version/$Name"
 
 		$ArtifactData = @{
 			ArtifactName = $Name
