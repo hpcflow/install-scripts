@@ -101,6 +101,13 @@ function Install-Application {
 		$Version = "latest"
 	}
 
+	$ScriptDataFilenames = @{
+		UserVersions=$Folder+"\user_versions.txt"
+		StableVersions=$Folder+"\stable_versions.txt"
+		PreReleaseVersions=$Folder+"\prerelease_versions.txt"
+		AliasFile=$Folder+"\aliases\aliases.csv"
+	}
+
 	Check-InstallDir -Folder $Folder
 	Check-InstallTrackerFiles -Folder $Folder
 
@@ -112,7 +119,6 @@ function Install-Application {
 	Get-LatestReleaseInfo -PreRelease $PreReleaseFlag | `
 	Extract-WindowsInfo -FileEnding $ArtifactEnding | `
 	Parse-WindowsInfo -VersionSpec $VersionSpecFlag -Version $Version -param $param| `
-	#Parse-WindowsInfo | `
 	Check-AppInstall -Folder $Folder -OneFile $OneFileFlag | `
 	Download-Artifact -DownloadFolder $DownloadFolder | `
 	Place-Artifact -FinalDestination $Folder -OneFile $OneFileFlag | `
@@ -370,7 +376,10 @@ function Create-SymLinkToApp {
 		[bool]$OneFile,
 
 		[parameter()]
-		[bool]$PreRelease,
+		[bool]$PreReleaseFlag,
+
+		[parameter()]
+		[bool]$VersionSpecFlag,
 
 		[parameter()]
 		[bool]$UnivLink,
@@ -379,6 +388,10 @@ function Create-SymLinkToApp {
 		[string]$AppName
 
 	)
+
+	$UserVersions=$Folder+"\user_versions.txt"
+	$StableVersions=$Folder+"\stable_versions.txt"
+	$PreReleaseVersions=$Folder+"\prerelease_versions.txt"
 
 	$artifact_name = $ArtifactData.ArtifactName
 
@@ -402,7 +415,7 @@ function Create-SymLinkToApp {
 		}
 
 		if($UnivLink) {
-			if($PreRelease) {
+			if($PreReleaseFlag) {
 				$univ_link_name = "$AppName-dev"
 			}
 			else {
@@ -414,6 +427,17 @@ function Create-SymLinkToApp {
 		
 		Write-Host "Type $artifact_name to get started!"
 		Start-Sleep -Milliseconds 100
+
+		if($VersionSpecFlag) {
+			Add-Content $UserVersions "$Folder\$artifact_name"
+		}
+		elseif($PreReleaseFlag){
+			Add-Content $PreReleaseVersions "$Folder\$artifact_name"
+		}
+		else{
+			Add-Content $StableVersions "$Folder\$artifact_name"
+		}
+
 
 	}
 	else {
@@ -433,7 +457,17 @@ function Create-SymLinkToApp {
 			else {
 				$univ_link_name = "$AppName"
 			}
-			Add-Content $AliasFile "`"$univ_link_name`",`"$Folder\$artifact_name`",`"`",`"None`""
+			Add-Content $AliasFile "`"$univ_link_name`",`"$Folder\$folder_name\$exe_name`",`"`",`"None`""
+		}
+
+		if($VersionSpecFlag) {
+			Add-Content $UserVersions "$Folder\$folder_name\$exe_name"
+		}
+		elseif($PreReleaseFlag){
+			Add-Content $PreReleaseVersions "$Folder\$folder_name\$exe_name"
+		}
+		else{
+			Add-Content $StableVersions "$Folder\$folder_name\$exe_name"
 		}
 
 		Write-Host "Type $link_name to get started!"
