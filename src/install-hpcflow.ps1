@@ -102,6 +102,8 @@ function Install-Application {
 	}
 
 	$ScriptDataFilenames = @{
+		AppName=$AppName
+		Folder=$Folder
 		UserVersions=$Folder+"\user_versions.txt"
 		StableVersions=$Folder+"\stable_versions.txt"
 		PreReleaseVersions=$Folder+"\prerelease_versions.txt"
@@ -476,6 +478,28 @@ function Create-SymLinkToApp {
 
 
 	return  $AliasFile
+
+}
+
+function Prune-InstalledVersions {
+	param(
+		[parameter(Mandatory)]
+		[hashtable]$ScriptDataFilenames
+	)
+
+	Get-Content -tail 3 $ScriptDataFilenames.UserVersions > temp.txt
+	Move-Item -Force temp.txt $ScriptDataFilenames.UserVersions
+
+	Get-Content -tail 3 $ScriptDataFilenames.PreReleaseVersions > temp.txt
+	Move-Item -Force temp.txt $ScriptDataFilenames.PreReleaseVersions
+
+	Get-Content -tail 3 $ScriptDataFilenames.StableVersions > temp.txt
+	Move-Item -Force temp.txt $ScriptDataFilenames.StableVersions
+
+	$to_keep=Get-Content $ScriptDataFilenames.Folder*_versions.txt
+
+	Get-ChildItem $ScriptDataFilenames.AppName* $ScriptDataFilenames.Folder | Where-Object { $to_keep.txt -notcontains $_.name } |`
+	Remove-Item -whatif
 
 }
 
