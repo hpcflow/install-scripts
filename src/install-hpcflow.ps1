@@ -111,7 +111,7 @@ function Install-Application {
 	}
 
 	Check-InstallDir -Folder $Folder
-	Check-InstallTrackerFiles -Folder $Folder
+	Check-InstallTrackerFiles -ScriptDataFilenames $ScriptDataFilenames
 
 	$DownloadFolder = New-TemporaryFolder
 
@@ -124,7 +124,7 @@ function Install-Application {
 	Check-AppInstall -Folder $Folder -OneFile $OneFileFlag | `
 	Download-Artifact -DownloadFolder $DownloadFolder | `
 	Place-Artifact -FinalDestination $Folder -OneFile $OneFileFlag | `
-	Create-SymLinkToApp -Folder $Folder -OneFile $OneFileFlag -PreRelease $PreReleaseFlag -UnivLink $UnivLinkFlag -AppName $AppName| `
+	Create-SymLinkToApp -OneFile $OneFileFlag -PreRelease $PreReleaseFlag -UnivLink $UnivLinkFlag -ScriptDataFilenames $ScriptDataFilenames| `
 	 
 	Add-SymLinkFolderToPath
 
@@ -159,12 +159,12 @@ function Check-InstallTrackerFiles {
 
 	param(
 		[Parameter()]
-		[string]$Folder
+		[hashtable]$ScriptDataFilenames
 	)
 
-	$UserVersions=$Folder+"\user_versions.txt"
-	$StableVersions=$Folder+"\stable_versions.txt"
-	$PreReleaseVersions=$Folder+"\prerelease_versions.txt"
+	$UserVersions=ScriptDataFilenames.UserVersions
+	$StableVersions=ScriptDataFilenames.StableVersions
+	$PreReleaseVersions=ScriptDataFilenames.PreReleaseVersions
 
 	if(-Not (Test-Path $UserVersions)) {
 		$null = New-Item -Force -ItemType File $UserVersions 
@@ -371,9 +371,6 @@ function Create-SymLinkToApp {
 		[parameter(Mandatory, ValueFromPipeline, ValueFromPipelineByPropertyName)]
 		[hashtable]$ArtifactData,
 
-		[parameter(Mandatory)]
-		[string]$Folder,
-
 		[parameter()]
 		[bool]$OneFile,
 
@@ -387,13 +384,16 @@ function Create-SymLinkToApp {
 		[bool]$UnivLink,
 
 		[parameter()]
-		[string]$AppName
+		[hashtable]$ScriptDataFilenames
+
 
 	)
 
-	$UserVersions=$Folder+"\user_versions.txt"
-	$StableVersions=$Folder+"\stable_versions.txt"
-	$PreReleaseVersions=$Folder+"\prerelease_versions.txt"
+	$UserVersions=$ScriptDataFilenames.UserVersions
+	$StableVersions=$ScriptDataFilenames.StableVersions
+	$PreReleaseVersions=$ScriptDataFilenames.PreReleaseVersions
+	$Folder=$ScriptDataFilenames.Folder
+	$AppName=$ScriptDataFilenames.AppName
 
 	$artifact_name = $ArtifactData.ArtifactName
 
@@ -475,6 +475,8 @@ function Create-SymLinkToApp {
 		Write-Host "Type $link_name to get started!"
 		Start-Sleep -Milliseconds 100
 	}
+
+	Prune-InstalledVersions -ScriptDataFilenames $ScriptDataFilenames
 
 
 	return  $AliasFile
