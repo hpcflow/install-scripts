@@ -498,7 +498,7 @@ function Prune-InstalledVersions {
 	Get-Content -tail 3 $ScriptDataFilenames.StableVersions > temp.txt
 	Move-Item -Force temp.txt $ScriptDataFilenames.StableVersions
 
-	$VersionsWildCard = $ScriptDataFilenames.Folder +"*_versions.txt"
+	$VersionsWildCard = $ScriptDataFilenames.Folder +"\*_versions.txt"
 
 	$to_keep=Get-Content $VersionsWildCard
 
