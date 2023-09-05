@@ -498,9 +498,9 @@ function Prune-InstalledVersions {
 	Get-Content -tail 3 $ScriptDataFilenames.StableVersions > temp.txt
 	Move-Item -Force temp.txt $ScriptDataFilenames.StableVersions
 
-	$to_keep=Get-Content $ScriptDataFilenames.Folder*_versions.txt
+	$to_keep=Get-Content $ScriptDataFilenames.Folder +"*_versions.txt"
 
-	Get-ChildItem $ScriptDataFilenames.AppName* $ScriptDataFilenames.Folder | Where-Object { $to_keep.txt -notcontains $_.name } |`
+	Get-ChildItem $ScriptDataFilenames.AppName+"*" $ScriptDataFilenames.Folder | Where-Object { $to_keep.txt -notcontains $_.name } |`
 	Remove-Item -whatif
 
 }
