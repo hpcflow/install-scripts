@@ -3,6 +3,9 @@ param(
 	[string]$Folder,
 
 	[Parameter()]
+	[string]$Version,
+
+	[Parameter()]
 	[switch]$OneFile,
 
 	[Parameter()]
@@ -18,6 +21,9 @@ function Install-Application {
 	param(
 		[Parameter()]
 		[string]$Folder,
+
+		[Parameter()]
+		[string]$Version,
 
 		[Parameter()]
 		[switch]$OneFile,
@@ -87,26 +93,45 @@ function Install-Application {
 		Start-Sleep -Milliseconds 100
 	}
 
-	Check-InstallDir $Folder
+	if ($PSBoundParameters.ContainsKey('Version')) {
+		$VersionSpecFlag = $true
+	}
+	else {
+		$VersionSpecFlag = $false
+		$Version = "latest"
+	}
+
+	$ScriptDataFilenames = @{
+		AppName=$AppName
+		Folder=$Folder
+		UserVersions=$Folder+"\user_versions.txt"
+		StableVersions=$Folder+"\stable_versions.txt"
+		PreReleaseVersions=$Folder+"\prerelease_versions.txt"
+		AliasFile=$Folder+"\aliases\aliases.csv"
+	}
+
+	Check-InstallDir -Folder $Folder
+	Check-InstallTrackerFiles -ScriptDataFilenames $ScriptDataFilenames
 
 	$DownloadFolder = New-TemporaryFolder
+
+	$param = Get-ScriptParameters -AppName $AppName 
 
 	Get-ScriptParameters -AppName $AppName | `
 	Get-LatestReleaseInfo -PreRelease $PreReleaseFlag | `
 	Extract-WindowsInfo -FileEnding $ArtifactEnding | `
-	Parse-WindowsInfo | `
+	Parse-WindowsInfo -VersionSpec $VersionSpecFlag -Version $Version -param $param| `
 	Check-AppInstall -Folder $Folder -OneFile $OneFileFlag | `
 	Download-Artifact -DownloadFolder $DownloadFolder | `
 	Place-Artifact -FinalDestination $Folder -OneFile $OneFileFlag | `
-	Create-SymLinkToApp -Folder $Folder -OneFile $OneFileFlag -PreRelease $PreReleaseFlag -UnivLink $UnivLinkFlag -AppName $AppName| `
+	Create-SymLinkToApp -OneFile $OneFileFlag -PreRelease $PreReleaseFlag -UnivLink $UnivLinkFlag -ScriptDataFilenames $ScriptDataFilenames| `
 	 
 	Add-SymLinkFolderToPath
-
-	
 
 }
 
 function Get-InstallDir {
+
 	param(
 		[Parameter()]
 		[string]$AppName
@@ -119,8 +144,38 @@ function Get-InstallDir {
 
 function Check-InstallDir {
 
+	param(
+		[Parameter()]
+		[string]$Folder
+	)
+
 	if(-Not (Test-Path $Folder)) {
 		New-Item -Force -ItemType Directory $Folder
+	}
+
+}
+
+function Check-InstallTrackerFiles {
+
+	param(
+		[Parameter()]
+		[hashtable]$ScriptDataFilenames
+	)
+
+	$UserVersions=$ScriptDataFilenames.UserVersions
+	$StableVersions=$ScriptDataFilenames.StableVersions
+	$PreReleaseVersions=$ScriptDataFilenames.PreReleaseVersions
+
+	if(-Not (Test-Path $UserVersions)) {
+		$null = New-Item -Force -ItemType File $UserVersions 
+	}
+
+	if(-Not (Test-Path $StableVersions)) {
+		$null = New-Item -Force -ItemType File $StableVersions
+	}
+
+	if(-Not (Test-Path $PreReleaseVersions)) {
+		$null = New-Item -Force -ItemType File $PreReleaseVersions
 	}
 
 }
@@ -131,6 +186,7 @@ function  Get-ScriptParameters {
 		[Parameter()]
 		[string]$AppName
 	)
+
     $params = @{
         AppName = $AppName
         BaseLink = "https://github.com/hpcflow/$AppName-new/releases/download"
@@ -190,19 +246,37 @@ function Extract-WindowsInfo {
 function Parse-WindowsInfo {
 	param(
 		[parameter(Mandatory, ValueFromPipeline, ValueFromPipelineByPropertyName)]
-		[string]$VersionInfo
+		[string]$VersionInfo,
+		[parameter()]
+		[bool]$VersionSpec,
+		[parameter()]
+		[string]$Version,
+		[parameter()]
+		[hashtable]$param
 	)
 
-	$Parts = $VersionInfo -Split ': '
-	$ArtifactData = @{
-		ArtifactName = $Parts[0]
-		ArtifactWebAddress = $Parts[1]
+	if ($VersionSpec) {
+
+		$Name = $param['AppName'] +"-" +$Version +"-" +$param['WindowsEndingFile']
+		$WebAddress = $param['BaseLink'] +"/" +$Version +"/" +$Name
+
+		$ArtifactData = @{
+			ArtifactName = $Name
+			ArtifactWebAddress = $WebAddress
+		}
+
+	}
+	else {
+		$Parts = $VersionInfo -Split ': '
+		$ArtifactData = @{
+			ArtifactName = $Parts[0]
+			ArtifactWebAddress = $Parts[1]
+		}
 	}
 
 	return $ArtifactData
 
 }
-
 function Check-AppInstall {
 	param(
 		[parameter(Mandatory, ValueFromPipeline, ValueFromPipelineByPropertyName)]
@@ -297,22 +371,29 @@ function Create-SymLinkToApp {
 		[parameter(Mandatory, ValueFromPipeline, ValueFromPipelineByPropertyName)]
 		[hashtable]$ArtifactData,
 
-		[parameter(Mandatory)]
-		[string]$Folder,
-
 		[parameter()]
 		[bool]$OneFile,
 
 		[parameter()]
-		[bool]$PreRelease,
+		[bool]$PreReleaseFlag,
+
+		[parameter()]
+		[bool]$VersionSpecFlag,
 
 		[parameter()]
 		[bool]$UnivLink,
 
 		[parameter()]
-		[string]$AppName
+		[hashtable]$ScriptDataFilenames
+
 
 	)
+
+	$UserVersions=$ScriptDataFilenames.UserVersions
+	$StableVersions=$ScriptDataFilenames.StableVersions
+	$PreReleaseVersions=$ScriptDataFilenames.PreReleaseVersions
+	$Folder=$ScriptDataFilenames.Folder
+	$AppName=$ScriptDataFilenames.AppName
 
 	$artifact_name = $ArtifactData.ArtifactName
 
@@ -336,7 +417,7 @@ function Create-SymLinkToApp {
 		}
 
 		if($UnivLink) {
-			if($PreRelease) {
+			if($PreReleaseFlag) {
 				$univ_link_name = "$AppName-dev"
 			}
 			else {
@@ -348,6 +429,17 @@ function Create-SymLinkToApp {
 		
 		Write-Host "Type $artifact_name to get started!"
 		Start-Sleep -Milliseconds 100
+
+		if($VersionSpecFlag) {
+			Add-Content $UserVersions "$Folder\$artifact_name"
+		}
+		elseif($PreReleaseFlag){
+			Add-Content $PreReleaseVersions "$Folder\$artifact_name"
+		}
+		else{
+			Add-Content $StableVersions "$Folder\$artifact_name"
+		}
+
 
 	}
 	else {
@@ -367,15 +459,53 @@ function Create-SymLinkToApp {
 			else {
 				$univ_link_name = "$AppName"
 			}
-			Add-Content $AliasFile "`"$univ_link_name`",`"$Folder\$artifact_name`",`"`",`"None`""
+			Add-Content $AliasFile "`"$univ_link_name`",`"$Folder\$folder_name\$exe_name`",`"`",`"None`""
+		}
+
+		if($VersionSpecFlag) {
+			Add-Content $UserVersions "$Folder\$folder_name\$exe_name"
+		}
+		elseif($PreReleaseFlag){
+			Add-Content $PreReleaseVersions "$Folder\$folder_name\$exe_name"
+		}
+		else{
+			Add-Content $StableVersions "$Folder\$folder_name\$exe_name"
 		}
 
 		Write-Host "Type $link_name to get started!"
 		Start-Sleep -Milliseconds 100
 	}
 
+	Prune-InstalledVersions -ScriptDataFilenames $ScriptDataFilenames
+
 
 	return  $AliasFile
+
+}
+
+function Prune-InstalledVersions {
+	param(
+		[parameter(Mandatory)]
+		[hashtable]$ScriptDataFilenames
+	)
+
+	Get-Content -tail 3 $ScriptDataFilenames.UserVersions > temp.txt
+	Move-Item -Force temp.txt $ScriptDataFilenames.UserVersions
+
+	Get-Content -tail 3 $ScriptDataFilenames.PreReleaseVersions > temp.txt
+	Move-Item -Force temp.txt $ScriptDataFilenames.PreReleaseVersions
+
+	Get-Content -tail 3 $ScriptDataFilenames.StableVersions > temp.txt
+	Move-Item -Force temp.txt $ScriptDataFilenames.StableVersions
+
+	$ToKeepWildCard = $ScriptDataFilenames.Folder +"\\*_versions.txt"
+
+	$to_keep=Get-Content $ToKeepWildCard
+
+	$AppWildCard = $ScriptDataFilenames.AppName+"*"
+
+	Get-ChildItem $AppWildCard $ScriptDataFilenames.Folder | Where-Object { $to_keep.txt -notcontains $_.name } |`
+	Remove-Item -whatif
 
 }
 
