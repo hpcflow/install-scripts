@@ -162,9 +162,9 @@ function Check-InstallTrackerFiles {
 		[hashtable]$ScriptDataFilenames
 	)
 
-	$UserVersions=ScriptDataFilenames.UserVersions
-	$StableVersions=ScriptDataFilenames.StableVersions
-	$PreReleaseVersions=ScriptDataFilenames.PreReleaseVersions
+	$UserVersions=$ScriptDataFilenames.UserVersions
+	$StableVersions=$ScriptDataFilenames.StableVersions
+	$PreReleaseVersions=$ScriptDataFilenames.PreReleaseVersions
 
 	if(-Not (Test-Path $UserVersions)) {
 		$null = New-Item -Force -ItemType File $UserVersions 
