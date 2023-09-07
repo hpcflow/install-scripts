@@ -46,72 +46,15 @@ run_main() {
 
 		fi
 
-		# Create symlinks and clear up older versions
-		if [[ "$prerelease" != true ]] && [[ "$versionspec" != true ]]; then
+		create_versioned_symlink
 
-			# Default - pre-release or specific version not specified
-			#
-			# Create generic app_name sym link to latest release along with specific version numbered link
+		if [ "$univlink" == true ]; then
 
-			if [ "$onefile" != true ]; then
-
-				create_versioned_symlink_stable_one_folder
-
-				if [ "$univlink" == true ]; then
-
-					create_universal_symlink
-
-				fi
-
-			elif [ "$onefile" == true ]; then
-
-				create_versioned_symlink_stable_onefile
-
-				if [ "$univlink" == true ]; then
-
-					create_universal_symlink
-
-				fi
-
-			else
-
-				echo "Unexpected error."
-				exit 1
-
-			fi
-
-			keep_most_recent_stable
-
-		else
-
-			if [ "$onefile" != true ]; then
-
-				create_versioned_symlink_user_one_folder
-
-				if [ "$univlink" == true ]; then
-
-					create_universal_symlink_dev
-
-				fi
-
-			elif [ "$onefile" == true ]; then
-
-				create_versioned_symlink_user_onefile
-
-				if [ "$univlink" == true ]; then
-
-					create_universal_symlink_dev
-
-				fi
-
-			else
-
-				echo "Unexpected error."
-				exit 1
-
-			fi
+			create_universal_symlink
 
 		fi
+
+		clear_up_installed_versions
 
 		if [ "$path" = true ]; then
 
@@ -136,18 +79,18 @@ run_main() {
 set_variables() {
 
 	app_name="hpcflow"
-	base_link="https://github.com/hpcflow/hpcflow-new/releases/download"
+	base_link="https://github.com/hpcflow/${app_name}-new/releases/download"
 
 	linux_ending_folder="linux-dir"
 	macOS_ending_folder="macOS-dir"
 	linux_ending_file="linux"
 	macOS_ending_file="macOS"
 
-	linux_install_dir=~/.local/share/hpcflow
-	macOS_install_dir=~/Library/Application\ Support/hpcflow
+	linux_install_dir=~/.local/share/$app_name
+	macOS_install_dir=~/Library/Application\ Support/$app_name
 
-	latest_stable_releases="https://raw.githubusercontent.com/hpcflow/hpcflow-new/dummy-stable/docs/source/released_binaries.yml"
-	latest_prerelease_releases="https://raw.githubusercontent.com/hpcflow/hpcflow-new/develop/docs/source/released_binaries.yml"
+	latest_stable_releases="https://raw.githubusercontent.com/hpcflow/${app_name}-new/dummy-stable/docs/source/released_binaries.yml"
+	latest_prerelease_releases="https://raw.githubusercontent.com/hpcflow/${app_name}-new/develop/docs/source/released_binaries.yml"
 
 	progress_string_1="Step 1 of 2: Downloading ${app_name} ..."
 	progress_string_2="Step 2 of 2: Installing ${app_name} ..."
@@ -164,7 +107,7 @@ set_flags() {
 
 	# Flag to note if user specified version
 	versionspec=false
-	# Flag recording if hpcflow symlink folder is on path
+	# Flag recording if symlink folder is on path
 	onpath=false
 
 }
@@ -304,6 +247,7 @@ make_main_folder() {
 
 create_install_tracker_files() {
 	touch "${folder}"/user_versions.txt
+	touch "${folder}"/prerelease_versions.txt
 	touch "${folder}"/stable_versions.txt
 }
 
@@ -362,79 +306,73 @@ unzip_and_move_onefile_version() {
 
 }
 
-create_versioned_symlink_stable_one_folder() {
-
-	ln -sf "${folder}/${folder_name}/${folder_name}" "${folder}/links/${folder_name}"
-
-	echo "-not -name ${folder_name}" >>"${folder}"/stable_versions.txt
-
-	# Record sym link names to inform user
-	symstring="${folder_name}"
-
-}
-
-create_versioned_symlink_user_one_folder () {
-
-	ln -sf "${folder}/${folder_name}/${folder_name}" "${folder}/links/${folder_name}"
-
-	echo "-not -name ${folder_name}" >>"${folder}"/user_versions.txt
-
-	# Record sym link names to inform user
-	symstring="${folder_name}"
-
-}
-
-create_universal_symlink () {
+create_versioned_symlink() {
 
 	if [ "$onefile" == true ]; then
-
-		ln -sf "${folder}/${artifact_name}" "${folder}/links/${app_name}}"
-		symstring="${app_name} or ${artifact_name}"
+	
+		ln -sf "${folder}/${artifact_name}" "${folder}/links/${artifact_name}"
+		install_name=${artifact_name}
+		versioned_symstring="${artifact_name}"
 
 	else
 
-		ln -sf "${folder}/${folder_name}/${folder_name}" "${folder}/links/${app_name}"
-		symstring="${app_name} or ${folder_name}"
+		ln -sf "${folder}/${folder_name}/${folder_name}" "${folder}/links/${folder_name}"
+		install_name=${folder_name}
+		versioned_symstring="${folder_name}"
 
+	fi
+
+	if [ "$versionspec" == true ]; then
+		echo "-not -name ${install_name}" >>"${folder}"/user_versions.txt
+	elif [ "$prerelease" == true ]; then
+		echo "-not -name ${install_name}" >>"${folder}"/prerelease_versions.txt
+	else
+		echo "-not -name ${install_name}" >>"${folder}"/stable_versions.txt
 	fi
 
 }
 
-create_universal_symlink_dev () {
+create_universal_symlink() {
 
-	if [ "$onefile" == true ]; then
+		if [ "$onefile" == true ]; then
 
-		ln -sf "${folder}/${artifact_name}" "${folder}/links/${app_name}-dev"
-		symstring="${app_name}-dev or ${artifact_name}"
+			if [ "$prerelease" == true ]; then
+				ln -sf "${folder}/${artifact_name}" "${folder}/links/${app_name}-dev"
+				univ_symstring="${app_name}-dev or ${artifact_name}"
+			else
+				ln -sf "${folder}/${artifact_name}" "${folder}/links/${app_name}}"
+				univ_symstring="${app_name} or ${artifact_name}"
+			fi
+		
+		else
 
-	else
+			if [ "$prerelease" == true ]; then
+				ln -sf "${folder}/${folder_name}/${folder_name}" "${folder}/links/${app_name}-dev"
+				univ_symstring="${app_name}-dev or ${folder_name}"
+			else
+				ln -sf "${folder}/${folder_name}/${folder_name}" "${folder}/links/${app_name}"
+				univ_symstring="${app_name} or ${folder_name}"
+			fi
 
-		ln -sf "${folder}/${folder_name}/${folder_name}" "${folder}/links/${app_name}-dev"
-		symstring="${app_name}-dev or ${folder_name}"
-
-	fi
+		fi
 
 }
 
-create_versioned_symlink_stable_onefile () {
+clear_up_installed_versions () {
 
-	ln -sf "${folder}/${artifact_name}" "${folder}/links/${artifact_name}"
+	# Keep most recent 3 latest stable versions
+	tail -n3 "${folder}/stable_versions.txt" > "${folder}/stable_versions_to_keep.txt"
+	mv "${folder}/stable_versions_to_keep.txt" "${folder}/stable_versions.txt"
 
-	echo "-not -name ${folder_name}" >>"${folder}"/stable_versions.txt
+	# Keep most recent 3 latest prerelease versions
+	tail -n3 "${folder}/prerelease_versions.txt" > "${folder}/prerelease_versions_to_keep.txt"
+	mv "${folder}/prerelease_versions_to_keep.txt" "${folder}/prerelease_versions.txt"
 
-	# Record sym link names to inform user
-	symstring="${artifact_name}"
+	# Remove versioned symlinks
+	find "${folder}"/links/"${app_name}"-v* $(cat "${folder}"/stable_versions.txt 2>/dev/null) $(cat "${folder}"/user_versions.txt 2>/dev/null) $(cat "${folder}"/prerelease_versions.txt 2>/dev/null) -delete
 
-}
-
-create_versioned_symlink_user_onefile () {
-
-	ln -sf "${folder}/${artifact_name}" "${folder}/links/${artifact_name}"
-
-	echo "-not -name ${folder_name}" >>"${folder}"/user_versions.txt
-
-	# Record sym link names to inform user
-	symstring="${artifact_name}"
+	# Remove installed apps
+	find "${folder}"/"${app_name}"-v* $(cat "${folder}"/stable_versions.txt 2>/dev/null) $(cat "${folder}"/user_versions.txt 2>/dev/null) $(cat "${folder}"/prerelease_versions.txt 2>/dev/null) -delete
 
 }
 
@@ -475,7 +413,7 @@ print_post_install_info () {
 	fi
 	echo
 	echo
-	echo "Re-open terminal and then type ${symstring} to get started."
+	echo "Re-open terminal and then type ${versioned_symstring} to get started."
 
 }
 

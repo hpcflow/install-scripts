@@ -3,6 +3,9 @@ param(
 	[string]$Folder,
 
 	[Parameter()]
+	[string]$Version,
+
+	[Parameter()]
 	[switch]$OneFile,
 
 	[Parameter()]
@@ -13,11 +16,14 @@ param(
 
 )
 
-function Install-MatFlowApplication {
+function Install-Application {
 
 	param(
 		[Parameter()]
 		[string]$Folder,
+
+		[Parameter()]
+		[string]$Version,
 
 		[Parameter()]
 		[switch]$OneFile,
@@ -29,20 +35,20 @@ function Install-MatFlowApplication {
 		[switch]$UnivLink
 
 	)
-	trap{
+	#trap{
 		# Check if DownloadFolder variable has been created. If it has, delete folder it points to.
 
 		# First check variable exists (i.e. is not null)
-		if($DownloadFolder){
+#		if($DownloadFolder){
 			# Next check if folder exists
-			if(Test-Path -Path $DownloadFolder){
-				Remove-Item $DownloadFolder
-				}
-		}
-		Write-Host "Installation of" $AppName "unsuccessful"
+#			if(Test-Path -Path $DownloadFolder){
+	#			Remove-Item $DownloadFolder
+		#		}
+	#	}
+	#	Write-Host "Installation of" $AppName "unsuccessful. $_"
 		#Exit
-		Return
-	}
+	#	Return
+	#}
 
 	$AppName = "matflow"
 
@@ -66,11 +72,11 @@ function Install-MatFlowApplication {
 		$VersionType = "latest stable"
 	}
 
-	if ($UnivLink.IsPresent) {
+	if( $UnivLink.IsPresent) {
 		$UnivLinkFlag = $true
 	}
 	else {
-		$UnivLinkFlag = $false
+		$UnivLinkFlag = $true
 	}
 
 
@@ -82,51 +88,114 @@ function Install-MatFlowApplication {
 		Start-Sleep -Milliseconds 100
 	}
 	else {
-		$Folder = Get-InstallDir
+		$Folder = Get-InstallDir -AppName $AppName
 		Write-Host "Installing to default location $Folder..."
 		Start-Sleep -Milliseconds 100
 	}
 
-	Check-InstallDir $Folder
+	if ($PSBoundParameters.ContainsKey('Version')) {
+		$VersionSpecFlag = $true
+	}
+	else {
+		$VersionSpecFlag = $false
+		$Version = "latest"
+	}
+
+	$ScriptDataFilenames = @{
+		AppName=$AppName
+		Folder=$Folder
+		UserVersions=$Folder+"\user_versions.txt"
+		StableVersions=$Folder+"\stable_versions.txt"
+		PreReleaseVersions=$Folder+"\prerelease_versions.txt"
+		AliasFile=$Folder+"\aliases\aliases.csv"
+	}
+
+	Check-InstallDir -Folder $Folder
+	Check-InstallTrackerFiles -ScriptDataFilenames $ScriptDataFilenames
 
 	$DownloadFolder = New-TemporaryFolder
 
-	Get-ScriptParameters | `
+	$param = Get-ScriptParameters -AppName $AppName 
+
+	Get-ScriptParameters -AppName $AppName | `
 	Get-LatestReleaseInfo -PreRelease $PreReleaseFlag | `
 	Extract-WindowsInfo -FileEnding $ArtifactEnding | `
-	Parse-WindowsInfo | `
+	Parse-WindowsInfo -VersionSpec $VersionSpecFlag -Version $Version -param $param| `
 	Check-AppInstall -Folder $Folder -OneFile $OneFileFlag | `
 	Download-Artifact -DownloadFolder $DownloadFolder | `
 	Place-Artifact -FinalDestination $Folder -OneFile $OneFileFlag | `
-	Create-SymLinkToApp -Folder $Folder -OneFile $OneFileFlag -PreRelease $PreReleaseFlag -UnivLink $UnivLinkFlag | `
+	Create-SymLinkToApp -OneFile $OneFileFlag -PreRelease $PreReleaseFlag -UnivLink $UnivLinkFlag -ScriptDataFilenames $ScriptDataFilenames| `
+	 
 	Add-SymLinkFolderToPath
 
 }
 
 function Get-InstallDir {
-	$WindowsInstallDir = "${env:USERPROFILE}\AppData\Local\matflow"
+
+	param(
+		[Parameter()]
+		[string]$AppName
+	)
+
+	$WindowsInstallDir = "${env:USERPROFILE}\AppData\Local\$AppName"
 
 	return $WindowsInstallDir
 }
 
 function Check-InstallDir {
 
+	param(
+		[Parameter()]
+		[string]$Folder
+	)
+
 	if(-Not (Test-Path $Folder)) {
-		New-Item -Force -ItemType Directory $Folder
+		$null = New-Item -Force -ItemType Directory $Folder
+	}
+
+}
+
+function Check-InstallTrackerFiles {
+
+	param(
+		[Parameter()]
+		[hashtable]$ScriptDataFilenames
+	)
+
+	$UserVersions=$ScriptDataFilenames.UserVersions
+	$StableVersions=$ScriptDataFilenames.StableVersions
+	$PreReleaseVersions=$ScriptDataFilenames.PreReleaseVersions
+
+	if(-Not (Test-Path $UserVersions)) {
+		$null = New-Item -Force -ItemType File $UserVersions 
+	}
+
+	if(-Not (Test-Path $StableVersions)) {
+		$null = New-Item -Force -ItemType File $StableVersions
+	}
+
+	if(-Not (Test-Path $PreReleaseVersions)) {
+		$null = New-Item -Force -ItemType File $PreReleaseVersions
 	}
 
 }
 
 function  Get-ScriptParameters {
+
+	param(
+		[Parameter()]
+		[string]$AppName
+	)
+
     $params = @{
-        AppName = "matflow"
-        BaseLink = "https://github.com/hpcflow/matflow-new/releases/download"
+        AppName = $AppName
+        BaseLink = "https://github.com/hpcflow/$AppName-new/releases/download"
         WindowsEndingFolder ="win-dir"
 	    WindowsEndingFile = "win.exe"
-        WindowsInstallDir = "${env:USERPROFILE}\AppData\Local\matflow"
+        WindowsInstallDir = "${env:USERPROFILE}\AppData\Local\$AppName"
 
-	    LatestStableReleases = "https://raw.githubusercontent.com/hpcflow/matflow-new/dummy-stable/docs/source/released_binaries.yml"
-	    LatestPrereleaseReleases="https://raw.githubusercontent.com/hpcflow/matflow-new/develop/docs/source/released_binaries.yml"
+	    LatestStableReleases = "https://raw.githubusercontent.com/hpcflow/$AppName-new/dummy-stable/docs/source/released_binaries.yml"
+	    LatestPrereleaseReleases="https://raw.githubusercontent.com/hpcflow/$AppName-new/develop/docs/source/released_binaries.yml"
 
 	    ProgressString1="Step 1 of 2: Downloading $AppName ..."
 	    ProgressString2="Step 2 of 2: Installing $AppName ..."
@@ -177,19 +246,37 @@ function Extract-WindowsInfo {
 function Parse-WindowsInfo {
 	param(
 		[parameter(Mandatory, ValueFromPipeline, ValueFromPipelineByPropertyName)]
-		[string]$VersionInfo
+		[string]$VersionInfo,
+		[parameter()]
+		[bool]$VersionSpec,
+		[parameter()]
+		[string]$Version,
+		[parameter()]
+		[hashtable]$param
 	)
 
-	$Parts = $VersionInfo -Split ': '
-	$ArtifactData = @{
-		ArtifactName = $Parts[0]
-		ArtifactWebAddress = $Parts[1]
+	if ($VersionSpec) {
+
+		$Name = $param['AppName'] +"-" +$Version +"-" +$param['WindowsEndingFile']
+		$WebAddress = $param['BaseLink'] +"/" +$Version +"/" +$Name
+
+		$ArtifactData = @{
+			ArtifactName = $Name
+			ArtifactWebAddress = $WebAddress
+		}
+
+	}
+	else {
+		$Parts = $VersionInfo -Split ': '
+		$ArtifactData = @{
+			ArtifactName = $Parts[0]
+			ArtifactWebAddress = $Parts[1]
+		}
 	}
 
 	return $ArtifactData
 
 }
-
 function Check-AppInstall {
 	param(
 		[parameter(Mandatory, ValueFromPipeline, ValueFromPipelineByPropertyName)]
@@ -284,32 +371,43 @@ function Create-SymLinkToApp {
 		[parameter(Mandatory, ValueFromPipeline, ValueFromPipelineByPropertyName)]
 		[hashtable]$ArtifactData,
 
-		[parameter(Mandatory)]
-		[string]$Folder,
-
 		[parameter()]
 		[bool]$OneFile,
 
 		[parameter()]
-		[bool]$PreRelease,
+		[bool]$PreReleaseFlag,
 
 		[parameter()]
-		[bool]$UnivLink
+		[bool]$VersionSpecFlag,
+
+		[parameter()]
+		[bool]$UnivLink,
+
+		[parameter()]
+		[hashtable]$ScriptDataFilenames
+
+
 	)
+
+	$UserVersions=$ScriptDataFilenames.UserVersions
+	$StableVersions=$ScriptDataFilenames.StableVersions
+	$PreReleaseVersions=$ScriptDataFilenames.PreReleaseVersions
+	$Folder=$ScriptDataFilenames.Folder
+	$AppName=$ScriptDataFilenames.AppName
 
 	$artifact_name = $ArtifactData.ArtifactName
 
 	if(-Not (Test-Path -PathType container $Folder\aliases))
 	{
-		New-Item -Force -ItemType Directory -Path $Folder\aliases
+		$null = New-Item -Force -ItemType Directory -Path $Folder\aliases
 	}
 
 	# First create folder to store alias files if it doesn't exist
 
-	$AliasFile=$Folder+"\aliases\matflow_aliases.csv"
+	$AliasFile=$Folder+"\aliases\aliases.csv"
 
 	if (-Not (Test-Path $AliasFile -PathType leaf)) {
-		New-Item -Force -Path $AliasFile -Type File
+		$null = New-Item -Force -Path $AliasFile -Type File
 	}
 
 	if($OneFile) {
@@ -318,12 +416,12 @@ function Create-SymLinkToApp {
 			Add-Content $AliasFile "`"$artifact_name`",`"$Folder\$artifact_name`",`"`",`"None`""
 		}
 
-		if ($UnivLink) {
-			if ($PreRelease) {
-				$univ_link_name = "matflow-dev"
+		if($UnivLink) {
+			if($PreReleaseFlag) {
+				$univ_link_name = "$AppName-dev"
 			}
 			else {
-				$univ_link_name = "matflow"
+				$univ_link_name = "$AppName"
 			}
 			Add-Content $AliasFile "`"$univ_link_name`",`"$Folder\$artifact_name`",`"`",`"None`""
 		}
@@ -331,6 +429,17 @@ function Create-SymLinkToApp {
 		
 		Write-Host "Type $artifact_name to get started!"
 		Start-Sleep -Milliseconds 100
+
+		if($VersionSpecFlag) {
+			Add-Content $UserVersions "$Folder\$artifact_name"
+		}
+		elseif($PreReleaseFlag){
+			Add-Content $PreReleaseVersions "$Folder\$artifact_name"
+		}
+		else{
+			Add-Content $StableVersions "$Folder\$artifact_name"
+		}
+
 
 	}
 	else {
@@ -343,22 +452,60 @@ function Create-SymLinkToApp {
 			Add-Content $AliasFile "`"$link_name`",`"$Folder\$folder_name\$exe_name`",`"`",`"None`""
 		}
 
-		if ($UnivLink) {
-			if ($PreRelease) {
-				$univ_link_name = "matflow-dev"
+		if($UnivLink) {
+			if($PreRelease) {
+				$univ_link_name = "$AppName-dev"
 			}
 			else {
-				$univ_link_name = "matflow"
+				$univ_link_name = "$AppName"
 			}
-			Add-Content $AliasFile "`"$univ_link_name`",`"$Folder\$artifact_name`",`"`",`"None`""
+			Add-Content $AliasFile "`"$univ_link_name`",`"$Folder\$folder_name\$exe_name`",`"`",`"None`""
+		}
+
+		if($VersionSpecFlag) {
+			Add-Content $UserVersions "$Folder\$folder_name\$exe_name"
+		}
+		elseif($PreReleaseFlag){
+			Add-Content $PreReleaseVersions "$Folder\$folder_name\$exe_name"
+		}
+		else{
+			Add-Content $StableVersions "$Folder\$folder_name\$exe_name"
 		}
 
 		Write-Host "Type $link_name to get started!"
 		Start-Sleep -Milliseconds 100
 	}
 
+	Prune-InstalledVersions -ScriptDataFilenames $ScriptDataFilenames
+
 
 	return  $AliasFile
+
+}
+
+function Prune-InstalledVersions {
+	param(
+		[parameter(Mandatory)]
+		[hashtable]$ScriptDataFilenames
+	)
+
+	Get-Content -tail 3 $ScriptDataFilenames.UserVersions > temp.txt
+	Move-Item -Force temp.txt $ScriptDataFilenames.UserVersions
+
+	Get-Content -tail 3 $ScriptDataFilenames.PreReleaseVersions > temp.txt
+	Move-Item -Force temp.txt $ScriptDataFilenames.PreReleaseVersions
+
+	Get-Content -tail 3 $ScriptDataFilenames.StableVersions > temp.txt
+	Move-Item -Force temp.txt $ScriptDataFilenames.StableVersions
+
+	$ToKeepWildCard = $ScriptDataFilenames.Folder +"\\*_versions.txt"
+
+	$to_keep=Get-Content $ToKeepWildCard
+
+	$AppWildCard = $ScriptDataFilenames.AppName+"*"
+
+	Get-ChildItem $AppWildCard $ScriptDataFilenames.Folder | Where-Object { $to_keep.txt -notcontains $_.name } |`
+	Remove-Item -whatif
 
 }
 
@@ -369,7 +516,7 @@ function Add-SymLinkFolderToPath {
 	)
 
 	if(-Not (Test-Path $profile)) {
-		New-Item -Force -Path $profile -Type File
+		$null = New-Item -Force -Path $profile -Type File
 	}
 
 	$ImportString = "Import-Alias $AliasFile" 
@@ -381,4 +528,4 @@ function Add-SymLinkFolderToPath {
 
 }
 
-Install-MatFlowApplication @PSBoundParameters
+Install-Application @PSBoundParameters
