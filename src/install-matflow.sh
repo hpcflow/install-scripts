@@ -361,12 +361,12 @@ create_universal_symlink() {
 clear_up_installed_versions () {
 
 	# Keep most recent 3 latest stable versions
-	tail -n3 "${folder}"/stable_versions.txt > ${folder}/stable_versions_to_keep.txt
-	mv ${folder}/stable_versions_to_keep.txt ${folder}/stable_versions.txt
+	tail -n3 "${folder}/stable_versions.txt" > "${folder}/stable_versions_to_keep.txt"
+	mv "${folder}/stable_versions_to_keep.txt" "${folder}/stable_versions.txt"
 
 	# Keep most recent 3 latest prerelease versions
-	tail -n3 "${folder}"/prerelease_versions.txt > ${folder}/prerelease_versions_to_keep.txt
-	mv ${folder}/prerelease_versions_to_keep.txt ${folder}/prerelease_versions.txt
+	tail -n3 "${folder}/prerelease_versions.txt" > "${folder}/prerelease_versions_to_keep.txt"
+	mv "${folder}/prerelease_versions_to_keep.txt" "${folder}/prerelease_versions.txt"
 
 	# Remove versioned symlinks
 	find "${folder}"/links/"${app_name}"-v* $(cat "${folder}"/stable_versions.txt 2>/dev/null) $(cat "${folder}"/user_versions.txt 2>/dev/null) $(cat "${folder}"/prerelease_versions.txt 2>/dev/null) -delete
