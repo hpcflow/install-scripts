@@ -82,7 +82,7 @@ jobs:
       - name: Run script
         id: run-script
         run: |
-          $ScriptOutput = & $([scriptblock]::Create((New-Object Net.WebClient).DownloadString('https://raw.githubusercontent.com/hpcflow/install-scripts/${{ env.BRANCH_NAME }}/src/install-matflow.ps1'))) -PreRelease -OneFile -UnivLink 6>&1
+          $ScriptOutput = & $([scriptblock]::Create((New-Object Net.WebClient).DownloadString('https://raw.githubusercontent.com/hpcflow/install-scripts/${{ env.BRANCH_NAME }}/src/install-matflow.ps1'))) -PreRelease -UnivLink 6>&1
           echo "ART_NAME_UNIV=matflow-dev" >> $env:GITHUB_ENV
 
       - name: Check results
