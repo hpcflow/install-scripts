@@ -150,7 +150,7 @@ function Check-InstallDir {
 	)
 
 	if(-Not (Test-Path $Folder)) {
-		New-Item -Force -ItemType Directory $Folder
+		$null = New-Item -Force -ItemType Directory $Folder
 	}
 
 }
@@ -399,7 +399,7 @@ function Create-SymLinkToApp {
 
 	if(-Not (Test-Path -PathType container $Folder\aliases))
 	{
-		New-Item -Force -ItemType Directory -Path $Folder\aliases
+		$null = New-Item -Force -ItemType Directory -Path $Folder\aliases
 	}
 
 	# First create folder to store alias files if it doesn't exist
@@ -407,7 +407,7 @@ function Create-SymLinkToApp {
 	$AliasFile=$Folder+"\aliases\aliases.csv"
 
 	if (-Not (Test-Path $AliasFile -PathType leaf)) {
-		New-Item -Force -Path $AliasFile -Type File
+		$null = New-Item -Force -Path $AliasFile -Type File
 	}
 
 	if($OneFile) {
@@ -516,7 +516,7 @@ function Add-SymLinkFolderToPath {
 	)
 
 	if(-Not (Test-Path $profile)) {
-		New-Item -Force -Path $profile -Type File
+		$null = New-Item -Force -Path $profile -Type File
 	}
 
 	$ImportString = "Import-Alias $AliasFile" 
