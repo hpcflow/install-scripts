@@ -504,7 +504,7 @@ function Prune-InstalledVersions {
 
 	$AppWildCard = $ScriptDataFilenames.AppName+"*"
 
-	Get-ChildItem $AppWildCard $ScriptDataFilenames.Folder | Where-Object { $to_keep.txt -notcontains $_.name } |`
+	Get-ChildItem $AppWildCard $ScriptDataFilenames.Folder | Where-Object { $to_keep -notcontains $_.name } |`
 	Remove-Item -whatif
 
 }
