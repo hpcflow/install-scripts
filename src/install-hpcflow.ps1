@@ -46,7 +46,6 @@ function Install-Application {
 				}
 		}
 		Write-Host "Installation of" $AppName "unsuccessful. $_"
-		#Exit
 		break
 	}
 
@@ -488,6 +487,8 @@ function Prune-InstalledVersions {
 		[parameter(Mandatory)]
 		[hashtable]$ScriptDataFilenames
 	)
+
+	RUBBISH!
 
 	Get-Content -tail 3 $ScriptDataFilenames.UserVersions > temp.txt
 	Move-Item -Force temp.txt $ScriptDataFilenames.UserVersions
