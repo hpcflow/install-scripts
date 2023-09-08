@@ -47,7 +47,7 @@ function Install-Application {
 		}
 		Write-Host "Installation of" $AppName "unsuccessful. $_"
 		#Exit
-		Return
+		break
 	}
 
 	$AppName = "hpcflow"
