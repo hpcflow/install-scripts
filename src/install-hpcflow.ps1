@@ -35,17 +35,18 @@ function Install-Application {
 		[switch]$UnivLink
 
 	)
-	trap{
+	Trap{
 		# Check if DownloadFolder variable has been created. If it has, delete folder it points to.
 
 		# First check variable exists (i.e. is not null)
-		if($DownloadFolder){
+		#if($DownloadFolder){
 			# Next check if folder exists
-			if(Test-Path -Path $DownloadFolder){
-				Remove-Item $DownloadFolder
-				}
-		}
-		Write-Host "Installation of" $AppName "unsuccessful. $_"
+		#	if(Test-Path -Path $DownloadFolder){
+		#		Remove-Item $DownloadFolder
+		#		}
+		#}
+
+		Write-Output "Installation of" $AppName "unsuccessful. $_"
 	}
 
 	$AppName = "hpcflow"
