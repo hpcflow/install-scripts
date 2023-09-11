@@ -47,6 +47,7 @@ function Install-Application {
 		#}
 
 		Write-Output "Installation of" $AppName "unsuccessful. $_"
+		return
 	}
 
 	$AppName = "hpcflow"
@@ -533,5 +534,5 @@ function Add-SymLinkFolderToPath {
 
 }
 
-Trap{'Oh dear!'}
+Trap {Write-Output "Oh dear!"}
 Install-Application @PSBoundParameters
