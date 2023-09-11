@@ -487,6 +487,10 @@ function Prune-InstalledVersions {
 		[parameter(Mandatory)]
 		[hashtable]$ScriptDataFilenames
 	)
+	Trap {
+		Write-Output "HI THERE!"
+	}
+
 
 	RUBBISH!
 
