@@ -533,4 +533,5 @@ function Add-SymLinkFolderToPath {
 
 }
 
+Trap{'Oh dear!'}
 Install-Application @PSBoundParameters
