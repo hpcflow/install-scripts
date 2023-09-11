@@ -46,9 +46,7 @@ function Install-Application {
 			}
 		}
 
-		Write-Output ""
 		Write-Output "Installation of" $AppName "unsuccessful."
-		Write-Output ""
 		Write-Output "Error:"
 		Write-Output "$_"
 		return
