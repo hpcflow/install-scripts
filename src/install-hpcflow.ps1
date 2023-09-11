@@ -46,9 +46,9 @@ function Install-Application {
 			}
 		}
 
-		Write-Output "Installation of" $AppName "unsuccessful."
-		Write-Output "Error:"
-		Write-Output "$_"
+		Write-Host"Installation of" $AppName "unsuccessful."
+		Write-Host "Error:"
+		Write-Host "$_"
 		return
 	}
 
