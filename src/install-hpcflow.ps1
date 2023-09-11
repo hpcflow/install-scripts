@@ -46,7 +46,11 @@ function Install-Application {
 			}
 		}
 
-		Write-Output "Installation of" $AppName "unsuccessful. $_"
+		Write-Output ""
+		Write-Output "Installation of" $AppName "unsuccessful."
+		Write-Output ""
+		Write-Output "Error:"
+		Write-Output "$_"
 		return
 	}
 
@@ -490,9 +494,6 @@ function Prune-InstalledVersions {
 		[parameter(Mandatory)]
 		[hashtable]$ScriptDataFilenames
 	)
-	Trap {
-		Write-Output "HI THERE!"
-	}
 
 	Get-Content -tail 3 $ScriptDataFilenames.UserVersions > temp.txt
 	Move-Item -Force temp.txt $ScriptDataFilenames.UserVersions
@@ -533,5 +534,4 @@ function Add-SymLinkFolderToPath {
 
 }
 
-Trap {Write-Output "Oh dear!"}
 Install-Application @PSBoundParameters
