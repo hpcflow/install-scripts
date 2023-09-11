@@ -47,6 +47,7 @@ function Install-Application {
 		}
 
 		Write-Output "Installation of" $AppName "unsuccessful. $_"
+		return
 	}
 
 	$AppName = "hpcflow"
@@ -115,6 +116,8 @@ function Install-Application {
 	$DownloadFolder = New-TemporaryFolder
 
 	$param = Get-ScriptParameters -AppName $AppName 
+
+	RUBBISH
 
 	Get-ScriptParameters -AppName $AppName | `
 	Get-LatestReleaseInfo -PreRelease $PreReleaseFlag | `
@@ -490,9 +493,6 @@ function Prune-InstalledVersions {
 	Trap {
 		Write-Output "HI THERE!"
 	}
-
-
-	RUBBISH!
 
 	Get-Content -tail 3 $ScriptDataFilenames.UserVersions > temp.txt
 	Move-Item -Force temp.txt $ScriptDataFilenames.UserVersions
