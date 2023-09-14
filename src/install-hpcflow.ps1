@@ -53,7 +53,7 @@ function Install-Application {
 		Write-Host "$_"
 		Write-Host "***************************************"
 		Write-Host "***************************************"
-		throw $_
+		break
 	}
 
 	$AppName = "hpcflow"
