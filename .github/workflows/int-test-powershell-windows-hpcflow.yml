@@ -51,7 +51,7 @@ jobs:
       - name: Run script
         id: run-script
         run: |
-          $ScriptOutput = & $([scriptblock]::Create((New-Object Net.WebClient).DownloadString('https://raw.githubusercontent.com/hpcflow/install-scripts/${{ env.BRANCH_NAME }}/src/install-hpcflow.ps1'))) -PreRelease -OneFile 
+          $ScriptOutput = & $([scriptblock]::Create((New-Object Net.WebClient).DownloadString('https://raw.githubusercontent.com/hpcflow/install-scripts/${{ env.BRANCH_NAME }}/src/install-hpcflow.ps1'))) -PreRelease -OneFile 6>&1
           Write-Host $ScriptOutput
           $ScriptOutputSplit = $ScriptOutput -Split " "
           $artifact_name = $ScriptOutputSplit[16]
@@ -83,7 +83,7 @@ jobs:
       - name: Run script
         id: run-script
         run: |
-          $ScriptOutput = & $([scriptblock]::Create((New-Object Net.WebClient).DownloadString('https://raw.githubusercontent.com/hpcflow/install-scripts/${{ env.BRANCH_NAME }}/src/install-hpcflow.ps1'))) -PreRelease -OneFile -UnivLink
+          $ScriptOutput = & $([scriptblock]::Create((New-Object Net.WebClient).DownloadString('https://raw.githubusercontent.com/hpcflow/install-scripts/${{ env.BRANCH_NAME }}/src/install-hpcflow.ps1'))) -PreRelease -OneFile -UnivLink 6>&1
           echo "ART_NAME_UNIV=hpcflow-dev" >> $env:GITHUB_ENV
 
       - name: Check results

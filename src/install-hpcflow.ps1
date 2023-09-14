@@ -123,8 +123,6 @@ function Install-Application {
 
 	$param = Get-ScriptParameters -AppName $AppName 
 
-	RUBBISH
-
 	Get-ScriptParameters -AppName $AppName | `
 	Get-LatestReleaseInfo -PreRelease $PreReleaseFlag | `
 	Extract-WindowsInfo -FileEnding $ArtifactEnding | `
