@@ -47,9 +47,11 @@ function Install-Application {
 		}
 	
 		Write-Host "****************************************"
+		Write-Host "****************************************"
 		Write-Host "Installation of" $AppName "unsuccessful."
 		Write-Host "Error:"
 		Write-Host "$_"
+		Write-Host "***************************************"
 		Write-Host "***************************************"
 		return
 	}
