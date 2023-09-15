@@ -467,13 +467,13 @@ function Create-SymLinkToApp {
 		}
 
 		if($VersionSpecFlag) {
-			Add-Content $UserVersions "$Folder\$folder_name\$exe_name"
+			Add-Content $UserVersions "$Folder\$folder_name"
 		}
 		elseif($PreReleaseFlag){
-			Add-Content $PreReleaseVersions "$Folder\$folder_name\$exe_name"
+			Add-Content $PreReleaseVersions "$Folder\$folder_name"
 		}
 		else{
-			Add-Content $StableVersions "$Folder\$folder_name\$exe_name"
+			Add-Content $StableVersions "$Folder\$folder_name"
 		}
 
 		Write-Host "Type $link_name to get started!"
