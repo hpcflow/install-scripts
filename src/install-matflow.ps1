@@ -300,8 +300,7 @@ function Check-AppInstall {
 			Start-Sleep -Milliseconds 50
 			Write-Host "Exiting..."
 			Start-Sleep -Milliseconds 100
-			#Exit
-			Return
+			break
 		}
 	}
 	Else {
@@ -311,8 +310,7 @@ function Check-AppInstall {
 			Start-Sleep -Milliseconds 50
 			Write-Host "Exiting..."
 			Start-Sleep -Milliseconds 100
-			#Exit
-			Return
+			break
 		}
 	}
 
