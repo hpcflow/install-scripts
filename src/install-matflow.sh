@@ -372,7 +372,7 @@ clear_up_installed_versions () {
 	find "${folder}"/links/"${app_name}"-v* $(cat "${folder}"/stable_versions.txt 2>/dev/null) $(cat "${folder}"/user_versions.txt 2>/dev/null) $(cat "${folder}"/prerelease_versions.txt 2>/dev/null) -delete
 
 	# Remove installed apps
-	find "${folder}"/"${app_name}"-v* $(cat "${folder}"/stable_versions.txt 2>/dev/null) $(cat "${folder}"/user_versions.txt 2>/dev/null) $(cat "${folder}"/prerelease_versions.txt 2>/dev/null) -delete
+	find "${folder}"/"${app_name}"-v* -maxdepth 0 $(cat "${folder}"/stable_versions.txt 2>/dev/null) $(cat "${folder}"/user_versions.txt 2>/dev/null) $(cat "${folder}"/prerelease_versions.txt 2>/dev/null) -delete
 
 }
 
