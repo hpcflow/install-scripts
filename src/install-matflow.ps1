@@ -418,6 +418,7 @@ function Create-SymLinkToApp {
 		
 		if (-Not (Get-Content $AliasFile | %{$_ -match $artifact_name})) {
 			Add-Content $AliasFile "`"$artifact_name`",`"$Folder\$artifact_name`",`"`",`"None`""
+			$link_name_to_print = $artifact_name
 		}
 
 		if($UnivLink) {
@@ -428,11 +429,8 @@ function Create-SymLinkToApp {
 				$univ_link_name = "$AppName"
 			}
 			Add-Content $AliasFile "`"$univ_link_name`",`"$Folder\$artifact_name`",`"`",`"None`""
+			$link_name_to_print = $univ_link_name
 		}
-
-		
-		Write-Host "Type $artifact_name to get started!"
-		Start-Sleep -Milliseconds 100
 
 		if($VersionSpecFlag) {
 			Add-Content $UserVersions "$Folder\$artifact_name"
@@ -454,6 +452,7 @@ function Create-SymLinkToApp {
 		
 		if (-Not (Get-Content $AliasFile | %{$_ -match $link_name})) {
 			Add-Content $AliasFile "`"$link_name`",`"$Folder\$folder_name\$exe_name`",`"`",`"None`""
+			$link_name_to_print = $link_name
 		}
 
 		if($UnivLink) {
@@ -464,6 +463,7 @@ function Create-SymLinkToApp {
 				$univ_link_name = "$AppName"
 			}
 			Add-Content $AliasFile "`"$univ_link_name`",`"$Folder\$folder_name\$exe_name`",`"`",`"None`""
+			$link_name_to_print = $univ_link_name
 		}
 
 		if($VersionSpecFlag) {
@@ -476,9 +476,10 @@ function Create-SymLinkToApp {
 			Add-Content $StableVersions "$Folder\$folder_name"
 		}
 
-		Write-Host "Type $link_name to get started!"
-		Start-Sleep -Milliseconds 100
 	}
+
+	Write-Host "Re-open the terminal and type `"$link_name_to_print`" to get started, or enter `"& `$profile`" followed by `"$link_name_to_print`" to start immediately."
+	Start-Sleep -Milliseconds 100
 
 	Prune-InstalledVersions -ScriptDataFilenames $ScriptDataFilenames
 
