@@ -55,6 +55,7 @@ jobs:
           Write-Host $ScriptOutput
           $ScriptOutputSplit = $ScriptOutput -Split " "
           $artifact_name = $ScriptOutputSplit[20]
+          $artifact_name = $artifact_name.Trim("`"")
           echo "ART_NAME=$artifact_name" >> $env:GITHUB_ENV
 
       - name: Check results
