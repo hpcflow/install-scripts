@@ -52,6 +52,7 @@ jobs:
         id: run-script
         run: |
           $ScriptOutput = & $([scriptblock]::Create((New-Object Net.WebClient).DownloadString('https://raw.githubusercontent.com/hpcflow/install-scripts/${{ env.BRANCH_NAME }}/src/install-matflow.ps1'))) -PreRelease -OneFile 6>&1
+          Write-Host $ScriptOutput
           $ScriptOutputSplit = $ScriptOutput -Split " "
           $artifact_name = $ScriptOutputSplit[20]
           $artifact_name = $artifact_name.Trim("`"")
@@ -85,6 +86,7 @@ jobs:
         id: run-script
         run: |
           $ScriptOutput = & $([scriptblock]::Create((New-Object Net.WebClient).DownloadString('https://raw.githubusercontent.com/hpcflow/install-scripts/${{ env.BRANCH_NAME }}/src/install-matflow.ps1'))) -PreRelease -OneFile -UnivLink 6>&1
+          Write-Host $ScriptOutput
           echo "ART_NAME_UNIV=matflow-dev" >> $env:GITHUB_ENV
 
       - name: Check results
