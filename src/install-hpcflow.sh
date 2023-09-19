@@ -338,20 +338,20 @@ create_universal_symlink() {
 
 			if [ "$prerelease" == true ]; then
 				ln -sf "${folder}/${artifact_name}" "${folder}/links/${app_name}-dev"
-				univ_symstring="${app_name}-dev or ${artifact_name}"
+				univ_symstring="${app_name}-dev"
 			else
 				ln -sf "${folder}/${artifact_name}" "${folder}/links/${app_name}}"
-				univ_symstring="${app_name} or ${artifact_name}"
+				univ_symstring="${app_name}"
 			fi
 		
 		else
 
 			if [ "$prerelease" == true ]; then
 				ln -sf "${folder}/${folder_name}/${folder_name}" "${folder}/links/${app_name}-dev"
-				univ_symstring="${app_name}-dev or ${folder_name}"
+				univ_symstring="${app_name}-dev"
 			else
 				ln -sf "${folder}/${folder_name}/${folder_name}" "${folder}/links/${app_name}"
-				univ_symstring="${app_name} or ${folder_name}"
+				univ_symstring="${app_name}"
 			fi
 
 		fi
@@ -403,17 +403,29 @@ add_to_path () {
 
 print_post_install_info () {
 
+	if [ -f ~/.zshrc ]; then
+		rcname="~/.zshrc"
+	fi
+
+	if [ -f ~/.bashrc ]; then
+		rcname="~/.bashrc"
+	fi
+
 	echo $completion_string_1
 	sleep 0.2
 	if [ "$path" != true ] && [ "$onpath" != true ]; then
 		echo
 		echo
-		echo "Add "${app_name}" to path by adding the following line to ~/.bashrc or ~/.zshrc:"
+		echo "Add "${app_name}" to path by adding the following line to ${rcname}:"
 		echo "export PATH=\"\$PATH:"${folder}"/links\""
 	fi
 	echo
 	echo
-	echo "Re-open terminal and then type ${versioned_symstring} to get started."
+	if [ "$univlink" == true ]; then
+		echo "Re-open terminal and type \"${univ_symstring}\" to get started, or type \"source ${rcname}\" followed by \"${univ_symstring}\" to start immediately." 
+	else
+		echo "Re-open terminal and type \"${versioned_symstring}\" to get started, or type \"source ${rcname}\" followed by \"${versioned_symstring}\" to start immediately." 
+	fi
 
 }
 
