@@ -78,11 +78,11 @@ function Install-Application {
 		$VersionType = "latest stable"
 	}
 
-	if( $UnivLink.IsPresent) {
+	if($UnivLink.IsPresent) {
 		$UnivLinkFlag = $true
 	}
 	else {
-		$UnivLinkFlag = $true
+		$UnivLinkFlag = $false
 	}
 
 
