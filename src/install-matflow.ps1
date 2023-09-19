@@ -78,11 +78,11 @@ function Install-Application {
 		$VersionType = "latest stable"
 	}
 
-	if( $UnivLink.IsPresent) {
+	if($UnivLink.IsPresent) {
 		$UnivLinkFlag = $true
 	}
 	else {
-		$UnivLinkFlag = $true
+		$UnivLinkFlag = $false
 	}
 
 
@@ -449,6 +449,7 @@ function Create-SymLinkToApp {
 		$link_name = $artifact_name.Replace(".zip","")
 		$folder_name = $link_name
 		$exe_name = $artifact_name.Replace(".zip",".exe")
+		$link_name_to_print = $link_name
 		
 		if (-Not (Get-Content $AliasFile | %{$_ -match $link_name})) {
 			Add-Content $AliasFile "`"$link_name`",`"$Folder\$folder_name\$exe_name`",`"`",`"None`""
