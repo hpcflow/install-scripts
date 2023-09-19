@@ -51,7 +51,7 @@ jobs:
       - name: Run script
         run: |
           script_output=`(touch tmp.sh && curl -fsSL https://raw.githubusercontent.com/hpcflow/install-scripts/${{ env.BRANCH_NAME }}/src/install-matflow.sh > tmp.sh && bash tmp.sh --prerelease --path --onefile) ; rm tmp.sh`
-          artifact_name=`echo $script_output | grep matflow- | cut -d " " -f 30`
+          artifact_name=`echo $script_output | grep matflow- | cut -d " " -f 29`
           echo "ART_NAME=$artifact_name" >> $GITHUB_ENV
 
       - name: Run Matflow test suite
