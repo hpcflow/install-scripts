@@ -54,7 +54,7 @@ jobs:
           $ScriptOutput = & $([scriptblock]::Create((New-Object Net.WebClient).DownloadString('https://raw.githubusercontent.com/hpcflow/install-scripts/${{ env.BRANCH_NAME }}/src/install-hpcflow.ps1'))) -PreRelease -OneFile 6>&1
           Write-Host $ScriptOutput
           $ScriptOutputSplit = $ScriptOutput -Split " "
-          $artifact_name = $ScriptOutputSplit[16]
+          $artifact_name = $ScriptOutputSplit[20]
           echo "ART_NAME=$artifact_name" >> $env:GITHUB_ENV
 
       - name: Check results
