@@ -429,8 +429,8 @@ function Create-SymLinkToApp {
 				$univ_link_name = "$AppName"
 			}
 			Add-Content $AliasFile "`"$univ_link_name`",`"$Folder\$artifact_name`",`"`",`"None`""
-			$link_name_to_print = $univ_link_name
 		}
+		$link_name_to_print = $univ_link_name
 
 		if($VersionSpecFlag) {
 			Add-Content $UserVersions "$Folder\$artifact_name"
@@ -449,6 +449,7 @@ function Create-SymLinkToApp {
 		$link_name = $artifact_name.Replace(".zip","")
 		$folder_name = $link_name
 		$exe_name = $artifact_name.Replace(".zip",".exe")
+		$link_name_to_print = $link_name
 		
 		if (-Not (Get-Content $AliasFile | %{$_ -match $link_name})) {
 			Add-Content $AliasFile "`"$link_name`",`"$Folder\$folder_name\$exe_name`",`"`",`"None`""
@@ -463,7 +464,6 @@ function Create-SymLinkToApp {
 				$univ_link_name = "$AppName"
 			}
 			Add-Content $AliasFile "`"$univ_link_name`",`"$Folder\$folder_name\$exe_name`",`"`",`"None`""
-			$link_name_to_print = $univ_link_name
 		}
 
 		if($VersionSpecFlag) {
