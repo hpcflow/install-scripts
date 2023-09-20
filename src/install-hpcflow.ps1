@@ -433,13 +433,13 @@ function Create-SymLinkToApp {
 		}
 
 		if($VersionSpecFlag) {
-			Add-Content $UserVersions "$Folder\$artifact_name"
+			Add-Content $UserVersions "$artifact_name"
 		}
 		elseif($PreReleaseFlag){
-			Add-Content $PreReleaseVersions "$Folder\$artifact_name"
+			Add-Content $PreReleaseVersions "$artifact_name"
 		}
 		else{
-			Add-Content $StableVersions "$Folder\$artifact_name"
+			Add-Content $StableVersions "$artifact_name"
 		}
 
 
@@ -468,13 +468,13 @@ function Create-SymLinkToApp {
 		}
 
 		if($VersionSpecFlag) {
-			Add-Content $UserVersions "$Folder\$folder_name"
+			Add-Content $UserVersions "$folder_name"
 		}
 		elseif($PreReleaseFlag){
-			Add-Content $PreReleaseVersions "$Folder\$folder_name"
+			Add-Content $PreReleaseVersions "$folder_name"
 		}
 		else{
-			Add-Content $StableVersions "$Folder\$folder_name"
+			Add-Content $StableVersions "$folder_name"
 		}
 
 	}
@@ -509,6 +509,8 @@ function Prune-InstalledVersions {
 	$to_keep=Get-Content $ToKeepWildCard
 
 	$AppWildCard = $ScriptDataFilenames.AppName+"*"
+
+	Get-ChildItem $AppWildCard -Path $ScriptDataFilenames.Folder | Write-Host
 
 	Get-ChildItem $AppWildCard -Path $ScriptDataFilenames.Folder | Where-Object { $to_keep -notcontains $_.name } |`
 	Remove-Item -Recurse -whatif
