@@ -337,7 +337,7 @@ unzip_and_move_onefile_version() {
 create_versioned_symlink() {
 
 	if [ "$onefile" == true ]; then
-	
+
 		ln -sf "${folder}/${artifact_name}" "${folder}/links/${artifact_name}"
 		install_name=${artifact_name}
 		versioned_symstring="${artifact_name}"
@@ -371,7 +371,7 @@ create_universal_symlink() {
 				ln -sf "${folder}/${artifact_name}" "${folder}/links/${app_name}}"
 				univ_symstring="${app_name}"
 			fi
-		
+
 		else
 
 			if [ "$prerelease" == true ]; then
