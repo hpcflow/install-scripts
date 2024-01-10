@@ -300,6 +300,10 @@ check_if_symlink_folder_on_path() {
 	*) ;;
 	esac
 
+	# or in rc_file
+	if grep -q "export PATH=\"\$PATH:"${folder}"/links\"" $rc_file; then
+		onpath=true
+	fi
 }
 
 download_artifact_to_temp() {
