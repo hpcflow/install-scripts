@@ -3,6 +3,8 @@ run_main() {
 
 	check_prerequisites
 
+	get_rc_file
+
 	set_variables
 
 	set_flags
@@ -412,45 +414,41 @@ keep_most_recent_stable () {
 
 }
 
+get_rc_file () {
+	# Store .bashrc or .zshrc in a variable
+	if [ -f ~/.zshrc ]; then
+		rc_file="~/.zshrc"
+	elif [ -f ~/.bashrc ]; then
+		rc_file="~/.bashrc"
+	fi
+}
+
 add_to_path () {
 
-	# Check which files exist
-	if [ -f ~/.zshrc ] && [[ "$onpath" = false ]]; then
-		echo "Updating ~/.zshrc..."
-		echo "export PATH=\"\$PATH:"${folder}"/links\"" >>~/.zshrc
+	# Update the (bash/zsh)rc file
+	if [ -f $rc_file ] && [[ "$onpath" = false ]]; then
+		echo "Updating $rc_file..."
+		echo "export PATH=\"\$PATH:"${folder}"/links\"" >> $rc_file
 	fi
-
-	if [ -f ~/.bashrc ] && [[ "$onpath" = false ]]; then
-		echo "Updating ~/.bashrc..."
-		echo "export PATH=\"\$PATH:"${folder}"/links\"" >>~/.bashrc
-	fi
-
 }
 
 print_post_install_info () {
 
-	if [ -f ~/.zshrc ]; then
-		rcname="~/.zshrc"
-	fi
-
-	if [ -f ~/.bashrc ]; then
-		rcname="~/.bashrc"
-	fi
 
 	echo $completion_string_1
 	sleep 0.2
 	if [ "$path" != true ] && [ "$onpath" != true ]; then
 		echo
 		echo
-		echo "Add "${app_name}" to path by adding the following line to ${rcname}:"
+		echo "Add "${app_name}" to path by adding the following line to ${rc_file}:"
 		echo "export PATH=\"\$PATH:"${folder}"/links\""
 	fi
 	echo
 	echo
 	if [ "$univlink" == true ]; then
-		echo "Re-open terminal and type \"${univ_symstring}\" to get started, or type \"source ${rcname}\" followed by \"${univ_symstring}\" to start immediately." 
+		echo "Re-open terminal and type \"${univ_symstring}\" to get started, or type \"source ${rc_file}\" followed by \"${univ_symstring}\" to start immediately."
 	else
-		echo "Re-open terminal and type \"${versioned_symstring}\" to get started, or type \"source ${rcname}\" followed by \"${versioned_symstring}\" to start immediately." 
+		echo "Re-open terminal and type \"${versioned_symstring}\" to get started, or type \"source ${rc_file}\" followed by \"${versioned_symstring}\" to start immediately."
 	fi
 
 }
