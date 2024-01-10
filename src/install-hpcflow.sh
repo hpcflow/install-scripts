@@ -296,7 +296,7 @@ check_if_symlink_folder_on_path() {
 
 	# Check if folders on path already
 	case :$PATH: in
-	*:"${folder}"/links:) onpath=true ;;
+	*:"${folder}"/links:*) onpath=true ;;
 	*) ;;
 	esac
 
