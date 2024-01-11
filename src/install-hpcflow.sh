@@ -421,9 +421,9 @@ keep_most_recent_stable () {
 get_rc_file () {
 	# Store .bashrc or .zshrc in a variable
 	if [ -f ~/.zshrc ]; then
-		rc_file="~/.zshrc"
+		rc_file=~/.zshrc
 	elif [ -f ~/.bashrc ]; then
-		rc_file="~/.bashrc"
+		rc_file=~/.bashrc
 	fi
 }
 

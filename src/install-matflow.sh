@@ -341,7 +341,7 @@ unzip_and_move_onefile_version() {
 create_versioned_symlink() {
 
 	if [ "$onefile" == true ]; then
-	
+
 		ln -sf "${folder}/${artifact_name}" "${folder}/links/${artifact_name}"
 		install_name=${artifact_name}
 		versioned_symstring="${artifact_name}"
@@ -375,7 +375,7 @@ create_universal_symlink() {
 				ln -sf "${folder}/${artifact_name}" "${folder}/links/${app_name}}"
 				univ_symstring="${app_name}"
 			fi
-		
+
 		else
 
 			if [ "$prerelease" == true ]; then
@@ -421,9 +421,9 @@ keep_most_recent_stable () {
 get_rc_file () {
 	# Store .bashrc or .zshrc in a variable
 	if [ -f ~/.zshrc ]; then
-		rc_file="~/.zshrc"
+		rc_file=~/.zshrc
 	elif [ -f ~/.bashrc ]; then
-		rc_file="~/.bashrc"
+		rc_file=~/.bashrc
 	fi
 }
 
