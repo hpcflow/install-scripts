@@ -462,13 +462,12 @@ purge_application (){
 
 	echo "Purging local install of "${app_name}"..."
 	sleep 0.2
-	echo "I say we take off and nuke the entire site from orbit. It's the only way to be sure."
-	# echo "Deleting "${app_name}" folder "${folder}"..."
-	# sleep 0.2
-	#rm -r  "${folder}"
-	# echo "Removing "${app_name}" folder "$folder}" from path..."
-	# sleep 0.2
-	# COMMAND GOES HERE
+	echo "Deleting "${app_name}" folder "${folder}"..."
+	sleep 0.2
+	rm -r  "${folder}"
+	echo "Removing "${app_name}" folder "{$folder}" from path..."
+	sleep 0.2
+	sed -i "\#$add_to_path_command#d" $rc_file
 
 }
 
