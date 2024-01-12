@@ -301,7 +301,8 @@ check_if_symlink_folder_on_path() {
 	esac
 
 	# or in rc_file
-	if grep -q "export PATH=\"\$PATH:"${folder}"/links\"" $rc_file; then
+	add_to_path_command="export PATH=\"\$PATH:"${folder}"/links\""
+	if grep -q "$add_to_path_command" $rc_file; then
 		onpath=true
 	fi
 }
@@ -432,7 +433,7 @@ add_to_path () {
 	# Update the (bash/zsh)rc file
 	if [ -f $rc_file ] && [[ "$onpath" = false ]]; then
 		echo "Updating $rc_file..."
-		echo "export PATH=\"\$PATH:"${folder}"/links\"" >> $rc_file
+		echo $add_to_path_command >> $rc_file
 	fi
 }
 
@@ -445,7 +446,7 @@ print_post_install_info () {
 		echo
 		echo
 		echo "Add "${app_name}" to path by adding the following line to ${rc_file}:"
-		echo "export PATH=\"\$PATH:"${folder}"/links\""
+		echo $add_to_path_command
 	fi
 	echo
 	echo
