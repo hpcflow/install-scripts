@@ -29,7 +29,7 @@ run_main() {
 	folder_name="${app_name}-${version}-${app_name_ending}"
 	download_link="${base_link}/${version}/${artifact_name}"
 
-	if [ "$purge" != true ]; then
+	if [ "$purge" != true ] && [ $desired_version_is_installed != true ]; then
 
 		download_artifact_to_temp
 
@@ -280,14 +280,12 @@ create_install_tracker_files() {
 }
 
 check_if_desired_version_installed() {
-
+	desired_version_is_installed=false
 	if [ $(grep -c "${version}-${app_name_ending}" "${folder}"/user_versions.txt) -ge 1 ] || [ $(grep -c "${version}-${app_name_ending}" "${folder}"/stable_versions.txt) -ge 1 ]; then
 
 		echo "${app_name} ${version} already installed on this system... "
 		sleep 0.2
-		echo "Exiting..."
-		exit 1
-
+		desired_version_is_installed=true
 	fi
 
 }
