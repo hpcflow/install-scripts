@@ -1,6 +1,8 @@
 #!/bin/bash
 run_main() {
 
+	check_prerequisites
+
 	set_variables
 
 	set_flags
@@ -74,6 +76,30 @@ run_main() {
 	trap "exit 1" HUP INT PIPE QUIT TERM
 	trap 'rm -rf $TEMPD' EXIT
 
+}
+
+is_software_installed() {
+	# Check that software is available on system
+	# Exit if any software is missing
+    software_missing=false
+    for tool in $@
+    do
+        if ! command -v $tool &> /dev/null
+        then
+            echo "$tool could not be found"
+            software_missing=true
+        fi
+    done
+
+    if $software_missing
+    then
+        exit 1
+    fi
+}
+
+check_prerequisites() {
+	# Check whether prerequisite software is available
+	is_software_installed mktemp curl grep unzip
 }
 
 set_variables() {
