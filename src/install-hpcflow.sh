@@ -460,12 +460,17 @@ purge_application (){
 
 	echo "Purging local install of "${app_name}"..."
 	sleep 0.2
-	echo "Deleting "${app_name}" folder "${folder}"..."
-	sleep 0.2
-	rm -r  "${folder}"
-	echo "Removing "${app_name}" folder "{$folder}" from path..."
-	sleep 0.2
-	sed -i "\#$add_to_path_command#d" $rc_file
+	if [ -d ${folder} ]; then
+		echo "Deleting "${app_name}" folder "${folder}"..."
+		sleep 0.2
+		rm -r  "${folder}"
+		echo "Removing "${app_name}" folder "${folder}" from path..."
+		sleep 0.2
+		sed -i "\#$add_to_path_command#d" $rc_file
+	else
+		echo "Directory ${folder} not found."
+		echo "If you chose a custom install path, please try again adding the '--folder' option."
+	fi
 
 }
 
