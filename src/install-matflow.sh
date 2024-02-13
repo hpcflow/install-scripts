@@ -29,7 +29,7 @@ run_main() {
 	folder_name="${app_name}-${version}-${app_name_ending}"
 	download_link="${base_link}/${version}/${artifact_name}"
 
-	if [ "$purge" != true ]; then
+	if [ "$purge" != true ] && [ $desired_version_is_installed != true ]; then
 
 		download_artifact_to_temp
 
@@ -280,14 +280,12 @@ create_install_tracker_files() {
 }
 
 check_if_desired_version_installed() {
-
+	desired_version_is_installed=false
 	if [ $(grep -c "${version}-${app_name_ending}" "${folder}"/user_versions.txt) -ge 1 ] || [ $(grep -c "${version}-${app_name_ending}" "${folder}"/stable_versions.txt) -ge 1 ]; then
 
 		echo "${app_name} ${version} already installed on this system... "
 		sleep 0.2
-		echo "Exiting..."
-		exit 1
-
+		desired_version_is_installed=true
 	fi
 
 }
@@ -301,7 +299,8 @@ check_if_symlink_folder_on_path() {
 	esac
 
 	# or in rc_file
-	if grep -q "export PATH=\"\$PATH:"${folder}"/links\"" $rc_file; then
+	add_to_path_command="export PATH=\"\$PATH:"${folder}"/links\""
+	if grep -q "$add_to_path_command" $rc_file; then
 		onpath=true
 	fi
 }
@@ -432,7 +431,7 @@ add_to_path () {
 	# Update the (bash/zsh)rc file
 	if [ -f $rc_file ] && [[ "$onpath" = false ]]; then
 		echo "Updating $rc_file..."
-		echo "export PATH=\"\$PATH:"${folder}"/links\"" >> $rc_file
+		echo $add_to_path_command >> $rc_file
 	fi
 }
 
@@ -445,7 +444,7 @@ print_post_install_info () {
 		echo
 		echo
 		echo "Add "${app_name}" to path by adding the following line to ${rc_file}:"
-		echo "export PATH=\"\$PATH:"${folder}"/links\""
+		echo $add_to_path_command
 	fi
 	echo
 	echo
@@ -458,17 +457,19 @@ print_post_install_info () {
 }
 
 purge_application (){
-
 	echo "Purging local install of "${app_name}"..."
 	sleep 0.2
-	echo "I say we take off and nuke the entire site from orbit. It's the only way to be sure."
-	# echo "Deleting "${app_name}" folder "${folder}"..."
-	# sleep 0.2
-	#rm -r  "${folder}"
-	# echo "Removing "${app_name}" folder "$folder}" from path..."
-	# sleep 0.2
-	# COMMAND GOES HERE
-
+	if [ -d ${folder}/links ]; then
+		echo "Deleting "${app_name}" folder "${folder}"..."
+		sleep 0.2
+		rm -r  "${folder}"
+		echo "Removing "${app_name}" folder "${folder}" from path..."
+		sleep 0.2
+		sed -i "\#$add_to_path_command#d" $rc_file
+	else
+		echo "Directory ${folder}/links not found."
+		echo "If you chose a custom install path, please try again adding the '--folder' option."
+	fi
 }
 
 dummy_func() {
